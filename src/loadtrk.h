@@ -54,11 +54,8 @@ extern bool monomode;
 extern char loadedsongfilename[MAX_FILENAME];
 extern char songfilename[MAX_FILENAME];
 extern char songfilter[MAX_FILENAME];
-extern char songpath[MAX_PATHNAME];
 extern char instrfilename[MAX_FILENAME];
 extern char instrfilter[MAX_FILENAME];
-extern char instrpath[MAX_PATHNAME];
-extern char packedpath[MAX_PATHNAME];
 extern const char *programname;
 extern const char *notename[];
 #endif

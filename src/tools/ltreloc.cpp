@@ -101,11 +101,8 @@ char configbuf[MAX_PATHNAME];
 char loadedsongfilename[MAX_FILENAME];
 char songfilename[MAX_FILENAME];
 char songfilter[MAX_FILENAME];
-char songpath[MAX_PATHNAME];
 char instrfilename[MAX_FILENAME];
 char instrfilter[MAX_FILENAME];
-char instrpath[MAX_PATHNAME];
-char packedpath[MAX_PATHNAME];
 char packedsongname[MAX_PATHNAME];
 
 const char *programname = "LTReloc v" PACKAGE_VERSION;
