@@ -16,6 +16,22 @@ if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU" OR
     add_compile_options("$<$<CONFIG:DEBUG>:-Wall;-Wextra;-pedantic>")
 endif()
 
+set(EXOMIZER_SOURCES
+    src/asm/asm.tab.c
+    src/asm/chunkpool.c
+    src/asm/expr.c
+    src/asm/lex.yy.c
+    src/asm/log.c
+    src/asm/map.c
+    src/asm/buf.c
+    src/asm/buf_io.c
+    src/asm/named_buffer.c
+    src/asm/parse.c
+    src/asm/pc.c
+    src/asm/vec.c)
+
+add_library(exomizer OBJECT ${EXOMIZER_SOURCES})
+
 set(LOADTRK_SOURCES
     ${CMAKE_BINARY_DIR}/src/ltrkdata.cpp
     src/loadtrk.cpp
@@ -36,18 +52,6 @@ set(LOADTRK_SOURCES
     src/sid.cpp
     src/ltlog.cpp
     src/ltmidi.cpp
-    src/asm/asm.tab.c
-    src/asm/chunkpool.c
-    src/asm/expr.c
-    src/asm/lex.yy.c
-    src/asm/log.c
-    src/asm/map.c
-    src/asm/buf.c
-    src/asm/buf_io.c
-    src/asm/named_buffer.c
-    src/asm/parse.c
-    src/asm/pc.c
-    src/asm/vec.c
     src/bme/bme_snd.cpp
     src/bme/bme_win.cpp
     src/bme/bme_io.cpp
@@ -97,18 +101,6 @@ set(LTRELOC_SOURCES
     src/console.cpp
     src/colors.cpp
     src/ltlog.cpp
-    src/asm/asm.tab.c
-    src/asm/chunkpool.c
-    src/asm/expr.c
-    src/asm/lex.yy.c
-    src/asm/log.c
-    src/asm/map.c
-    src/asm/buf.c
-    src/asm/buf_io.c
-    src/asm/named_buffer.c
-    src/asm/parse.c
-    src/asm/pc.c
-    src/asm/vec.c
     src/bme/bme_win.cpp
     src/bme/bme_io.cpp
     src/bme/bme_end.cpp)
@@ -122,11 +114,11 @@ find_package(SDL3 REQUIRED)
 
 add_executable(dat2inc ${DAT2INC_SOURCES})
 add_executable(datafile ${DATAFILE_SOURCES})
-add_executable(loadtrk ${LOADTRK_SOURCES})
+add_executable(loadtrk ${LOADTRK_SOURCES} $<TARGET_OBJECTS:exomizer>)
 add_executable(mod2sng ${MOD2SNG_SOURCES})
 add_executable(ins2snd2 ${INS2SND2_SOURCES})
 add_executable(sngspli2 ${SNGSPLI2_SOURCES})
-add_executable(ltreloc ${LTRELOC_SOURCES})
+add_executable(ltreloc ${LTRELOC_SOURCES} $<TARGET_OBJECTS:exomizer>)
 
 target_compile_definitions(ltreloc PUBLIC LTRELOC)
 
