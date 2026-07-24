@@ -19,13 +19,14 @@
 #ifndef FILE_H
 #define FILE_H
 
-#define MAX_FILENAME 60
-#define MAX_PATHNAME 256
+#include "common.h"
 
 #ifndef FILE_C
 extern char songpath[MAX_PATHNAME];
 extern char instrpath[MAX_PATHNAME];
 extern char packedpath[MAX_PATHNAME];
+extern char songfilter[MAX_FILENAME];
+extern char instrfilter[MAX_FILENAME];
 #endif
 
 void initpaths();

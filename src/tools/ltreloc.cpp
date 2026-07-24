@@ -26,11 +26,11 @@
 
 #include "config.h"
 
+#include "common.h"
 #include "colors.h"
 #include "console.h"
 #include "pattern.h"
 #include "reloc.h"
-#include "file.h"
 #include "play.h"
 #include "song.h"
 
@@ -63,8 +63,6 @@ bool exitprogram = false;
 int eacolumn = 0;
 int eamode = 0;
 EditHdr ehmode = EditHdr::NONE;
-char songfilter[MAX_FILENAME];
-char instrfilter[MAX_FILENAME];
 
 #define NUMSIDREGS 0x19
 unsigned char sidreg[NUMSIDREGS];
@@ -383,76 +381,6 @@ void waitkeymousenoupdate()
 
 void waitkeynoupdate()
 {
-}
-
-void getparam(FILE *handle, unsigned *value)
-{
-  char *configptr;
-  char configbuf[MAX_PATHNAME];
-
-  for (;;)
-  {
-    if (std::feof(handle)) return;
-    std::fgets(configbuf, MAX_PATHNAME, handle);
-    if ((configbuf[0]) && (configbuf[0] != ';') && (configbuf[0] != ' ') && (configbuf[0] != 13) && (configbuf[0] != 10)) break;
-  }
-
-  configptr = configbuf;
-  if (*configptr == '$')
-  {
-    *value = 0;
-    configptr++;
-    for (;;)
-    {
-      char c = tolower(*configptr++);
-      int h = -1;
-
-      if ((c >= 'a') && (c <= 'f')) h = c - 'a' + 10;
-      if ((c >= '0') && (c <= '9')) h = c - '0';
-
-      if (h >= 0)
-      {
-        *value *= 16;
-        *value += h;
-      }
-      else break;
-    }
-  }
-  else
-  {
-    *value = 0;
-    for (;;)
-    {
-      char c = tolower(*configptr++);
-      int d = -1;
-
-      if ((c >= '0') && (c <= '9')) d = c - '0';
-
-      if (d >= 0)
-      {
-        *value *= 10;
-        *value += d;
-      }
-      else break;
-    }
-  }
-}
-
-void getfloatparam(FILE *handle, float *value)
-{
-  char *configptr;
-  char configbuf[MAX_PATHNAME];
-
-  for (;;)
-  {
-    if (std::feof(handle)) return;
-    std::fgets(configbuf, MAX_PATHNAME, handle);
-    if ((configbuf[0]) && (configbuf[0] != ';') && (configbuf[0] != ' ') && (configbuf[0] != 13) && (configbuf[0] != 10)) break;
-  }
-
-  configptr = configbuf;
-  *value = 0.0f;
-  std::sscanf(configptr, "%f", value);
 }
 
 void calculatefreqtable()

@@ -65,9 +65,7 @@ bool writer = false;
 
 char loadedsongfilename[MAX_FILENAME];
 char songfilename[MAX_FILENAME];
-char songfilter[MAX_FILENAME];
 char instrfilename[MAX_FILENAME];
-char instrfilter[MAX_FILENAME];
 
 int tuningcount = 0;
 double tuning[96];

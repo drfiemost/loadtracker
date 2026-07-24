@@ -63,6 +63,8 @@ Direntry direntry[MAX_DIRFILES];
 char songpath[MAX_PATHNAME];
 char instrpath[MAX_PATHNAME];
 char packedpath[MAX_PATHNAME];
+char songfilter[MAX_FILENAME];
+char instrfilter[MAX_FILENAME];
 
 int cmpname(char *string1, char *string2);
 

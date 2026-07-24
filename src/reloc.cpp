@@ -90,8 +90,7 @@ const char *tablerightname[] = {
   "mt_filtspdtbl",
   "mt_speedrighttbl"};
 
-unsigned char chnused[MAX_CHN_MONO];
-unsigned char chnused_stereo[MAX_CHN];
+unsigned char chnused[MAX_CHN];
 unsigned char pattused[MAX_PATT];
 unsigned char pattmap[MAX_PATT];
 unsigned char instrused[MAX_INSTR];
@@ -251,7 +250,6 @@ void relocator(const char* songfilename)
   std::memset(pattused, 0, sizeof pattused);
   std::memset(instrused, 0, sizeof instrused);
   std::memset(chnused, 0, sizeof chnused);
-  std::memset(chnused_stereo, 0, sizeof chnused_stereo);
   std::memset(tableused, 0, sizeof tableused);
   std::memset(tablemap, 0, sizeof tablemap);
   tableerror = ErrorType::NONE;
@@ -2273,7 +2271,6 @@ void calcspeedtest(unsigned char pos)
   else nonormalspeed = 0;
 }
 
-
 void relocator_stereo(const char* songfilename)
 {
     unsigned char *packeddata = nullptr;
@@ -2314,7 +2311,7 @@ void relocator_stereo(const char* songfilename)
     unsigned char *pattwork = nullptr;
     unsigned char *instrwork = nullptr;
 
-    channels = 6;
+    channels = getMaxChannels();
     fixedparams = 1;
     simplepulse = 1;
     firstnote = MAX_NOTES-1;
@@ -2355,7 +2352,7 @@ void relocator_stereo(const char* songfilename)
 
     std::memset(pattused, 0, sizeof pattused);
     std::memset(instrused, 0, sizeof instrused);
-    std::memset(chnused_stereo, 0, sizeof chnused_stereo);
+    std::memset(chnused, 0, sizeof chnused);
     std::memset(tableused, 0, sizeof tableused);
     std::memset(tablemap, 0, sizeof tablemap);
     tableerror = ErrorType::NONE;
@@ -2387,7 +2384,7 @@ void relocator_stereo(const char* songfilename)
                         for (int f = 0; f < getPattlen(num); f++)
                         {
                             if ((song.pattern[num][f*4] != REST) || (song.pattern[num][f*4+1]) || (song.pattern[num][f*4+2]))
-                                chnused_stereo[d] = 1;
+                                chnused[d] = 1;
                         }
                     }
                     else
@@ -2698,8 +2695,7 @@ TABLETYPE_S:
     {
         for (int c = 0; c < (MAX_OPTIONS-1); c++)
         {
-            int color = colors.CNORMAL;
-            if (opt == c) color = colors.CEDIT;
+            int color = (opt == c) ? colors.CEDIT : colors.CNORMAL;
 
             printtext(1, 3+c, color, playeroptname[c]);
             if (playerversion & (PLAYER_BUFFERED << c))
@@ -3847,4 +3843,3 @@ PRCLEANUP_S:
     key = 0;
     rawkey = 0;
 }
-
