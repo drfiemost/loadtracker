@@ -2074,7 +2074,8 @@ int insertfile(const char *name)
 
 void inserttext(const char *text)
 {
-  buf_append(&src, text, std::strlen(text));
+  int l = (int)std::strlen(text);
+  buf_append(&src, text, l);
 }
 
 void insertdefine(const char *name, int value)
@@ -3694,7 +3695,7 @@ SKIPTABLE_S:
         if (std::strlen(packedsongname) < MAX_FILENAME-4)
         {
             int extfound = 0;
-            for (int c = std::strlen(packedsongname)-1; c >= 0; c--)
+            for (int c = (int)std::strlen(packedsongname)-1; c >= 0; c--)
             {
                 if (packedsongname[c] == '.') extfound = 1;
             }

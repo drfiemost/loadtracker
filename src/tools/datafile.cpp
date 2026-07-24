@@ -54,7 +54,7 @@ int main(int argc, char **argv)
         std::fclose(listfile);
         return EXIT_FAILURE;
     }
-    std::memset(&header[0], 0, MAXFILES * sizeof(Header));
+    std::memset(header, 0, MAXFILES * sizeof(Header));
     // Get names from list
     for (;;)
     {
@@ -68,8 +68,8 @@ int main(int argc, char **argv)
 
             std::strcpy(fullname[files], searchname);
 
-            int c;
-            for (c = std::strlen(fullname[files]) - 1; c >= 0; c--)
+            int c = (int)std::strlen(fullname[files]) - 1;
+            for (; c >= 0; c--)
             {
                 if (fullname[files][c] == '\\')
                 {
@@ -136,9 +136,9 @@ bool addfile(Header *header, FILE *dest, char *name)
         std::printf("ERROR: Couldn't open file %s\n", name);
         return false;
     }
-    header->offset = std::ftell(dest);
+    header->offset = (uint32_t)std::ftell(dest);
     std::fseek(src, 0, SEEK_END);
-    header->length = std::ftell(src);
+    header->length = (uint32_t)std::ftell(src);
     std::fseek(src, 0, SEEK_SET);
     unsigned char *originalbuf = new (std::nothrow) unsigned char[header->length];
     if (!originalbuf)

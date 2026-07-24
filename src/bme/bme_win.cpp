@@ -172,7 +172,7 @@ int win_getspeed(int framerate)
         Uint64 win_lasttime = win_currenttime;
         win_currenttime = SDL_GetTicks();
 
-        win_framecounter += (win_currenttime - win_lasttime)*10;
+        win_framecounter += (int)(win_currenttime - win_lasttime)*10;
         frames = win_framecounter / frametime;
         win_framecounter -= frames * frametime;
 

@@ -112,7 +112,7 @@ int io_open(const char *name)
                 {
                         handle[index].open = true;
                         handle[index].filepos = 0;
-                        return index;
+                        return (int)index;
                 }
                 count--;
                 handle[index].currentheader++;

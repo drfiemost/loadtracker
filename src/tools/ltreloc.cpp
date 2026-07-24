@@ -178,8 +178,8 @@ int main(int argc, char **argv)
       std::exit(EXIT_FAILURE);
   }
 
-  int c = std::strlen(packedsongname);
-  if (std::strlen(packedsongname) <= 0) {
+  int c = (int)std::strlen(packedsongname);
+  if (c <= 0) {
       std::fprintf(STDERR, "error: no output filename given.\n");
       std::exit(EXIT_FAILURE);
   }

@@ -133,14 +133,14 @@ void patterncommands()
       switch (keypreset)
       {
         case KEY_TRACKER:
-        for (size_t i = 0; i < sizeof(notekeytbl1); i++)
+        for (int i = 0; i < (int)sizeof(notekeytbl1); i++)
         {
           if ((rawkey == notekeytbl1[i]) && (!epcolumn) && (!shiftpressed) && (!altpressed))
           {
             newnote = FIRSTNOTE+i+epoctave*12;
           }
         }
-        for (size_t i = 0; i < sizeof(notekeytbl2); i++)
+        for (int i = 0; i < (int)sizeof(notekeytbl2); i++)
         {
           if ((rawkey == notekeytbl2[i]) && (!epcolumn) && (!shiftpressed) && (!altpressed))
           {
@@ -150,7 +150,7 @@ void patterncommands()
         break;
 
         case KEY_DMC:
-        for (size_t i = 0; i < sizeof(dmckeytbl); i++)
+        for (int i = 0; i < (int)sizeof(dmckeytbl); i++)
         {
           if ((rawkey == dmckeytbl[i]) && (!epcolumn) && (!shiftpressed) && (!altpressed))
           {
@@ -160,14 +160,14 @@ void patterncommands()
         break;
 
         case KEY_JANKO:
-        for (size_t i = 0; i < sizeof(jankokeytbl1); i++)
+        for (int i = 0; i < (int)sizeof(jankokeytbl1); i++)
         {
           if ((rawkey == jankokeytbl1[i]) && (!epcolumn) && (!shiftpressed) && (!altpressed))
           {
             newnote = FIRSTNOTE+i+epoctave*12;
           }
         }
-        for (size_t i = 0; i < sizeof(jankokeytbl2); i++)
+        for (int i = 0; i < (int)sizeof(jankokeytbl2); i++)
         {
           if ((rawkey == jankokeytbl2[i]) && (!epcolumn) && (!shiftpressed) && (!altpressed))
           {

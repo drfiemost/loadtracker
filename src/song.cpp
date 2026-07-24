@@ -62,7 +62,7 @@ bool savesong()
   if (std::strlen(songfilename) < MAX_FILENAME-4)
   {
     int extfound = 0;
-    for (int c = std::strlen(songfilename)-1; c >= 0; c--)
+    for (int c = (int)std::strlen(songfilename)-1; c >= 0; c--)
     {
       if (songfilename[c] == '.') extfound = 1;
     }
@@ -161,7 +161,7 @@ bool saveinstrument()
   if (std::strlen(instrfilename) < MAX_FILENAME-4)
   {
     int extfound = 0;
-    for (int c = std::strlen(instrfilename)-1; c >= 0; c--)
+    for (int c = (int)std::strlen(instrfilename)-1; c >= 0; c--)
     {
       if (instrfilename[c] == '.') extfound = 1;
     }
@@ -1701,7 +1701,7 @@ ABORT:
 
 int determinechannels(FILE* handle)
 {
-    int returnpos = std::ftell(handle);
+    long returnpos = std::ftell(handle);
     int songs = fread8(handle);
     unsigned char songbuffer[257];
 

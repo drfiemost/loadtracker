@@ -26,11 +26,11 @@ int main(int argc, char *argv[])
         return EXIT_FAILURE;
     }
     std::fseek(in, 0, SEEK_END);
-    int length = std::ftell(in);
+    long length = std::ftell(in);
     std::fseek(in, 0, SEEK_SET);
 
     std::fprintf(out, "unsigned char datafile[] = {\n");
-    for (int c = 0; c < length; c++)
+    for (long c = 0; c < length; c++)
     {
         if (c)
         {

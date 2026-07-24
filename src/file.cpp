@@ -476,21 +476,21 @@ ENTERFILE:
         switch (direntry[fileview+c].attribute)
         {
           case 0:
-          std::sprintf(textbuffer, "%-60s        ", direntry[fileview+c].name);
+          std::snprintf(textbuffer, MAX_PATHNAME, "%-60s        ", direntry[fileview+c].name);
           break;
 
           case 1:
-          std::sprintf(textbuffer, "%-60s   <DIR>", direntry[fileview+c].name);
+          std::snprintf(textbuffer, MAX_PATHNAME, "%-60s   <DIR>", direntry[fileview+c].name);
           break;
 
           case 2:
-          std::sprintf(textbuffer, "%-60s   <DRV>", direntry[fileview+c].name);
+          std::snprintf(textbuffer, MAX_PATHNAME, "%-60s   <DRV>", direntry[fileview+c].name);
           break;
         }
       }
       else
       {
-        std::sprintf(textbuffer, "                                                                    ");
+        std::snprintf(textbuffer, MAX_PATHNAME, "                                                                    ");
       }
       int color = colors.CNORMAL;
       if ((fileview+c) == filepos) color = colors.CEDIT;
@@ -500,21 +500,21 @@ ENTERFILE:
     }
 
     printtext(dpos.loadboxX-(MAX_FILENAME+10)/2+1, dpos.loadboxY+3+VISIBLEFILES, 15, "PATH:   ");
-    std::sprintf(textbuffer, "%-60s", path);
+    std::snprintf(textbuffer, MAX_PATHNAME, "%-60s", path);
     textbuffer[MAX_FILENAME] = 0;
     int color = (filemode == 1) ? colors.CEDIT : colors.CNORMAL;
     printtext(dpos.loadboxX-(MAX_FILENAME+10)/2+9, dpos.loadboxY+3+VISIBLEFILES, color, textbuffer);
     if ((filemode == 1) && (strlen(path) < MAX_FILENAME)) printbg(dpos.loadboxX-(MAX_FILENAME+10)/2+9+strlen(path), dpos.loadboxY+3+VISIBLEFILES, cc, 1);
 
     printtext(dpos.loadboxX-(MAX_FILENAME+10)/2+1, dpos.loadboxY+4+VISIBLEFILES, 15, "FILTER: ");
-    std::sprintf(textbuffer, "%-60s", filter);
+    std::snprintf(textbuffer, MAX_PATHNAME, "%-60s", filter);
     textbuffer[MAX_FILENAME] = 0;
     color = (filemode == 2) ? colors.CEDIT : colors.CNORMAL;
     printtext(dpos.loadboxX-(MAX_FILENAME+10)/2+9, dpos.loadboxY+4+VISIBLEFILES, color, textbuffer);
     if (filemode == 2) printbg(dpos.loadboxX-(MAX_FILENAME+10)/2+9+strlen(filter), dpos.loadboxY+4+VISIBLEFILES, cc, 1);
 
     printtext(dpos.loadboxX-(MAX_FILENAME+10)/2+1, dpos.loadboxY+5+VISIBLEFILES, 15, "NAME:   ");
-    std::sprintf(textbuffer, "%-60s", name);
+    std::snprintf(textbuffer, MAX_PATHNAME, "%-60s", name);
     textbuffer[MAX_FILENAME] = 0;
     color = (filemode == 3) ? colors.CEDIT : colors.CNORMAL;
     printtext(dpos.loadboxX-(MAX_FILENAME+10)/2+9, dpos.loadboxY+5+VISIBLEFILES, color, textbuffer);
