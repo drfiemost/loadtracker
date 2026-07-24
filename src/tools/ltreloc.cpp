@@ -47,8 +47,7 @@
 #include <cstring>
 #include <cstdlib>
 
-#define DEFAULTMIXRATE 48000
-
+#if 1
 enum class EditHdr
 {
   NONE    = 0,
@@ -56,17 +55,25 @@ enum class EditHdr
   BPM     = 2
 };
 
-bool menu = false;
 int editmode = 0;
 bool recordmode = true;
-bool followplay = false;
 int hexnybble = -1;
 int stepsize = 4;
-int defaultpatternlength = 64;
 bool exitprogram = false;
 int eacolumn = 0;
 int eamode = 0;
 EditHdr ehmode = EditHdr::NONE;
+char songfilter[MAX_FILENAME];
+char instrfilter[MAX_FILENAME];
+
+#define NUMSIDREGS 0x19
+unsigned char sidreg[NUMSIDREGS];
+unsigned char sidreg2[NUMSIDREGS];
+#endif
+
+bool menu = false;
+bool followplay = false;
+int defaultpatternlength = 64;
 
 unsigned keypreset = KEY_TRACKER;
 unsigned playerversion = 0;
@@ -85,35 +92,20 @@ unsigned optimizepulse = 1;
 unsigned optimizerealtime = 1;
 unsigned customclockrate = 0;
 bool usefinevib = false;
-unsigned mr = DEFAULTMIXRATE;
-unsigned writer = 0;
-unsigned interpolate = 0;
-unsigned residdelay = 0;
 float basepitch = 0.0f;
 unsigned numsids = 1;
 bool monomode = true;
 int snd_bpmtempo = 125;
 
-#define NUMSIDREGS 0x19
-unsigned char sidreg[NUMSIDREGS];
-unsigned char sidreg2[NUMSIDREGS];
-
-char configbuf[MAX_PATHNAME];
 char loadedsongfilename[MAX_FILENAME];
 char songfilename[MAX_FILENAME];
-char songfilter[MAX_FILENAME];
 char instrfilename[MAX_FILENAME];
-char instrfilter[MAX_FILENAME];
-char packedsongname[MAX_PATHNAME];
 
 const char *programname = "LTReloc v" PACKAGE_VERSION;
 
 extern unsigned char datafile[];
 
 void calculatefreqtable();
-int getMaxChannels();
-int getVisibleOrderlist();
-void waitkeynoupdate();
 
 #ifdef _WIN32
 FILE *STDOUT, *STDERR;
@@ -168,6 +160,7 @@ int main(int argc, char **argv)
   initchannels();
   clearsong(true,true,true,true,true);
 
+  char packedsongname[MAX_PATHNAME];
   // get input- and output file names
   if (argc >= 3) {
       std::strcpy(songfilename, argv[1]);
@@ -354,7 +347,7 @@ int main(int argc, char **argv)
   }
 
   // Init colorscheme
-  initcolorscheme(1);
+  initcolorscheme(true);
 
   // Validate parameters
   sidmodel &= 1;
@@ -377,7 +370,8 @@ int main(int argc, char **argv)
     calculatefreqtable();
 
   // perform relocation
-  relocator();
+  relocator(packedsongname);
+  // FIXME relocator_stereo
 
   // Exit
   return 0;
@@ -389,19 +383,12 @@ void waitkeymousenoupdate()
 
 void waitkeynoupdate()
 {
-  /*for (;;)
-  {
-    fliptoscreen();
-    getkey();
-    if ((rawkey) || (key)) break;
-    if ((mouseb) && (!prevmouseb)) break;
-    if (win_quitted) break;
-  }*/
 }
 
 void getparam(FILE *handle, unsigned *value)
 {
   char *configptr;
+  char configbuf[MAX_PATHNAME];
 
   for (;;)
   {
@@ -454,6 +441,7 @@ void getparam(FILE *handle, unsigned *value)
 void getfloatparam(FILE *handle, float *value)
 {
   char *configptr;
+  char configbuf[MAX_PATHNAME];
 
   for (;;)
   {

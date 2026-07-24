@@ -20,12 +20,25 @@
 #define LTRELOC_H
 
 #ifndef LTRELOC_C
-#ifdef _WIN32
-extern FILE *STDOUT, *STDERR;
-#else
-#  define STDOUT stdout
-#  define STDERR stderr
+#  ifdef _WIN32
+#    include <cstdio>
+     extern FILE *STDOUT, *STDERR;
+#  else
+#    define STDOUT stdout
+#    define STDERR stderr
+#  endif
+extern const char *programname;
+extern bool exitprogram;
+extern bool followplay;
+
+extern char loadedsongfilename[MAX_FILENAME];
+extern char songfilename[MAX_FILENAME];
+extern char instrfilename[MAX_FILENAME];
 #endif
-#endif
+
+void waitkeymousenoupdate();
+void waitkeynoupdate();
+int getMaxChannels();
+int getVisibleOrderlist();
 
 #endif

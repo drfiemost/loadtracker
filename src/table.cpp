@@ -39,6 +39,11 @@
 #include <cmath>
 #include <cstring>
 
+#ifdef OVERFLOW
+// might be defined in math.h
+#  undef OVERFLOW
+#endif
+
 unsigned char ltablecopybuffer[MAX_TABLELEN];
 unsigned char rtablecopybuffer[MAX_TABLELEN];
 int tablecopyrows = 0;
@@ -945,7 +950,7 @@ void exectable(int num, int ptr)
   {
     if (song.ltable[num][ptr-1] == 0xff)
     {
-      tableerror = TYPE_JUMP;
+      tableerror = ErrorType::JUMP;
       return;
     }
   }
@@ -957,7 +962,7 @@ void exectable(int num, int ptr)
     // Overflow check
     if ((num != STBL) && (ptr > MAX_TABLELEN))
     {
-      tableerror = TYPE_OVERFLOW;
+      tableerror = ErrorType::OVERFLOW;
       break;
     }
     // If were already here, exit

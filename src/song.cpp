@@ -28,12 +28,17 @@
 #include "configfile.h"
 #include "file.h"
 #include "instr.h"
-#include "loadtrk.h"
 #include "order.h"
 #include "pattern.h"
 #include "play.h"
 #include "reloc.h"
 #include "table.h"
+
+#ifdef LTRELOC
+#  include "tools/ltreloc.h"
+#else
+#  include "loadtrk.h"
+#endif
 
 #include "bme_end.h"
 

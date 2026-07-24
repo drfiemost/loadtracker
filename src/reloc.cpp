@@ -28,7 +28,6 @@
 #include "configfile.h"
 #include "console.h"
 #include "display.h"
-#include "loadtrk.h"
 #include "play.h"
 #include "song.h"
 #include "table.h"
@@ -41,6 +40,8 @@
 
 #ifdef LTRELOC
 #  include "tools/ltreloc.h"
+#else
+#  include "loadtrk.h"
 #endif
 
 extern "C" {
@@ -56,12 +57,12 @@ extern "C" {
 
 #define MAX_OPTIONS 7
 
-enum
+enum class Cause
 {
-  CAUSE_NONE        = 0,
-  CAUSE_PATTERN     = 1,
-  CAUSE_INSTRUMENT  = 2,
-  CAUSE_WAVECMD     = 3
+  NONE,
+  PATTERN,
+  INSTRUMENT,
+  WAVE_CMD
 };
 
 #define MAX_BYTES_PER_ROW 16
@@ -103,7 +104,8 @@ int pattsize[MAX_PATT];
 int songoffset[MAX_SONGS][MAX_CHN];
 int songsize[MAX_SONGS][MAX_CHN];
 
-int tableerror;
+ErrorType tableerror;
+
 int channels;
 int fixedparams;
 int simplepulse;
@@ -163,15 +165,13 @@ void insertaddrlo(const char *name);
 void insertaddrhi(const char *name);
 
 
-void relocator()
+void relocator(const char* songfilename)
 {
-  char packedsongname[MAX_FILENAME];
-
   unsigned char *packeddata = nullptr;
   const char *playername = "player.s";
 
-  int tableerrortype = TYPE_NONE;
-  int tableerrorcause = CAUSE_NONE;
+  ErrorType tableerrortype = ErrorType::NONE;
+  Cause tableerrorcause = Cause::NONE;
   int tableerrorsource1 = 0;
   int tableerrorsource2 = 0;
   int patterns = 0;
@@ -254,7 +254,7 @@ void relocator()
   std::memset(chnused_stereo, 0, sizeof chnused_stereo);
   std::memset(tableused, 0, sizeof tableused);
   std::memset(tablemap, 0, sizeof tablemap);
-  tableerror = 0;
+  tableerror = ErrorType::NONE;
 
   parse_init();
   buf_free(&src);
@@ -349,7 +349,7 @@ void relocator()
       // See which instruments/tablecommands are used
       for (int d = 0; d < getPattlen(c); d++)
       {
-        tableerror = 0;
+        tableerror = ErrorType::NONE;
 
         if ((song.pattern[c][d*4] == KEYOFF) || (song.pattern[c][d*4] == KEYON))
           nogate = 0;
@@ -393,10 +393,10 @@ void relocator()
             lastnote = newfirstnote;
           }
         }
-        if ((tableerror) && (!tableerrortype))
+        if ((tableerror != ErrorType::NONE) && (tableerrortype == ErrorType::NONE))
         {
           tableerrortype = tableerror;
-          tableerrorcause = CAUSE_PATTERN;
+          tableerrorcause = Cause::PATTERN;
           tableerrorsource1 = c;
           tableerrorsource2 = d;
         }
@@ -438,13 +438,13 @@ void relocator()
       instruments++;
       for (int d = 0; d < MAX_TABLES; d++)
       {
-        tableerror = 0;
+        tableerror = ErrorType::NONE;
         exectable(d, song.instr[c].ptr[d]);
         if (d == STBL) calcspeedtest(song.instr[c].ptr[d]);
-        if ((tableerror) && (!tableerrortype))
+        if ((tableerror != ErrorType::NONE) && (tableerrortype == ErrorType::NONE))
         {
           tableerrortype = tableerror;
-          tableerrorcause = CAUSE_INSTRUMENT;
+          tableerrorcause = Cause::INSTRUMENT;
           tableerrorsource1 = c;
           tableerrorsource2 = d;
         }
@@ -460,7 +460,7 @@ void relocator()
       if ((song.ltable[WTBL][c] >= WAVECMD) && (song.ltable[WTBL][c] <= WAVELASTCMD))
       {
         int d = -1;
-        tableerror = 0;
+        tableerror = ErrorType::NONE;
 
         switch(song.ltable[WTBL][c] - WAVECMD)
         {
@@ -495,10 +495,10 @@ void relocator()
 
         if (d != -1) exectable(d, song.rtable[WTBL][c]);
 
-        if ((tableerror) && (!tableerrortype))
+        if ((tableerror != ErrorType::NONE) && (tableerrortype == ErrorType::NONE))
         {
           tableerrortype = tableerror;
-          tableerrorcause = CAUSE_WAVECMD;
+          tableerrorcause = Cause::WAVE_CMD;
           tableerrorsource1 = c+1;
           tableerrorsource2 = d;
         }
@@ -521,32 +521,36 @@ void relocator()
   }
 
   // Check for table errors
-  if (tableerrorcause)
+  if (tableerrorcause != Cause::NONE)
   {
     clearscreen();
     switch(tableerrortype)
     {
-      case TYPE_JUMP:
+      case ErrorType::JUMP:
       std::sprintf(textbuffer, "TABLE POINTER POINTS TO A JUMP! ");
       break;
 
-      case TYPE_OVERFLOW:
+      case ErrorType::OVERFLOW:
       std::sprintf(textbuffer, "TABLE EXECUTION OVERFLOWS! ");
+      break;
+
+      case ErrorType::NONE:
+      // unreachable
       break;
     }
     switch (tableerrorcause)
     {
-      case CAUSE_PATTERN:
+      case Cause::PATTERN:
       std::sprintf(textbuffer + std::strlen(textbuffer), "(PATTERN %02X, ROW %02d)", tableerrorsource1, tableerrorsource2);
       break;
 
-      case CAUSE_WAVECMD:
+      case Cause::WAVE_CMD:
       std::sprintf(textbuffer + std::strlen(textbuffer), "WAVETABLE CMD (ROW %02X, ", tableerrorsource1);
       goto TABLETYPE;
 
-      case CAUSE_INSTRUMENT:
+      case Cause::INSTRUMENT:
       std::sprintf(textbuffer + std::strlen(textbuffer), "(INSTRUMENT %02X, ", tableerrorsource1);
-      TABLETYPE:
+TABLETYPE:
       switch (tableerrorsource2)
       {
         case WTBL:
@@ -562,6 +566,10 @@ void relocator()
         break;
       }
       std::strcat(textbuffer, ")");
+      break;
+
+      case Cause::NONE:
+      // unreachable
       break;
     }
     printtextc(MAX_ROWS/2, colors.CTITLE, textbuffer);
@@ -1508,10 +1516,10 @@ void relocator()
   std::fprintf(STDOUT, "Tables:          %d bytes\n", wavetblsize+pulsetblsize+filttblsize+speedtblsize);
   std::fprintf(STDOUT, "Total size:      %d bytes\n", packedsize);
 
-  songhandle = std::fopen(packedsongname, "wb");
+  songhandle = std::fopen(songfilename, "wb");
   if (!songhandle) 
   {
-      std::fprintf(STDERR, "error: could not open output file '%s'.\n", packedsongname);
+      std::fprintf(STDERR, "error: could not open output file '%s'.\n", songfilename);
       goto PRCLEANUP;
   }
 
@@ -1608,11 +1616,12 @@ void relocator()
   if (selectdone == -1) goto PRCLEANUP;
 
   // By default, copy loaded song name up to the extension
+  char packedsongname[MAX_FILENAME];
   std::memset(packedsongname, 0, sizeof packedsongname);
-  for (size_t i = 0; i < std::strlen(loadedsongfilename); i++)
+  for (size_t i = 0; i < std::strlen(songfilename); i++)
   {
-    if (loadedsongfilename[i] == '.') break;
-    packedsongname[i] = loadedsongfilename[i];
+    if (songfilename[i] == '.') break;
+    packedsongname[i] = songfilename[i];
   }
   switch (fileformat)
   {
@@ -2264,14 +2273,13 @@ void calcspeedtest(unsigned char pos)
 }
 
 
-void relocator_stereo()
+void relocator_stereo(const char* songfilename)
 {
-    char packedsongname[MAX_FILENAME];
     unsigned char *packeddata = nullptr;
     const char *playername = "player_s.s";
 
-    int tableerrortype = TYPE_NONE;
-    int tableerrorcause = CAUSE_NONE;
+    ErrorType tableerrortype = ErrorType::NONE;
+    Cause tableerrorcause = Cause::NONE;
     int tableerrorsource1 = 0;
     int tableerrorsource2 = 0;
     int patterns = 0;
@@ -2349,7 +2357,7 @@ void relocator_stereo()
     std::memset(chnused_stereo, 0, sizeof chnused_stereo);
     std::memset(tableused, 0, sizeof tableused);
     std::memset(tablemap, 0, sizeof tablemap);
-    tableerror = 0;
+    tableerror = ErrorType::NONE;
 
     parse_init();
     buf_free(&src);
@@ -2436,7 +2444,7 @@ void relocator_stereo()
             // See which instruments/tablecommands are used
             for (int d = 0; d < getPattlen(c); d++)
             {
-                tableerror = 0;
+                tableerror = ErrorType::NONE;
 
                 if ((song.pattern[c][d*4] == KEYOFF) || (song.pattern[c][d*4] == KEYON))
                     nogate = 0;
@@ -2480,10 +2488,10 @@ void relocator_stereo()
                         lastnote = newfirstnote;
                     }
                 }
-                if ((tableerror) && (!tableerrortype))
+                if ((tableerror != ErrorType::NONE) && (tableerrortype == ErrorType::NONE))
                 {
                     tableerrortype = tableerror;
-                    tableerrorcause = CAUSE_PATTERN;
+                    tableerrorcause = Cause::PATTERN;
                     tableerrorsource1 = c;
                     tableerrorsource2 = d;
                 }
@@ -2525,13 +2533,13 @@ void relocator_stereo()
             instruments++;
             for (int d = 0; d < MAX_TABLES; d++)
             {
-                tableerror = 0;
+                tableerror = ErrorType::NONE;
                 exectable(d, song.instr[c].ptr[d]);
                 if (d == STBL) calcspeedtest(song.instr[c].ptr[d]);
-                if ((tableerror) && (!tableerrortype))
+                if ((tableerror != ErrorType::NONE) && (tableerrortype == ErrorType::NONE))
                 {
                     tableerrortype = tableerror;
-                    tableerrorcause = CAUSE_INSTRUMENT;
+                    tableerrorcause = Cause::INSTRUMENT;
                     tableerrorsource1 = c;
                     tableerrorsource2 = d;
                 }
@@ -2547,7 +2555,7 @@ void relocator_stereo()
             if ((song.ltable[WTBL][c] >= WAVECMD) && (song.ltable[WTBL][c] <= WAVELASTCMD))
             {
                 int d = -1;
-                tableerror = 0;
+                tableerror = ErrorType::NONE;
 
                 switch(song.ltable[WTBL][c] - WAVECMD)
                 {
@@ -2582,10 +2590,10 @@ void relocator_stereo()
 
                 if (d != -1) exectable(d, song.rtable[WTBL][c]);
 
-                if ((tableerror) && (!tableerrortype))
+                if ((tableerror != ErrorType::NONE) && (tableerrortype == ErrorType::NONE))
                 {
                     tableerrortype = tableerror;
-                    tableerrorcause = CAUSE_WAVECMD;
+                    tableerrorcause = Cause::WAVE_CMD;
                     tableerrorsource1 = c+1;
                     tableerrorsource2 = d;
                 }
@@ -2608,31 +2616,35 @@ void relocator_stereo()
     }
 
     // Check for table errors
-    if (tableerrorcause)
+    if (tableerrorcause != Cause::NONE)
     {
         clearscreen();
         switch(tableerrortype)
         {
-        case TYPE_JUMP:
+        case ErrorType::JUMP:
             std::sprintf(textbuffer, "TABLE POINTER POINTS TO A JUMP! ");
             break;
 
-        case TYPE_OVERFLOW:
+        case ErrorType::OVERFLOW:
             std::sprintf(textbuffer, "TABLE EXECUTION OVERFLOWS! ");
             break;
+
+        case ErrorType::NONE:
+        // unreachable
+        break;
         }
         switch (tableerrorcause)
         {
-        case CAUSE_PATTERN:
+        case Cause::PATTERN:
             std::sprintf(textbuffer + std::strlen(textbuffer), "(PATTERN %02X, ROW %02d)", tableerrorsource1, tableerrorsource2);
             break;
 
-        case CAUSE_WAVECMD:
+        case Cause::WAVE_CMD:
             std::sprintf(textbuffer + std::strlen(textbuffer), "WAVETABLE CMD (ROW %02X, ", tableerrorsource1);
             goto TABLETYPE_S;
 
-        case CAUSE_INSTRUMENT:
-            sprintf(textbuffer + std::strlen(textbuffer), "(INSTRUMENT %02X, ", tableerrorsource1);
+        case Cause::INSTRUMENT:
+            std::sprintf(textbuffer + std::strlen(textbuffer), "(INSTRUMENT %02X, ", tableerrorsource1);
 TABLETYPE_S:
             switch (tableerrorsource2)
             {
@@ -2650,6 +2662,10 @@ TABLETYPE_S:
             }
             std::strcat(textbuffer, ")");
             break;
+
+            case Cause::NONE:
+            // unreachable
+            break;
         }
         printtextc(MAX_ROWS/2, colors.CTITLE, textbuffer);
 
@@ -2665,10 +2681,10 @@ TABLETYPE_S:
     // Select playroutine options
     clearscreen();
     printblankc(0, 0, colors.CHEADER, MAX_COLUMNS);
-    if (!std::strlen(loadedsongfilename))
+    if (!std::strlen(songfilename))
         std::sprintf(textbuffer, "%s Packer/Relocator", programname);
     else
-        std::sprintf(textbuffer, "%s Packer/Relocator - %s", programname, loadedsongfilename);
+        std::sprintf(textbuffer, "%s Packer/Relocator - %s", programname, songfilename);
     textbuffer[MAX_COLUMNS] = 0;
     printtext(0, 0, colors.CHEADER, textbuffer);
     printtext(1, 2, colors.CTITLE, "SELECT PLAYROUTINE OPTIONS: (CURSORS=MOVE/CHANGE, ENTER=ACCEPT, ESC=CANCEL)");
@@ -3557,10 +3573,10 @@ SKIPTABLE_S:
     // Print results
     clearscreen();
     printblankc(0, 0, colors.CHEADER, MAX_COLUMNS);
-    if (!std::strlen(loadedsongfilename))
+    if (!std::strlen(songfilename))
         std::sprintf(textbuffer, "%s Packer/Relocator", programname);
     else
-        std::sprintf(textbuffer, "%s Packer/Relocator - %s", programname, loadedsongfilename);
+        std::sprintf(textbuffer, "%s Packer/Relocator - %s", programname, songfilename);
     textbuffer[80] = 0;
     printtext(0, 0, colors.CHEADER, textbuffer);
 
@@ -3647,11 +3663,12 @@ SKIPTABLE_S:
     if (selectdone == -1) goto PRCLEANUP_S;
 
     // By default, copy loaded song name up to the extension
+    char packedsongname[MAX_FILENAME];
     std::memset(packedsongname, 0, sizeof packedsongname);
-    for (size_t c = 0; c < std::strlen(loadedsongfilename); c++)
+    for (size_t c = 0; c < std::strlen(songfilename); c++)
     {
-        if (loadedsongfilename[c] == '.') break;
-        packedsongname[c] = loadedsongfilename[c];
+        if (songfilename[c] == '.') break;
+        packedsongname[c] = songfilename[c];
     }
     switch (fileformat)
     {

@@ -1008,11 +1008,11 @@ void mousecommands()
       {
         if (numsids == 1)
         {
-          relocator();
+          relocator(loadedsongfilename);
         }
         else if (numsids == 2)
         {
-          relocator_stereo();
+          relocator_stereo(loadedsongfilename);
         }
       }
       if ((mousex >= 59) && (mousex <= 64))
@@ -1221,11 +1221,11 @@ void generalcommands()
     {
         if (numsids == 1)
         {
-          relocator();
+          relocator(loadedsongfilename);
         }
         else if (numsids == 2)
         {
-          relocator_stereo();
+          relocator_stereo(loadedsongfilename);
         }
     }
     else if (shiftpressed && (numsids == 2))

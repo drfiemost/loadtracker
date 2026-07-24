@@ -28,11 +28,11 @@ enum
   FORMAT_BIN = 2
 };
 
-enum
+enum class ErrorType
 {
-  TYPE_NONE     = 0,
-  TYPE_OVERFLOW = 1,
-  TYPE_JUMP     = 2
+  NONE,
+  OVERFLOW,
+  JUMP
 };
 
 enum
@@ -50,14 +50,11 @@ enum
 extern unsigned char pattused[MAX_PATT];
 extern unsigned char instrused[MAX_INSTR];
 extern unsigned char tableused[MAX_TABLES][MAX_TABLELEN+1];
-extern unsigned char pattmap[MAX_PATT];
-extern unsigned char instrmap[MAX_INSTR];
-extern unsigned char tablemap[MAX_TABLES][MAX_TABLELEN+1];
-extern int tableerror;
+extern ErrorType tableerror;
 #endif
 
-void relocator();
-void relocator_stereo();
+void relocator(const char* songfilename);
+void relocator_stereo(const char* songfilename);
 unsigned char swapnybbles(unsigned char n);
 
 #endif
