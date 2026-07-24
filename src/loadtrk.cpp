@@ -1287,7 +1287,7 @@ void save()
     // Repeat until quit or save successful
     while (!done)
     {
-      if (std::strlen(loadedsongfilename)) strcpy(songfilename, loadedsongfilename);
+      if (std::strlen(loadedsongfilename)) std::strcpy(songfilename, loadedsongfilename);
       if (fileselector(songfilename, songpath, songfilter, "SAVE SONG", 3))
         done = savesong();
       else done = true;

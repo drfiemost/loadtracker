@@ -30,7 +30,6 @@
 #include "console.h"
 #include "pattern.h"
 #include "reloc.h"
-#include "sound.h"
 #include "file.h"
 #include "play.h"
 #include "song.h"
@@ -47,6 +46,8 @@
 #include <cstdio>
 #include <cstring>
 #include <cstdlib>
+
+#define DEFAULTMIXRATE 48000
 
 enum class EditHdr
 {
@@ -386,6 +387,18 @@ void waitkeymousenoupdate()
 {
 }
 
+void waitkeynoupdate()
+{
+  /*for (;;)
+  {
+    fliptoscreen();
+    getkey();
+    if ((rawkey) || (key)) break;
+    if ((mouseb) && (!prevmouseb)) break;
+    if (win_quitted) break;
+  }*/
+}
+
 void getparam(FILE *handle, unsigned *value)
 {
   char *configptr;
@@ -457,9 +470,8 @@ void getfloatparam(FILE *handle, float *value)
 void calculatefreqtable()
 {
   double basefreq = (double)basepitch * (16777216.0 / 985248.0) * std::pow(2.0, 0.25) / 32.0;
-  int c;
 
-  for (c = 0; c < 8*12 ; c++)
+  for (int c = 0; c < 8*12 ; c++)
   {
     double note = c;
     double freq = basefreq * std::pow(2.0, note/12.0);
@@ -479,16 +491,4 @@ int getMaxChannels()
 int getVisibleOrderlist()
 {
     return (numsids == 1) ? 23 : 14;
-}
-
-void waitkeynoupdate()
-{
-  for (;;)
-  {
-    fliptoscreen();
-    getkey();
-    if ((rawkey) || (key)) break;
-    if ((mouseb) && (!prevmouseb)) break;
-    if (win_quitted) break;
-  }
 }
