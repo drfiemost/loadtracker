@@ -53,8 +53,8 @@ extern unsigned char tableused[MAX_TABLES][MAX_TABLELEN+1];
 extern ErrorType tableerror;
 #endif
 
-void relocator(const char* songfilename);
-void relocator_stereo(const char* songfilename);
+void relocator(const char* filename);
+void relocator_stereo(const char* filename);
 unsigned char swapnybbles(unsigned char n);
 
 #endif

@@ -164,7 +164,7 @@ void insertaddrlo(const char *name);
 void insertaddrhi(const char *name);
 
 
-void relocator(const char* songfilename)
+void relocator(const char* filename)
 {
   unsigned char *packeddata = nullptr;
   const char *playername = "player.s";
@@ -585,10 +585,10 @@ TABLETYPE:
 #ifndef LTRELOC
   clearscreen();
   printblankc(0, 0, colors.CHEADER, MAX_COLUMNS);
-  if (!std::strlen(loadedsongfilename))
+  if (!std::strlen(filename))
     std::snprintf(textbuffer, MAX_PATHNAME, "%s Packer/Relocator", programname);
   else
-    std::snprintf(textbuffer, MAX_PATHNAME, "%s Packer/Relocator - %s", programname, loadedsongfilename);
+    std::snprintf(textbuffer, MAX_PATHNAME, "%s Packer/Relocator - %s", programname, filename);
   textbuffer[MAX_COLUMNS] = 0;
   printtext(1, 0, colors.CHEADER, textbuffer);
   printtext(1, 2, colors.CTITLE, "SELECT PLAYROUTINE OPTIONS: (CURSORS=MOVE/CHANGE, ENTER=ACCEPT, ESC=CANCEL)");
@@ -1514,20 +1514,20 @@ TABLETYPE:
   std::fprintf(STDOUT, "Tables:          %d bytes\n", wavetblsize+pulsetblsize+filttblsize+speedtblsize);
   std::fprintf(STDOUT, "Total size:      %d bytes\n", packedsize);
 
-  songhandle = std::fopen(songfilename, "wb");
+  songhandle = std::fopen(filename, "wb");
   if (!songhandle) 
   {
-      std::fprintf(STDERR, "error: could not open output file '%s'.\n", songfilename);
+      std::fprintf(STDERR, "error: could not open output file '%s'.\n", filename);
       goto PRCLEANUP;
   }
 
 #else
   clearscreen();
   printblankc(0, 0, colors.CHEADER, MAX_COLUMNS);
-  if (!std::strlen(loadedsongfilename))
+  if (!std::strlen(filename))
     std::snprintf(textbuffer, MAX_PATHNAME, "%s Packer/Relocator", programname);
   else
-    std::snprintf(textbuffer, MAX_PATHNAME, "%s Packer/Relocator - %s", programname, loadedsongfilename);
+    std::snprintf(textbuffer, MAX_PATHNAME, "%s Packer/Relocator - %s", programname, filename);
   textbuffer[80] = 0;
   printtext(0, 0, colors.CHEADER, textbuffer);
 
@@ -1616,10 +1616,10 @@ TABLETYPE:
   // By default, copy loaded song name up to the extension
   char packedsongname[MAX_FILENAME];
   std::memset(packedsongname, 0, sizeof packedsongname);
-  for (size_t i = 0; i < std::strlen(songfilename); i++)
+  for (size_t i = 0; i < std::strlen(filename); i++)
   {
-    if (songfilename[i] == '.') break;
-    packedsongname[i] = songfilename[i];
+    if (filename[i] == '.') break;
+    packedsongname[i] = filename[i];
   }
   switch (fileformat)
   {
@@ -1645,7 +1645,7 @@ TABLETYPE:
     if (std::strlen(packedsongname) < MAX_FILENAME-4)
     {
       int extfound = 0;
-      for (int c = std::strlen(packedsongname)-1; c >= 0; c--)
+      for (int c = (int)std::strlen(packedsongname)-1; c >= 0; c--)
       {
         if (packedsongname[c] == '.') extfound = 1;
       }
@@ -2271,7 +2271,7 @@ void calcspeedtest(unsigned char pos)
   else nonormalspeed = 0;
 }
 
-void relocator_stereo(const char* songfilename)
+void relocator_stereo(const char* filename)
 {
     unsigned char *packeddata = nullptr;
     const char *playername = "player_s.s";
@@ -2361,6 +2361,8 @@ void relocator_stereo(const char* songfilename)
     buf_free(&src);
     buf_free(&dest);
 
+    int maxChns = getMaxChannels();
+
     // Process song-orderlists
     countpatternlengths();
     // Calculate amount of songs with nonzero length
@@ -2371,7 +2373,7 @@ void relocator_stereo(const char* songfilename)
                 (song.len[c][2]))
         {
             // See which patterns are used in this song
-            for (int d = 0; d < MAX_CHN; d++)
+            for (int d = 0; d < maxChns; d++)
             {
                 songdatasize += song.len[c][d]+2;
                 for (int e = 0; e < song.len[c][d]; e++)
@@ -2419,7 +2421,13 @@ void relocator_stereo(const char* songfilename)
             songs++;
         }
     }
-
+#if 0
+    // Optimize amount of used channels
+    if (!chnused[2])
+      channels = 2;
+    if ((!chnused[1]) && (!chnused[2]))
+      channels = 1;
+#endif
     if (!songs)
     {
         clearscreen();
@@ -2679,10 +2687,10 @@ TABLETYPE_S:
     // Select playroutine options
     clearscreen();
     printblankc(0, 0, colors.CHEADER, MAX_COLUMNS);
-    if (!std::strlen(songfilename))
+    if (!std::strlen(filename))
         std::snprintf(textbuffer, MAX_PATHNAME, "%s Packer/Relocator", programname);
     else
-        std::snprintf(textbuffer, MAX_PATHNAME, "%s Packer/Relocator - %s", programname, songfilename);
+        std::snprintf(textbuffer, MAX_PATHNAME, "%s Packer/Relocator - %s", programname, filename);
     textbuffer[MAX_COLUMNS] = 0;
     printtext(0, 0, colors.CHEADER, textbuffer);
     printtext(1, 2, colors.CTITLE, "SELECT PLAYROUTINE OPTIONS: (CURSORS=MOVE/CHANGE, ENTER=ACCEPT, ESC=CANCEL)");
@@ -2822,7 +2830,7 @@ TABLETYPE_S:
                 (song.len[c][1]) &&
                 (song.len[c][2]))
         {
-            for (int d = 0; d < MAX_CHN; d++)
+            for (int d = 0; d < maxChns; d++)
             {
                 songoffset[c][d] = songdatasize;
                 songsize[c][d] = song.len[c][d] + 2;
@@ -2866,7 +2874,7 @@ TABLETYPE_S:
         }
         else
         {
-            for (int d = 0; d < MAX_CHN; d++)
+            for (int d = 0; d < maxChns; d++)
             {
                 songoffset[c][d] = songdatasize;
                 songsize[c][d] = 0;
@@ -3527,7 +3535,7 @@ SKIPTABLE_S:
     // Insert orderlists
     for (int c = 0; c < songs; c++)
     {
-        for (int d = 0; d < MAX_CHN; d++)
+        for (int d = 0; d < maxChns; d++)
         {
             std::snprintf(textbuffer, MAX_PATHNAME, "mt_song%d", c*6+d);
             insertlabel(textbuffer);
@@ -3570,10 +3578,10 @@ SKIPTABLE_S:
     // Print results
     clearscreen();
     printblankc(0, 0, colors.CHEADER, MAX_COLUMNS);
-    if (!std::strlen(songfilename))
+    if (!std::strlen(filename))
         std::snprintf(textbuffer, MAX_PATHNAME, "%s Packer/Relocator", programname);
     else
-        std::snprintf(textbuffer, MAX_PATHNAME, "%s Packer/Relocator - %s", programname, songfilename);
+        std::snprintf(textbuffer, MAX_PATHNAME, "%s Packer/Relocator - %s", programname, filename);
     textbuffer[80] = 0;
     printtext(0, 0, colors.CHEADER, textbuffer);
 
@@ -3662,10 +3670,10 @@ SKIPTABLE_S:
     // By default, copy loaded song name up to the extension
     char packedsongname[MAX_FILENAME];
     std::memset(packedsongname, 0, sizeof packedsongname);
-    for (size_t c = 0; c < std::strlen(songfilename); c++)
+    for (size_t c = 0; c < std::strlen(filename); c++)
     {
-        if (songfilename[c] == '.') break;
-        packedsongname[c] = songfilename[c];
+        if (filename[c] == '.') break;
+        packedsongname[c] = filename[c];
     }
     switch (fileformat)
     {
