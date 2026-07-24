@@ -171,6 +171,11 @@ int main(int argc, char **argv)
   // Load song
   if (std::strlen(songfilename)) {
       loadsong();
+      if (std::strlen(loadedsongfilename) == 0)
+      {
+        std::fprintf(STDERR, "error: file not found.\n");
+        std::exit(EXIT_FAILURE);
+      }
   } else {
       std::fprintf(STDERR, "error: no song filename given.\n");
       std::exit(EXIT_FAILURE);
