@@ -43,6 +43,7 @@ struct Positions
 
 
 bool initscreen();
+void closescreen();
 void clearscreen();
 void fliptoscreen();
 void printtext(int x, int y, int color, const char *text);

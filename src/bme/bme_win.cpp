@@ -43,6 +43,7 @@ void win_checkmessages();
 void gfx_setclipregion(unsigned left, unsigned top, unsigned right, unsigned bottom);
 bool gfx_reinit();
 void gfx_uninit();
+void win_savepos();
 
 // Global variables
 
@@ -134,6 +135,7 @@ bool win_openwindow(const char *appname)
 
 void win_closewindow()
 {
+    win_savepos();
     SDL_StopTextInput(win_window);
     SDL_DestroyWindow(win_window);
 }

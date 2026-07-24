@@ -19,7 +19,6 @@ enum
 
 bool win_openwindow(const char *appname);
 void win_closewindow();
-void win_savepos();
 int win_getspeed(int framerate);
 
 bool gfx_init(unsigned xsize, unsigned ysize);

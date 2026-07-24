@@ -145,7 +145,6 @@ bool initscreen()
 
   gfxinitted = true;
   clearscreen();
-  std::atexit(closescreen);
   return true;
 }
 

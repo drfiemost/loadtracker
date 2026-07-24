@@ -49,7 +49,7 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
-#define HOLDDELAY 24
+constexpr int HOLDDELAY = 24;
 
 bool menu = false;
 int editmode = EDIT_PATTERN;
@@ -366,7 +366,7 @@ int main(int argc, char **argv)
 
   io_closelinkeddatafile();
 
-  win_savepos();
+  closescreen();
 
   saveconfig();
 
@@ -1215,7 +1215,7 @@ void generalcommands()
     else
     {
       sidmodel ^= 1;
-      sound_init( mr, writer, sidmodel, ntsc, multiplier, interpolate, customclockrate, exsid, filterbias, combwaves);
+      sound_init(mr, writer, sidmodel, ntsc, multiplier, interpolate, customclockrate, exsid, filterbias, combwaves);
     }
     break;
 
