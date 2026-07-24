@@ -116,7 +116,7 @@ void loadconfig()
 
   specialnotenames[0] = 0;
   scalatuningfilepath[0] = 0;
-  FILE *configfile = fopen(filename, "rt");
+  FILE *configfile = std::fopen(filename, "rt");
   if (configfile)
   {
     unsigned cfg_version;
@@ -324,6 +324,9 @@ void getfloatparam(FILE *handle, float *value)
   std::sscanf(configptr, "%f", value);
 }
 
+#define xstr(s) str(s)
+#define str(s) #s
+
 void getstringparam(FILE *handle, char *value)
 {
   char configbuf[MAX_PATHNAME];
@@ -336,9 +339,8 @@ void getstringparam(FILE *handle, char *value)
 
   char *configptr = configbuf;
 
-    // FIXME prevent overflows
   char tmpbuf[MAX_PATHNAME];
-  std::sscanf(configptr, "%s", tmpbuf);
+  std::sscanf(configptr, "%" xstr(MAX_PATHNAME) "s", tmpbuf);
   // Strip quotes
   size_t len = std::strlen(tmpbuf);
   std::memcpy(value, tmpbuf+1, len-1);
