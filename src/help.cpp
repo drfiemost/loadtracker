@@ -363,7 +363,7 @@ void onlinehelp(int standalone,int context)
 
     printblank(0, 0, MAX_COLUMNS);
     printbg(0, 0, colors.CHDRBG, MAX_COLUMNS);
-    std::sprintf(textbuffer, "%s Online Help", programname);
+    std::snprintf(textbuffer, MAX_PATHNAME, "%s Online Help", programname);
     printtext(1, 0, colors.CHEADER, textbuffer);
     if(standalone) {
       printtext(84, 0, colors.CHEADER, "Arrows/PgUp/PgDn/Home/End scroll, ESC exits");

@@ -309,7 +309,7 @@ void relocator(const char* songfilename)
         }
         if (song.order[c][d][song.len[c][d]+1] >= song.len[c][d])
         {
-          std::sprintf(textbuffer, "ILLEGAL SONG RESTART POSITION! (SUBTUNE %02X, CHANNEL %d)", c, d+1);
+          std::snprintf(textbuffer, MAX_PATHNAME, "ILLEGAL SONG RESTART POSITION! (SUBTUNE %02X, CHANNEL %d)", c, d+1);
           clearscreen();
           printtextc(MAX_ROWS/2, colors.CTITLE, textbuffer);
           fliptoscreen();
@@ -485,7 +485,7 @@ void relocator(const char* songfilename)
           case CMD_DONOTHING:
           case CMD_SETWAVEPTR:
           case CMD_FUNKTEMPO:
-          std::sprintf(textbuffer, "ILLEGAL WAVETABLE COMMAND (ROW %02X, COMMAND %X)", c+1, song.ltable[WTBL][c] - WAVECMD);
+          std::snprintf(textbuffer, MAX_PATHNAME, "ILLEGAL WAVETABLE COMMAND (ROW %02X, COMMAND %X)", c+1, song.ltable[WTBL][c] - WAVECMD);
           clearscreen();
           printtextc(MAX_ROWS/2, colors.CTITLE, textbuffer);
           fliptoscreen();
@@ -527,11 +527,11 @@ void relocator(const char* songfilename)
     switch(tableerrortype)
     {
       case ErrorType::JUMP:
-      std::sprintf(textbuffer, "TABLE POINTER POINTS TO A JUMP! ");
+      std::snprintf(textbuffer, MAX_PATHNAME, "TABLE POINTER POINTS TO A JUMP! ");
       break;
 
       case ErrorType::OVERFLOW:
-      std::sprintf(textbuffer, "TABLE EXECUTION OVERFLOWS! ");
+      std::snprintf(textbuffer, MAX_PATHNAME, "TABLE EXECUTION OVERFLOWS! ");
       break;
 
       case ErrorType::NONE:
@@ -541,15 +541,15 @@ void relocator(const char* songfilename)
     switch (tableerrorcause)
     {
       case Cause::PATTERN:
-      std::sprintf(textbuffer + std::strlen(textbuffer), "(PATTERN %02X, ROW %02d)", tableerrorsource1, tableerrorsource2);
+      std::snprintf(textbuffer, MAX_PATHNAME + std::strlen(textbuffer), "(PATTERN %02X, ROW %02d)", tableerrorsource1, tableerrorsource2);
       break;
 
       case Cause::WAVE_CMD:
-      std::sprintf(textbuffer + std::strlen(textbuffer), "WAVETABLE CMD (ROW %02X, ", tableerrorsource1);
+      std::snprintf(textbuffer, MAX_PATHNAME + std::strlen(textbuffer), "WAVETABLE CMD (ROW %02X, ", tableerrorsource1);
       goto TABLETYPE;
 
       case Cause::INSTRUMENT:
-      std::sprintf(textbuffer + std::strlen(textbuffer), "(INSTRUMENT %02X, ", tableerrorsource1);
+      std::snprintf(textbuffer, MAX_PATHNAME + std::strlen(textbuffer), "(INSTRUMENT %02X, ", tableerrorsource1);
 TABLETYPE:
       switch (tableerrorsource2)
       {
@@ -588,9 +588,9 @@ TABLETYPE:
   clearscreen();
   printblankc(0, 0, colors.CHEADER, MAX_COLUMNS);
   if (!std::strlen(loadedsongfilename))
-    std::sprintf(textbuffer, "%s Packer/Relocator", programname);
+    std::snprintf(textbuffer, MAX_PATHNAME, "%s Packer/Relocator", programname);
   else
-    std::sprintf(textbuffer, "%s Packer/Relocator - %s", programname, loadedsongfilename);
+    std::snprintf(textbuffer, MAX_PATHNAME, "%s Packer/Relocator - %s", programname, loadedsongfilename);
   textbuffer[MAX_COLUMNS] = 0;
   printtext(1, 0, colors.CHEADER, textbuffer);
   printtext(1, 2, colors.CTITLE, "SELECT PLAYROUTINE OPTIONS: (CURSORS=MOVE/CHANGE, ENTER=ACCEPT, ESC=CANCEL)");
@@ -599,7 +599,7 @@ TABLETYPE:
   {
     ciaval = 19566 - ((19655 / 125) * (snd_bpmtempo - 125));
 
-    std::sprintf(textbuffer, "[INFO] CIA timer value for %03d BPM: $%04X", snd_bpmtempo, ciaval);
+    std::snprintf(textbuffer, MAX_PATHNAME, "[INFO] CIA timer value for %03d BPM: $%04X", snd_bpmtempo, ciaval);
     printtext(1, 3+MAX_OPTIONS+8, colors.CEDIT, textbuffer);
   }
   else
@@ -803,7 +803,7 @@ TABLETYPE:
       if (result < 0)
       {
         clearscreen();
-        std::sprintf(textbuffer, "PATTERN %02X IS TOO COMPLEX (OVER 256 BYTES PACKED)!", c);
+        std::snprintf(textbuffer, MAX_PATHNAME, "PATTERN %02X IS TOO COMPLEX (OVER 256 BYTES PACKED)!", c);
         printtextc(MAX_ROWS/2, colors.CTITLE, textbuffer);
         fliptoscreen();
         waitkeynoupdate();
@@ -1023,13 +1023,13 @@ TABLETYPE:
   std::fprintf(STDOUT, "Player address:   $%04X\n", playeradr);
   std::fprintf(STDOUT, "Zeropage address: $%04X\n", zeropageadr);
 #else
-  std::sprintf(textbuffer, "SELECT START ADDRESS: (CURSORS=MOVE, ENTER=ACCEPT, ESC=CANCEL)");
+  std::snprintf(textbuffer, MAX_PATHNAME, "SELECT START ADDRESS: (CURSORS=MOVE, ENTER=ACCEPT, ESC=CANCEL)");
   printtext(1, 11, colors.CTITLE, textbuffer);
 
   selectdone = 0;
   while (!selectdone)
   {
-    std::sprintf(textbuffer, "$%04X", playeradr);
+    std::snprintf(textbuffer, MAX_PATHNAME, "$%04X", playeradr);
     printtext(1, 12, colors.CEDIT, textbuffer);
 
     fliptoscreen();
@@ -1075,7 +1075,7 @@ TABLETYPE:
 
   if (selectdone == -1) goto PRCLEANUP;
 
-  std::sprintf(textbuffer, "SELECT ZEROPAGE ADDRESS: (CURSORS=MOVE, ENTER=ACCEPT, ESC=CANCEL)");
+  std::snprintf(textbuffer, MAX_PATHNAME, "SELECT ZEROPAGE ADDRESS: (CURSORS=MOVE, ENTER=ACCEPT, ESC=CANCEL)");
   printtext(1, 14, colors.CTITLE, textbuffer);
 
   selectdone = 0;
@@ -1095,17 +1095,17 @@ TABLETYPE:
     if (!(playerversion & PLAYER_ZPGHOSTREGS))
     {
       if (zeropageadr < 0x90)
-        std::sprintf(textbuffer, "$%02X-$%02X (Used by BASIC interpreter)    ", zeropageadr, zeropageadr+1);
+        std::snprintf(textbuffer, MAX_PATHNAME, "$%02X-$%02X (Used by BASIC interpreter)    ", zeropageadr, zeropageadr+1);
       if ((zeropageadr >= 0x90) && (zeropageadr < 0xfb))
-        std::sprintf(textbuffer, "$%02X-$%02X (Used by KERNAL routines)      ", zeropageadr, zeropageadr+1);
+        std::snprintf(textbuffer, MAX_PATHNAME, "$%02X-$%02X (Used by KERNAL routines)      ", zeropageadr, zeropageadr+1);
       if ((zeropageadr >= 0xfb) && (zeropageadr < 0xfe))
-        std::sprintf(textbuffer, "$%02X-$%02X (Unused)                       ", zeropageadr, zeropageadr+1);
+        std::snprintf(textbuffer, MAX_PATHNAME, "$%02X-$%02X (Unused)                       ", zeropageadr, zeropageadr+1);
       if (zeropageadr >= 0xfe)
-        std::sprintf(textbuffer, "$%02X-$%02X ($FF used by BASIC interpreter)", zeropageadr, zeropageadr+1);
+        std::snprintf(textbuffer, MAX_PATHNAME, "$%02X-$%02X ($FF used by BASIC interpreter)", zeropageadr, zeropageadr+1);
     }
     else
     {
-      std::sprintf(textbuffer, "$%02X-$%02X (ghostregs start at %02X)", zeropageadr, zeropageadr+26, zeropageadr);
+      std::snprintf(textbuffer, MAX_PATHNAME, "$%02X-$%02X (ghostregs start at %02X)", zeropageadr, zeropageadr+26, zeropageadr);
     }
 
     printtext(1, 15, colors.CEDIT, textbuffer);
@@ -1273,13 +1273,13 @@ TABLETYPE:
   insertlabel("mt_songtbllo");
   for (int c = 0; c < songs*3; c++)
   {
-    std::sprintf(textbuffer, "mt_song%d", c);
+    std::snprintf(textbuffer, MAX_PATHNAME, "mt_song%d", c);
     insertaddrlo(textbuffer);
   }
   insertlabel("mt_songtblhi");
   for (int c = 0; c < songs*3; c++)
   {
-    std::sprintf(textbuffer, "mt_song%d", c);
+    std::snprintf(textbuffer, MAX_PATHNAME, "mt_song%d", c);
     insertaddrhi(textbuffer);
   }
 
@@ -1287,13 +1287,13 @@ TABLETYPE:
   insertlabel("mt_patttbllo");
   for (int c = 0; c < patterns; c++)
   {
-    std::sprintf(textbuffer, "mt_patt%d", c);
+    std::snprintf(textbuffer, MAX_PATHNAME, "mt_patt%d", c);
     insertaddrlo(textbuffer);
   }
   insertlabel("mt_patttblhi");
   for (int c = 0; c < patterns; c++)
   {
-    std::sprintf(textbuffer, "mt_patt%d", c);
+    std::snprintf(textbuffer, MAX_PATHNAME, "mt_patt%d", c);
     insertaddrhi(textbuffer);
   }
 
@@ -1466,7 +1466,7 @@ TABLETYPE:
   {
     for (int d = 0; d < maxChns; d++)
     {
-      std::sprintf(textbuffer, "mt_song%d", c*3+d);
+      std::snprintf(textbuffer, MAX_PATHNAME, "mt_song%d", c*3+d);
       insertlabel(textbuffer);
       insertbytes(&songwork[songoffset[c][d]], songsize[c][d]);
     }
@@ -1475,7 +1475,7 @@ TABLETYPE:
   // Insert patterns
   for (int c = 0; c < patterns; c++)
   {
-    std::sprintf(textbuffer, "mt_patt%d", c);
+    std::snprintf(textbuffer, MAX_PATHNAME, "mt_patt%d", c);
     insertlabel(textbuffer);
     insertbytes(&pattwork[pattoffset[c]], pattsize[c]);
   }
@@ -1527,30 +1527,30 @@ TABLETYPE:
   clearscreen();
   printblankc(0, 0, colors.CHEADER, MAX_COLUMNS);
   if (!std::strlen(loadedsongfilename))
-    std::sprintf(textbuffer, "%s Packer/Relocator", programname);
+    std::snprintf(textbuffer, MAX_PATHNAME, "%s Packer/Relocator", programname);
   else
-    std::sprintf(textbuffer, "%s Packer/Relocator - %s", programname, loadedsongfilename);
+    std::snprintf(textbuffer, MAX_PATHNAME, "%s Packer/Relocator - %s", programname, loadedsongfilename);
   textbuffer[80] = 0;
   printtext(0, 0, colors.CHEADER, textbuffer);
 
-  std::sprintf(textbuffer, "PACKING RESULTS:");
+  std::snprintf(textbuffer, MAX_PATHNAME, "PACKING RESULTS:");
   printtext(1, 2, 15, textbuffer);
 
-  std::sprintf(textbuffer, "Playroutine:     %d bytes", playersize);
+  std::snprintf(textbuffer, MAX_PATHNAME, "Playroutine:     %d bytes", playersize);
   printtext(1, 3, 7, textbuffer);
-  std::sprintf(textbuffer, "Songtable:       %d bytes", songtblsize);
+  std::snprintf(textbuffer, MAX_PATHNAME, "Songtable:       %d bytes", songtblsize);
   printtext(1, 4, 7, textbuffer);
-  std::sprintf(textbuffer, "Song-orderlists: %d bytes", songdatasize);
+  std::snprintf(textbuffer, MAX_PATHNAME, "Song-orderlists: %d bytes", songdatasize);
   printtext(1, 5, 7, textbuffer);
-  std::sprintf(textbuffer, "Patterntable:    %d bytes", patttblsize);
+  std::snprintf(textbuffer, MAX_PATHNAME, "Patterntable:    %d bytes", patttblsize);
   printtext(1, 6, 7, textbuffer);
-  std::sprintf(textbuffer, "Patterns:        %d bytes", pattdatasize);
+  std::snprintf(textbuffer, MAX_PATHNAME, "Patterns:        %d bytes", pattdatasize);
   printtext(1, 7, 7, textbuffer);
-  std::sprintf(textbuffer, "Instruments:     %d bytes", instrsize);
+  std::snprintf(textbuffer, MAX_PATHNAME, "Instruments:     %d bytes", instrsize);
   printtext(1, 8, 7, textbuffer);
-  std::sprintf(textbuffer, "Tables:          %d bytes", wavetblsize+pulsetblsize+filttblsize+speedtblsize);
+  std::snprintf(textbuffer, MAX_PATHNAME, "Tables:          %d bytes", wavetblsize+pulsetblsize+filttblsize+speedtblsize);
   printtext(1, 9, 7, textbuffer);
-  std::sprintf(textbuffer, "Total size:      %d bytes", packedsize);
+  std::snprintf(textbuffer, MAX_PATHNAME, "Total size:      %d bytes", packedsize);
   printtext(1, 11, 7, textbuffer);
   fliptoscreen();
 
@@ -2081,7 +2081,7 @@ void insertdefine(const char *name, int value)
 {
   char insertbuffer[80];
 
-  std::sprintf(insertbuffer, "%-16s = %d\n", name, value);
+  std::snprintf(insertbuffer, 80, "%-16s = %d\n", name, value);
   inserttext(insertbuffer);
 }
 
@@ -2089,7 +2089,7 @@ void insertlabel(const char *name)
 {
   char insertbuffer[80];
 
-  std::sprintf(insertbuffer, "%s:\n", name);
+  std::snprintf(insertbuffer, 80, "%s:\n", name);
   inserttext(insertbuffer);
 }
 
@@ -2103,14 +2103,14 @@ void insertbytes(const unsigned char *bytes, int size)
     if (!row)
     {
       inserttext("                .BYTE (");
-      std::sprintf(insertbuffer, "$%02x", *bytes);
+      std::snprintf(insertbuffer, 80, "$%02x", *bytes);
       inserttext(insertbuffer);
       bytes++;
       row++;
     }
     else
     {
-      std::sprintf(insertbuffer, ",$%02x", *bytes);
+      std::snprintf(insertbuffer, 80, ",$%02x", *bytes);
       inserttext(insertbuffer);
       bytes++;
       row++;
@@ -2128,7 +2128,7 @@ void insertbyte(unsigned char byte)
 {
   char insertbuffer[80];
 
-  std::sprintf(insertbuffer, "                .BYTE ($%02x)\n", byte);
+  std::snprintf(insertbuffer, 80, "                .BYTE ($%02x)\n", byte);
   inserttext(insertbuffer);
 }
 
@@ -2136,7 +2136,7 @@ void insertaddrlo(const char *name)
 {
   char insertbuffer[80];
 
-  std::sprintf(insertbuffer, "                .BYTE (%s %% 256)\n", name);
+  std::snprintf(insertbuffer, 80, "                .BYTE (%s %% 256)\n", name);
   inserttext(insertbuffer);
 }
 
@@ -2144,7 +2144,7 @@ void insertaddrhi(const char *name)
 {
   char insertbuffer[80];
 
-  std::sprintf(insertbuffer, "                .BYTE (%s / 256)\n", name);
+  std::snprintf(insertbuffer, 80, "                .BYTE (%s / 256)\n", name);
   inserttext(insertbuffer);
 }
 
@@ -2410,7 +2410,7 @@ void relocator_stereo(const char* songfilename)
                 }
                 if (song.order[c][d][song.len[c][d]+1] >= song.len[c][d])
                 {
-                    std::sprintf(textbuffer, "ILLEGAL SONG RESTART POSITION! (SUBTUNE %02X, CHANNEL %d)", c, d+1);
+                    std::snprintf(textbuffer, MAX_PATHNAME, "ILLEGAL SONG RESTART POSITION! (SUBTUNE %02X, CHANNEL %d)", c, d+1);
                     clearscreen();
                     printtextc(MAX_ROWS/2, colors.CTITLE, textbuffer);
                     fliptoscreen();
@@ -2580,7 +2580,7 @@ void relocator_stereo(const char* songfilename)
                 case CMD_DONOTHING:
                 case CMD_SETWAVEPTR:
                 case CMD_FUNKTEMPO:
-                    std::sprintf(textbuffer, "ILLEGAL WAVETABLE COMMAND (ROW %02X, COMMAND %X)", c+1, song.ltable[WTBL][c] - WAVECMD);
+                    std::snprintf(textbuffer, MAX_PATHNAME, "ILLEGAL WAVETABLE COMMAND (ROW %02X, COMMAND %X)", c+1, song.ltable[WTBL][c] - WAVECMD);
                     clearscreen();
                     printtextc(MAX_ROWS/2, colors.CTITLE, textbuffer);
                     fliptoscreen();
@@ -2622,11 +2622,11 @@ void relocator_stereo(const char* songfilename)
         switch(tableerrortype)
         {
         case ErrorType::JUMP:
-            std::sprintf(textbuffer, "TABLE POINTER POINTS TO A JUMP! ");
+            std::snprintf(textbuffer, MAX_PATHNAME, "TABLE POINTER POINTS TO A JUMP! ");
             break;
 
         case ErrorType::OVERFLOW:
-            std::sprintf(textbuffer, "TABLE EXECUTION OVERFLOWS! ");
+            std::snprintf(textbuffer, MAX_PATHNAME, "TABLE EXECUTION OVERFLOWS! ");
             break;
 
         case ErrorType::NONE:
@@ -2636,15 +2636,15 @@ void relocator_stereo(const char* songfilename)
         switch (tableerrorcause)
         {
         case Cause::PATTERN:
-            std::sprintf(textbuffer + std::strlen(textbuffer), "(PATTERN %02X, ROW %02d)", tableerrorsource1, tableerrorsource2);
+            std::snprintf(textbuffer, MAX_PATHNAME + std::strlen(textbuffer), "(PATTERN %02X, ROW %02d)", tableerrorsource1, tableerrorsource2);
             break;
 
         case Cause::WAVE_CMD:
-            std::sprintf(textbuffer + std::strlen(textbuffer), "WAVETABLE CMD (ROW %02X, ", tableerrorsource1);
+            std::snprintf(textbuffer, MAX_PATHNAME + std::strlen(textbuffer), "WAVETABLE CMD (ROW %02X, ", tableerrorsource1);
             goto TABLETYPE_S;
 
         case Cause::INSTRUMENT:
-            std::sprintf(textbuffer + std::strlen(textbuffer), "(INSTRUMENT %02X, ", tableerrorsource1);
+            std::snprintf(textbuffer, MAX_PATHNAME + std::strlen(textbuffer), "(INSTRUMENT %02X, ", tableerrorsource1);
 TABLETYPE_S:
             switch (tableerrorsource2)
             {
@@ -2682,9 +2682,9 @@ TABLETYPE_S:
     clearscreen();
     printblankc(0, 0, colors.CHEADER, MAX_COLUMNS);
     if (!std::strlen(songfilename))
-        std::sprintf(textbuffer, "%s Packer/Relocator", programname);
+        std::snprintf(textbuffer, MAX_PATHNAME, "%s Packer/Relocator", programname);
     else
-        std::sprintf(textbuffer, "%s Packer/Relocator - %s", programname, songfilename);
+        std::snprintf(textbuffer, MAX_PATHNAME, "%s Packer/Relocator - %s", programname, songfilename);
     textbuffer[MAX_COLUMNS] = 0;
     printtext(0, 0, colors.CHEADER, textbuffer);
     printtext(1, 2, colors.CTITLE, "SELECT PLAYROUTINE OPTIONS: (CURSORS=MOVE/CHANGE, ENTER=ACCEPT, ESC=CANCEL)");
@@ -2887,7 +2887,7 @@ TABLETYPE_S:
             if (result < 0)
             {
                 clearscreen();
-                std::sprintf(textbuffer, "PATTERN %02X IS TOO COMPLEX (OVER 256 BYTES PACKED)!", c);
+                std::snprintf(textbuffer, MAX_PATHNAME, "PATTERN %02X IS TOO COMPLEX (OVER 256 BYTES PACKED)!", c);
                 printtextc(MAX_ROWS/2, colors.CTITLE, textbuffer);
                 fliptoscreen();
                 waitkeynoupdate();
@@ -3103,13 +3103,13 @@ TABLETYPE_S:
     if (nopulse) pulsetblsize = 0;
     if (nofilter) filttblsize = 0;
 
-    std::sprintf(textbuffer, "SELECT START ADDRESS: (CURSORS=MOVE, ENTER=ACCEPT, ESC=CANCEL)");
+    std::snprintf(textbuffer, MAX_PATHNAME, "SELECT START ADDRESS: (CURSORS=MOVE, ENTER=ACCEPT, ESC=CANCEL)");
     printtext(1, 10, colors.CTITLE, textbuffer);
 
     selectdone = 0;
     while (!selectdone)
     {
-        std::sprintf(textbuffer, "$%04X", playeradr);
+        std::snprintf(textbuffer, MAX_PATHNAME, "$%04X", playeradr);
         printtext(1, 11, colors.CEDIT, textbuffer);
 
         fliptoscreen();
@@ -3155,7 +3155,7 @@ TABLETYPE_S:
 
     if (selectdone == -1) goto PRCLEANUP_S;
 
-    std::sprintf(textbuffer, "SELECT ZEROPAGE ADDRESS: (CURSORS=MOVE, ENTER=ACCEPT, ESC=CANCEL)");
+    std::snprintf(textbuffer, MAX_PATHNAME, "SELECT ZEROPAGE ADDRESS: (CURSORS=MOVE, ENTER=ACCEPT, ESC=CANCEL)");
     printtext(1, 13, colors.CTITLE, textbuffer);
 
     selectdone = 0;
@@ -3175,17 +3175,17 @@ TABLETYPE_S:
         if (!(playerversion & PLAYER_ZPGHOSTREGS))
         {
             if (zeropageadr < 0x90)
-                std::sprintf(textbuffer, "$%02X-$%02X (Used by BASIC interpreter)    ", zeropageadr, zeropageadr+1);
+                std::snprintf(textbuffer, MAX_PATHNAME, "$%02X-$%02X (Used by BASIC interpreter)    ", zeropageadr, zeropageadr+1);
             if ((zeropageadr >= 0x90) && (zeropageadr < 0xfb))
-                std::sprintf(textbuffer, "$%02X-$%02X (Used by KERNAL routines)      ", zeropageadr, zeropageadr+1);
+                std::snprintf(textbuffer, MAX_PATHNAME, "$%02X-$%02X (Used by KERNAL routines)      ", zeropageadr, zeropageadr+1);
             if ((zeropageadr >= 0xfb) && (zeropageadr < 0xfe))
-                std::sprintf(textbuffer, "$%02X-$%02X (Unused)                       ", zeropageadr, zeropageadr+1);
+                std::snprintf(textbuffer, MAX_PATHNAME, "$%02X-$%02X (Unused)                       ", zeropageadr, zeropageadr+1);
             if (zeropageadr >= 0xfe)
-                std::sprintf(textbuffer, "$%02X-$%02X ($FF used by BASIC interpreter)", zeropageadr, zeropageadr+1);
+                std::snprintf(textbuffer, MAX_PATHNAME, "$%02X-$%02X ($FF used by BASIC interpreter)", zeropageadr, zeropageadr+1);
         }
         else
         {
-            std::sprintf(textbuffer, "$%02X-$%02X (ghostregs start at %02X)", zeropageadr, zeropageadr+26, zeropageadr);
+            std::snprintf(textbuffer, MAX_PATHNAME, "$%02X-$%02X (ghostregs start at %02X)", zeropageadr, zeropageadr+26, zeropageadr);
         }
 
         printtext(1, 14, colors.CEDIT, textbuffer);
@@ -3338,13 +3338,13 @@ TABLETYPE_S:
     insertlabel("mt_songtbllo");
     for (int c = 0; c < songs*6; c++)
     {
-        std::sprintf(textbuffer, "mt_song%d", c);
+        std::snprintf(textbuffer, MAX_PATHNAME, "mt_song%d", c);
         insertaddrlo(textbuffer);
     }
     insertlabel("mt_songtblhi");
     for (int c = 0; c < songs*6; c++)
     {
-        std::sprintf(textbuffer, "mt_song%d", c);
+        std::snprintf(textbuffer, MAX_PATHNAME, "mt_song%d", c);
         insertaddrhi(textbuffer);
     }
 
@@ -3352,13 +3352,13 @@ TABLETYPE_S:
     insertlabel("mt_patttbllo");
     for (int c = 0; c < patterns; c++)
     {
-        std::sprintf(textbuffer, "mt_patt%d", c);
+        std::snprintf(textbuffer, MAX_PATHNAME, "mt_patt%d", c);
         insertaddrlo(textbuffer);
     }
     insertlabel("mt_patttblhi");
     for (int c = 0; c < patterns; c++)
     {
-        std::sprintf(textbuffer, "mt_patt%d", c);
+        std::snprintf(textbuffer, MAX_PATHNAME, "mt_patt%d", c);
         insertaddrhi(textbuffer);
     }
 
@@ -3532,7 +3532,7 @@ SKIPTABLE_S:
     {
         for (int d = 0; d < MAX_CHN; d++)
         {
-            std::sprintf(textbuffer, "mt_song%d", c*6+d);
+            std::snprintf(textbuffer, MAX_PATHNAME, "mt_song%d", c*6+d);
             insertlabel(textbuffer);
             insertbytes(&songwork[songoffset[c][d]], songsize[c][d]);
         }
@@ -3541,7 +3541,7 @@ SKIPTABLE_S:
     // Insert patterns
     for (int c = 0; c < patterns; c++)
     {
-        std::sprintf(textbuffer, "mt_patt%d", c);
+        std::snprintf(textbuffer, MAX_PATHNAME, "mt_patt%d", c);
         insertlabel(textbuffer);
         insertbytes(&pattwork[pattoffset[c]], pattsize[c]);
     }
@@ -3574,30 +3574,30 @@ SKIPTABLE_S:
     clearscreen();
     printblankc(0, 0, colors.CHEADER, MAX_COLUMNS);
     if (!std::strlen(songfilename))
-        std::sprintf(textbuffer, "%s Packer/Relocator", programname);
+        std::snprintf(textbuffer, MAX_PATHNAME, "%s Packer/Relocator", programname);
     else
-        std::sprintf(textbuffer, "%s Packer/Relocator - %s", programname, songfilename);
+        std::snprintf(textbuffer, MAX_PATHNAME, "%s Packer/Relocator - %s", programname, songfilename);
     textbuffer[80] = 0;
     printtext(0, 0, colors.CHEADER, textbuffer);
 
-    std::sprintf(textbuffer, "PACKING RESULTS:");
+    std::snprintf(textbuffer, MAX_PATHNAME, "PACKING RESULTS:");
     printtext(1, 2, 15, textbuffer);
 
-    std::sprintf(textbuffer, "Playroutine:     %d bytes", playersize);
+    std::snprintf(textbuffer, MAX_PATHNAME, "Playroutine:     %d bytes", playersize);
     printtext(1, 3, 7, textbuffer);
-    std::sprintf(textbuffer, "Songtable:       %d bytes", songtblsize);
+    std::snprintf(textbuffer, MAX_PATHNAME, "Songtable:       %d bytes", songtblsize);
     printtext(1, 4, 7, textbuffer);
-    std::sprintf(textbuffer, "Song-orderlists: %d bytes", songdatasize);
+    std::snprintf(textbuffer, MAX_PATHNAME, "Song-orderlists: %d bytes", songdatasize);
     printtext(1, 5, 7, textbuffer);
-    std::sprintf(textbuffer, "Patterntable:    %d bytes", patttblsize);
+    std::snprintf(textbuffer, MAX_PATHNAME, "Patterntable:    %d bytes", patttblsize);
     printtext(1, 6, 7, textbuffer);
-    std::sprintf(textbuffer, "Patterns:        %d bytes", pattdatasize);
+    std::snprintf(textbuffer, MAX_PATHNAME, "Patterns:        %d bytes", pattdatasize);
     printtext(1, 7, 7, textbuffer);
-    std::sprintf(textbuffer, "Instruments:     %d bytes", instrsize);
+    std::snprintf(textbuffer, MAX_PATHNAME, "Instruments:     %d bytes", instrsize);
     printtext(1, 8, 7, textbuffer);
-    std::sprintf(textbuffer, "Tables:          %d bytes", wavetblsize+pulsetblsize+filttblsize+speedtblsize);
+    std::snprintf(textbuffer, MAX_PATHNAME, "Tables:          %d bytes", wavetblsize+pulsetblsize+filttblsize+speedtblsize);
     printtext(1, 9, 7, textbuffer);
-    std::sprintf(textbuffer, "Total size:      %d bytes", packedsize);
+    std::snprintf(textbuffer, MAX_PATHNAME, "Total size:      %d bytes", packedsize);
     printtext(1, 11, 7, textbuffer);
     fliptoscreen();
 
