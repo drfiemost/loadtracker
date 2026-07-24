@@ -1534,24 +1534,24 @@ TABLETYPE:
   printtext(0, 0, colors.CHEADER, textbuffer);
 
   std::snprintf(textbuffer, MAX_PATHNAME, "PACKING RESULTS:");
-  printtext(1, 2, 15, textbuffer);
+  printtext(1, 2, CLGREY, textbuffer);
 
   std::snprintf(textbuffer, MAX_PATHNAME, "Playroutine:     %d bytes", playersize);
-  printtext(1, 3, 7, textbuffer);
+  printtext(1, 3, CYELLOW, textbuffer);
   std::snprintf(textbuffer, MAX_PATHNAME, "Songtable:       %d bytes", songtblsize);
-  printtext(1, 4, 7, textbuffer);
+  printtext(1, 4, CYELLOW, textbuffer);
   std::snprintf(textbuffer, MAX_PATHNAME, "Song-orderlists: %d bytes", songdatasize);
-  printtext(1, 5, 7, textbuffer);
+  printtext(1, 5, CYELLOW, textbuffer);
   std::snprintf(textbuffer, MAX_PATHNAME, "Patterntable:    %d bytes", patttblsize);
-  printtext(1, 6, 7, textbuffer);
+  printtext(1, 6, CYELLOW, textbuffer);
   std::snprintf(textbuffer, MAX_PATHNAME, "Patterns:        %d bytes", pattdatasize);
-  printtext(1, 7, 7, textbuffer);
+  printtext(1, 7, CYELLOW, textbuffer);
   std::snprintf(textbuffer, MAX_PATHNAME, "Instruments:     %d bytes", instrsize);
-  printtext(1, 8, 7, textbuffer);
+  printtext(1, 8, CYELLOW, textbuffer);
   std::snprintf(textbuffer, MAX_PATHNAME, "Tables:          %d bytes", wavetblsize+pulsetblsize+filttblsize+speedtblsize);
-  printtext(1, 9, 7, textbuffer);
+  printtext(1, 9, CYELLOW, textbuffer);
   std::snprintf(textbuffer, MAX_PATHNAME, "Total size:      %d bytes", packedsize);
-  printtext(1, 11, 7, textbuffer);
+  printtext(1, 11, CYELLOW, textbuffer);
   fliptoscreen();
 
 
@@ -3581,24 +3581,24 @@ SKIPTABLE_S:
     printtext(0, 0, colors.CHEADER, textbuffer);
 
     std::snprintf(textbuffer, MAX_PATHNAME, "PACKING RESULTS:");
-    printtext(1, 2, 15, textbuffer);
+    printtext(1, 2, CLGREY, textbuffer);
 
     std::snprintf(textbuffer, MAX_PATHNAME, "Playroutine:     %d bytes", playersize);
-    printtext(1, 3, 7, textbuffer);
+    printtext(1, 3, CYELLOW, textbuffer);
     std::snprintf(textbuffer, MAX_PATHNAME, "Songtable:       %d bytes", songtblsize);
-    printtext(1, 4, 7, textbuffer);
+    printtext(1, 4, CYELLOW, textbuffer);
     std::snprintf(textbuffer, MAX_PATHNAME, "Song-orderlists: %d bytes", songdatasize);
-    printtext(1, 5, 7, textbuffer);
+    printtext(1, 5, CYELLOW, textbuffer);
     std::snprintf(textbuffer, MAX_PATHNAME, "Patterntable:    %d bytes", patttblsize);
-    printtext(1, 6, 7, textbuffer);
+    printtext(1, 6, CYELLOW, textbuffer);
     std::snprintf(textbuffer, MAX_PATHNAME, "Patterns:        %d bytes", pattdatasize);
-    printtext(1, 7, 7, textbuffer);
+    printtext(1, 7, CYELLOW, textbuffer);
     std::snprintf(textbuffer, MAX_PATHNAME, "Instruments:     %d bytes", instrsize);
-    printtext(1, 8, 7, textbuffer);
+    printtext(1, 8, CYELLOW, textbuffer);
     std::snprintf(textbuffer, MAX_PATHNAME, "Tables:          %d bytes", wavetblsize+pulsetblsize+filttblsize+speedtblsize);
-    printtext(1, 9, 7, textbuffer);
+    printtext(1, 9, CYELLOW, textbuffer);
     std::snprintf(textbuffer, MAX_PATHNAME, "Total size:      %d bytes", packedsize);
-    printtext(1, 11, 7, textbuffer);
+    printtext(1, 11, CYELLOW, textbuffer);
     fliptoscreen();
 
 
