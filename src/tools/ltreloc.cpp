@@ -340,7 +340,7 @@ int main(int argc, char **argv)
   }
 
   // Init colorscheme
-  initcolorscheme(true);
+  colors.init(true);
 
   // Validate parameters
   sidmodel &= 1;

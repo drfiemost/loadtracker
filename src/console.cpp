@@ -58,7 +58,6 @@ int mouseheld = 0;
 int region[MAX_ROWS];
 
 int cursorflash = 0;
-int cursorcolortable[] = { CWHITE, CLGREY, CGREY, CLGREY };
 
 constexpr int fontwidth = 8;
 constexpr int fontheight = 16;
@@ -103,7 +102,7 @@ void flashCursor()
 
 int getCursorColor()
 {
-    return cursorcolortable[cursorflash];
+    return colors.getCursorColor(cursorflash);
 }
 
 static inline void setcharcolor(unsigned *dptr, unsigned char ch, unsigned char color)

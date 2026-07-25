@@ -39,22 +39,34 @@ enum
   CLGREY  = 0xF
 };
 
-struct Colors
+class Colorscheme
 {
-  unsigned char CBKGND;
-  unsigned char CNORMAL;
-  unsigned char CMUTE;
-  unsigned char CEDIT;
-  unsigned char CPLAYING;
-  unsigned char CCOMMAND;
-  unsigned char CTITLE;
-  unsigned char CHDRBG;
-  unsigned char CHDRFG;
-  unsigned char CHEADER;
+private:
+    int rainbowtable[5];
+
+public: // FIXME
+    unsigned char CBKGND;
+    unsigned char CNORMAL;
+    unsigned char CMUTE;
+    unsigned char CEDIT;
+    unsigned char CPLAYING;
+    unsigned char CCOMMAND;
+    unsigned char CTITLE;
+    unsigned char CHDRBG;
+    unsigned char CHDRFG;
+    unsigned char CHEADER;
+    unsigned char CMESSAGE;
+    unsigned char CTOOLTIP;
+
+public:
+    void init(bool dark);
+
+    int getCursorColor(int i);
+
+    int getRainbowColor(int i);
 };
 
-extern Colors colors;
+extern Colorscheme colors;
 
-void initcolorscheme(bool dark);
 
 #endif

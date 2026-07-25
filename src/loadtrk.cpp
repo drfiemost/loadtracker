@@ -181,7 +181,7 @@ int main(int argc, char **argv)
         if (!initscreen())
           return EXIT_FAILURE;
         for (int y = 0; y < usagelen; ++y)
-          printtext(0, y, CLGREY, usage[y]);
+          printtext(0, y, colors.CMESSAGE, usage[y]);
         waitkeynoupdate();
 #else
         for (int y = 0; y < usagelen; ++y)
@@ -308,7 +308,7 @@ int main(int argc, char **argv)
   }
 
   // Init colorscheme
-  initcolorscheme(dark);
+  colors.init(dark);
 
   // Validate parameters
   validateconfig();
@@ -347,7 +347,7 @@ int main(int argc, char **argv)
   // Init sound
   if (!sound_init(mr, writer, sidmodel, ntsc, multiplier, interpolate, customclockrate, exsid, filterbias, combwaves))
   {
-    printtextc(MAX_ROWS/2-1, CLGREY, "Sound init failed. Press any key to run without sound (notice that song timer won't start)");
+    printtextc(MAX_ROWS/2-1, colors.CMESSAGE, "Sound init failed. Press any key to run without sound (notice that song timer won't start)");
     waitkeynoupdate();
   }
 
@@ -1337,7 +1337,7 @@ void quit()
 {
   if ((!shiftpressed) || (mouseb))
   {
-    printtextcp(dpos.statusBottomX+29, dpos.statusBottomY, CLGREY, "Really Quit (y/n)?");
+    printtextcp(dpos.statusBottomX+29, dpos.statusBottomY, colors.CMESSAGE, "Really Quit (y/n)?");
     waitkey();
     printblank(dpos.statusBottomX, dpos.statusBottomY, 58);
     if ((key == 'y') || (key == 'Y')) exitprogram = true;
@@ -1348,7 +1348,7 @@ void quit()
 
 void clear()
 {
-  printtextcp(dpos.statusBottomX+29, dpos.statusBottomY, CLGREY, "Optimize everything (y/n)?");
+  printtextcp(dpos.statusBottomX+29, dpos.statusBottomY, colors.CMESSAGE, "Optimize everything (y/n)?");
   waitkey();
   printblank(dpos.statusBottomX, dpos.statusBottomY, 58);
   if ((key == 'y') || (key == 'Y'))
@@ -1365,27 +1365,27 @@ void clear()
   bool ct = false;
   bool cn = false;
 
-  printtextcp(dpos.statusBottomX+29, dpos.statusBottomY, CLGREY, "Clear orderlists (y/n)?");
+  printtextcp(dpos.statusBottomX+29, dpos.statusBottomY, colors.CMESSAGE, "Clear orderlists (y/n)?");
   waitkey();
   printblank(dpos.statusBottomX, dpos.statusBottomY, 58);
   if ((key == 'y') || (key == 'Y')) cs = true;
 
-  printtextcp(dpos.statusBottomX+29, dpos.statusBottomY, CLGREY, "Clear patterns (y/n)?");
+  printtextcp(dpos.statusBottomX+29, dpos.statusBottomY, colors.CMESSAGE, "Clear patterns (y/n)?");
   waitkey();
   printblank(dpos.statusBottomX, dpos.statusBottomY, 58);
   if ((key == 'y') || (key == 'Y')) cp = true;
 
-  printtextcp(dpos.statusBottomX+29, dpos.statusBottomY, CLGREY, "Clear instruments (y/n)?");
+  printtextcp(dpos.statusBottomX+29, dpos.statusBottomY, colors.CMESSAGE, "Clear instruments (y/n)?");
   waitkey();
   printblank(dpos.statusBottomX, dpos.statusBottomY, 58);
   if ((key == 'y') || (key == 'Y')) ci = true;
 
-  printtextcp(dpos.statusBottomX+29, dpos.statusBottomY, CLGREY, "Clear tables (y/n)?");
+  printtextcp(dpos.statusBottomX+29, dpos.statusBottomY, colors.CMESSAGE, "Clear tables (y/n)?");
   waitkey();
   printblank(dpos.statusBottomX, dpos.statusBottomY, 58);
   if ((key == 'y') || (key == 'Y')) ct = true;
 
-  printtextcp(dpos.statusBottomX+29, dpos.statusBottomY, CLGREY, "Clear songname (y/n)?");
+  printtextcp(dpos.statusBottomX+29, dpos.statusBottomY, colors.CMESSAGE, "Clear songname (y/n)?");
   waitkey();
   printblank(dpos.statusBottomX, dpos.statusBottomY, 58);
   if ((key == 'y') || (key == 'Y')) cn = true;
@@ -1395,7 +1395,7 @@ void clear()
     bool selectdone = false;
     unsigned olddpl = defaultpatternlength;
 
-    printtext(dpos.statusBottomX+20, dpos.statusBottomY, CLGREY, "Pattern length:");
+    printtext(dpos.statusBottomX+20, dpos.statusBottomY, colors.CMESSAGE, "Pattern length:");
     while (!selectdone)
     {
         if (patterndispmode)
@@ -1783,7 +1783,7 @@ void switchMode()
     printtextcp(
         dpos.statusBottomX+29,
         dpos.statusBottomY,
-        CLGREY,
+        colors.CMESSAGE,
         textbuffer
     );
     settooltip("Warning: All Songdata Will Be Lost!!!");

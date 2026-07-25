@@ -92,12 +92,11 @@ void printstatus()
   // Header
   if (!menu)
   {
-    short cblue = (colors.CHDRBG == CDBLUE) ? CLBLUE : CDBLUE;
-    printtext(dpos.statusTopX+1,  dpos.statusTopY,  cblue|(colors.CHDRBG<<4), " \x9b\x9b\x9b");
-    printtext(dpos.statusTopX+5,  dpos.statusTopY, CDGREEN|(colors.CHDRBG<<4), "\x9b\x9b\x9b");
-    printtext(dpos.statusTopX+8,  dpos.statusTopY, CYELLOW|(colors.CHDRBG<<4), "\x9b\x9b\x9b");
-    printtext(dpos.statusTopX+11, dpos.statusTopY, CLBROWN|(colors.CHDRBG<<4), "\x9b\x9b\x9b");
-    printtext(dpos.statusTopX+14, dpos.statusTopY,   CDRED|(colors.CHDRBG<<4), "\x9b\x9b\x9b ");
+    printtext(dpos.statusTopX+1,  dpos.statusTopY, colors.getRainbowColor(0), " \x9b\x9b\x9b");
+    printtext(dpos.statusTopX+5,  dpos.statusTopY, colors.getRainbowColor(1), "\x9b\x9b\x9b");
+    printtext(dpos.statusTopX+8,  dpos.statusTopY, colors.getRainbowColor(2), "\x9b\x9b\x9b");
+    printtext(dpos.statusTopX+11, dpos.statusTopY, colors.getRainbowColor(3), "\x9b\x9b\x9b");
+    printtext(dpos.statusTopX+14, dpos.statusTopY, colors.getRainbowColor(4), "\x9b\x9b\x9b ");
 
     if (!std::strlen(loadedsongfilename))
       std::snprintf(textbuffer, MAX_PATHNAME, "%s", programname);
@@ -565,7 +564,7 @@ void printstatus()
 
   // pad with spaces
   tooltip.append(40 - tooltip.length(), ' ');
-  printtext(dpos.octaveX+35, dpos.octaveY+1, CLBLUE, tooltip.c_str());
+  printtext(dpos.octaveX+35, dpos.octaveY+1, colors.CTOOLTIP, tooltip.c_str());
 }
 
 void settooltip(const char *msg)

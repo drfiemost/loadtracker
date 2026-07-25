@@ -18,9 +18,11 @@
 
 #include "colors.h"
 
-Colors colors;
+Colorscheme colors;
 
-void initcolorscheme(bool dark)
+int cursorcolortable[4] = { CWHITE, CLGREY, CGREY, CLGREY };
+
+void Colorscheme::init(bool dark)
 {
   colors.CBKGND   = dark ? CBLACK : CDBLUE;
 
@@ -34,5 +36,24 @@ void initcolorscheme(bool dark)
   colors.CHDRBG   = dark ? CDBLUE : CLBLUE;
   colors.CHDRFG   = CYELLOW;
 
+  colors.CMESSAGE = CLGREY;
+  colors.CTOOLTIP = dark ? CDGREY : CLBLUE;
+
   colors.CHEADER  = colors.CHDRFG|(colors.CHDRBG<<4);
+
+  rainbowtable[0] = dark ? CLBLUE : CDBLUE;
+  rainbowtable[1] = CDGREEN;
+  rainbowtable[2] = CYELLOW;
+  rainbowtable[3] = CLBROWN;
+  rainbowtable[4] = CDRED;
+}
+
+int Colorscheme::getCursorColor(int i)
+{
+    return cursorcolortable[i];
+}
+
+int Colorscheme::getRainbowColor(int i)
+{
+    return rainbowtable[i]|(colors.CHDRBG<<4);
 }
