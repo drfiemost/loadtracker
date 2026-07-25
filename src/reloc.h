@@ -28,13 +28,6 @@ enum
   FORMAT_BIN = 2
 };
 
-enum class ErrorType
-{
-  NONE,
-  OVERFLOW,
-  JUMP
-};
-
 enum
 {
   PLAYER_BUFFERED       =   8,
@@ -49,12 +42,12 @@ enum
 #ifndef RELOC_C
 extern unsigned char pattused[MAX_PATT];
 extern unsigned char instrused[MAX_INSTR];
-extern unsigned char tableused[MAX_TABLES][MAX_TABLELEN+1];
-extern ErrorType tableerror;
 #endif
 
 void relocator(const char* filename);
 void relocator_stereo(const char* filename);
 unsigned char swapnybbles(unsigned char n);
+void exectable(int num, int ptr);
+void optimizetable(int num);
 
 #endif

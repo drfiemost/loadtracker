@@ -32,11 +32,9 @@ enum
 
 void tablecommands();
 int makespeedtable(unsigned data, int mode, bool makenew);
-void optimizetable(int num);
 void deleteinstrtable(int i);
-
+void deletetable(int num, int pos);
 void gototable(int num, int pos);
-void exectable(int num, int ptr);
 
 class Tables
 {

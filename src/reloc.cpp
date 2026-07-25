@@ -66,6 +66,13 @@ enum class Cause
   WAVE_CMD
 };
 
+enum class ErrorType
+{
+  NONE,
+  OVERFLOW,
+  JUMP
+};
+
 #define MAX_BYTES_PER_ROW 16
 
 const char *playeroptname[MAX_OPTIONS] =
@@ -3855,4 +3862,110 @@ PRCLEANUP_S:
     printmainscreen();
     key = 0;
     rawkey = 0;
+}
+
+void exectable(int num, int ptr)
+{
+  // Jump error check
+  if ((num != STBL) && (ptr) && (ptr <= MAX_TABLELEN))
+  {
+    if (song.ltable[num][ptr-1] == 0xff)
+    {
+      tableerror = ErrorType::JUMP;
+      return;
+    }
+  }
+
+  for (;;)
+  {
+    // Exit when table stopped
+    if (!ptr) break;
+    // Overflow check
+    if ((num != STBL) && (ptr > MAX_TABLELEN))
+    {
+      tableerror = ErrorType::OVERFLOW;
+      break;
+    }
+    // If were already here, exit
+    if (tableused[num][ptr]) break;
+    // Mark current position used
+    tableused[num][ptr] = 1;
+    // Go to next ptr.
+    if (num != STBL)
+    {
+      if (song.ltable[num][ptr-1] == 0xff)
+      {
+        ptr = song.rtable[num][ptr-1];
+      }
+      else ptr++;
+    }
+    else break;
+  }
+}
+
+void optimizetable(int num)
+{
+  std::memset(tableused, 0, sizeof tableused);
+
+  for (int c = 0; c < MAX_PATT; c++)
+  {
+    for (int d = 0; d < getPattlen(c); d++)
+    {
+      if ((song.pattern[c][d*4+2] >= CMD_SETWAVEPTR) && (song.pattern[c][d*4+2] <= CMD_SETFILTERPTR))
+        exectable(song.pattern[c][d*4+2] - CMD_SETWAVEPTR, song.pattern[c][d*4+3]);
+      if ((song.pattern[c][d*4+2] >= CMD_PORTAUP) && (song.pattern[c][d*4+2] <= CMD_VIBRATO))
+        exectable(STBL, song.pattern[c][d*4+3]);
+      if (song.pattern[c][d*4+2] == CMD_FUNKTEMPO)
+        exectable(STBL, song.pattern[c][d*4+3]);
+    }
+  }
+
+  for (int c = 0; c < MAX_INSTR; c++)
+  {
+    for (int d = 0; d < MAX_TABLES; d++)
+    {
+      exectable(d, song.instr[c].ptr[d]);
+    }
+  }
+
+  for (int c = 0; c < MAX_TABLELEN; c++)
+  {
+    if (tableused[WTBL][c+1])
+    {
+      if ((song.ltable[WTBL][c] >= WAVECMD) && (song.ltable[WTBL][c] <= WAVELASTCMD))
+      {
+        int d = -1;
+
+        switch(song.ltable[WTBL][c] - WAVECMD)
+        {
+          case CMD_PORTAUP:
+          case CMD_PORTADOWN:
+          case CMD_TONEPORTA:
+          case CMD_VIBRATO:
+          d = STBL;
+          break;
+
+          case CMD_SETPULSEPTR:
+          d = PTBL;
+           break;
+
+           case CMD_SETFILTERPTR:
+           d = FTBL;
+          break;
+        }
+
+        if (d != -1) exectable(d, song.rtable[WTBL][c]);
+      }
+    }
+  }
+
+  int c;
+  for (c = MAX_TABLELEN-1; c >= 0; c--)
+  {
+    if ((song.ltable[num][c]) || (song.rtable[num][c])) break;
+  }
+  for (; c >= 0; c--)
+  {
+    if (!tableused[num][c+1]) deletetable(num, c);
+  }
 }
