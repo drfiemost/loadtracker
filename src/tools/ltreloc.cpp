@@ -48,13 +48,12 @@
 
 #if 1
 int stepsize = 4;
+int defaultpatternlength = 64;
 
 #define NUMSIDREGS 0x19
 unsigned char sidreg[NUMSIDREGS];
 unsigned char sidreg2[NUMSIDREGS];
 #endif
-
-int defaultpatternlength = 64;
 
 unsigned keypreset = KEY_TRACKER;
 unsigned playerversion = 0;

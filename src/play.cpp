@@ -56,6 +56,16 @@ int startpattpos = 0;
 
 void sequencer(int c, Chn *cptr);
 
+void resetmasterfader()
+{
+  masterfader = 0x0f;
+}
+
+int getlastsonginit()
+{
+    return lastsonginit;
+}
+
 void initsong(int num, int mode)
 {
   initsongpos(num, mode, 0);

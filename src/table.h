@@ -34,11 +34,9 @@ void tablecommands();
 int makespeedtable(unsigned data, int mode, bool makenew);
 void optimizetable(int num);
 void deleteinstrtable(int i);
-int gettablelen(int num);
-int gettablepartlen(int num, int pos);
+
 void gototable(int num, int pos);
 void exectable(int num, int ptr);
-int findfreespeedtable();
 
 class Tables
 {

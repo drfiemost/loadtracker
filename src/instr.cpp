@@ -186,7 +186,7 @@ void instrumentcommands()
         }
         else
         {
-          pos = gettablelen(eipos-2);
+          pos = song.gettablelen(eipos-2);
           if (pos >= MAX_TABLELEN-1) pos = MAX_TABLELEN - 1;
           if (shiftpressed) song.instr[einum].ptr[eipos-2] = pos + 1;
         }

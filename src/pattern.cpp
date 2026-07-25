@@ -40,20 +40,35 @@
 
 #include <cstring>
 
-unsigned char notekeytbl1[] = {KEY_Z, KEY_S, KEY_X, KEY_D, KEY_C, KEY_V,
-  KEY_G, KEY_B, KEY_H, KEY_N, KEY_J, KEY_M, KEY_COMMA, KEY_L, KEY_COLON};
+unsigned char notekeytbl1[] =
+{
+    KEY_Z, KEY_S, KEY_X, KEY_D, KEY_C, KEY_V,
+    KEY_G, KEY_B, KEY_H, KEY_N, KEY_J, KEY_M, KEY_COMMA, KEY_L, KEY_COLON
+};
 
-unsigned char notekeytbl2[] = {KEY_Q, KEY_2, KEY_W, KEY_3, KEY_E, KEY_R,
-  KEY_5, KEY_T, KEY_6, KEY_Y, KEY_7, KEY_U, KEY_I, KEY_9, KEY_O, KEY_0, KEY_P};
+unsigned char notekeytbl2[] =
+{
+    KEY_Q, KEY_2, KEY_W, KEY_3, KEY_E, KEY_R,
+    KEY_5, KEY_T, KEY_6, KEY_Y, KEY_7, KEY_U, KEY_I, KEY_9, KEY_O, KEY_0, KEY_P
+};
 
-unsigned char dmckeytbl[] = {KEY_A, KEY_W, KEY_S, KEY_E, KEY_D, KEY_F,
-  KEY_T, KEY_G, KEY_Y, KEY_H, KEY_U, KEY_J, KEY_K, KEY_O, KEY_L, KEY_P};
+unsigned char dmckeytbl[] =
+{
+    KEY_A, KEY_W, KEY_S, KEY_E, KEY_D, KEY_F,
+    KEY_T, KEY_G, KEY_Y, KEY_H, KEY_U, KEY_J, KEY_K, KEY_O, KEY_L, KEY_P
+};
 
-unsigned char jankokeytbl1[] = {KEY_Z, KEY_S, KEY_X, KEY_D, KEY_C, KEY_F, KEY_V,
-  KEY_G, KEY_B, KEY_H, KEY_N, KEY_J, KEY_M, KEY_K, KEY_COMMA, KEY_L, KEY_COLON};
+unsigned char jankokeytbl1[] =
+{
+    KEY_Z, KEY_S, KEY_X, KEY_D, KEY_C, KEY_F, KEY_V,
+    KEY_G, KEY_B, KEY_H, KEY_N, KEY_J, KEY_M, KEY_K, KEY_COMMA, KEY_L, KEY_COLON
+};
 
-unsigned char jankokeytbl2[] = {KEY_Q, KEY_2, KEY_W, KEY_3, KEY_E, KEY_4, KEY_R,
-  KEY_5, KEY_T, KEY_6, KEY_Y, KEY_7, KEY_U, KEY_8, KEY_I, KEY_9, KEY_O, KEY_0, KEY_P};
+unsigned char jankokeytbl2[] =
+{
+    KEY_Q, KEY_2, KEY_W, KEY_3, KEY_E, KEY_4, KEY_R,
+    KEY_5, KEY_T, KEY_6, KEY_Y, KEY_7, KEY_U, KEY_8, KEY_I, KEY_9, KEY_O, KEY_0, KEY_P
+};
 
 unsigned char patterncopybuffer[MAX_PATTROWS*4+4];
 unsigned char cmdcopybuffer[MAX_PATTROWS*4+4];
@@ -215,7 +230,7 @@ void patterncommands()
           {
             if (shiftpressed)
             {
-              int pos = gettablelen(WTBL);
+              int pos = song.gettablelen(WTBL);
               if (pos >= MAX_TABLELEN-1) pos = MAX_TABLELEN - 1;
               song.pattern[epnum[epchn]][eppos*4+3] = pos + 1;
               gototable(WTBL, pos);
@@ -234,7 +249,7 @@ void patterncommands()
           {
             if (shiftpressed)
             {
-              int pos = gettablelen(PTBL);
+              int pos = song.gettablelen(PTBL);
               if (pos >= MAX_TABLELEN-1) pos = MAX_TABLELEN - 1;
               song.pattern[epnum[epchn]][eppos*4+3] = pos + 1;
               gototable(PTBL, pos);
@@ -253,7 +268,7 @@ void patterncommands()
           {
             if (shiftpressed)
             {
-              int pos = gettablelen(FTBL);
+              int pos = song.gettablelen(FTBL);
               if (pos >= MAX_TABLELEN-1) pos = MAX_TABLELEN - 1;
               song.pattern[epnum[epchn]][eppos*4+3] = pos + 1;
               gototable(FTBL, pos);
@@ -280,7 +295,7 @@ void patterncommands()
           {
             if (shiftpressed)
             {
-              int pos = findfreespeedtable();
+              int pos = song.findfreespeedtable();
               if (pos >= 0)
               {
                 song.pattern[epnum[epchn]][eppos*4+3] = pos + 1;
@@ -311,7 +326,7 @@ void patterncommands()
           {
             if (shiftpressed)
             {
-              int pos = findfreespeedtable();
+              int pos = song.findfreespeedtable();
               if (pos >= 0)
               {
                 song.pattern[epnum[epchn]][eppos*4+3] = pos + 1;
@@ -340,7 +355,7 @@ void patterncommands()
           {
             if (shiftpressed)
             {
-              int pos = findfreespeedtable();
+              int pos = song.findfreespeedtable();
               if (pos >= 0)
               {
                 song.pattern[epnum[epchn]][eppos*4+3] = pos + 1;
@@ -828,7 +843,7 @@ void patterncommands()
       recordmode = !recordmode;
     else
     {
-      if (lastsonginit != PLAY_PATTERN)
+      if (getlastsonginit() != PLAY_PATTERN)
       {
         if (eseditpos != espos[eschn])
         {

@@ -2185,9 +2185,9 @@ void findtableduplicates(int num)
     {
       if (isusedandselfcontained(num, c))
       {
-        for (d = c + gettablepartlen(num, c - 1); d <= MAX_TABLELEN; )
+        for (d = c + song.gettablepartlen(num, c - 1); d <= MAX_TABLELEN; )
         {
-          int len = gettablepartlen(num, d - 1);
+          int len = song.gettablepartlen(num, d - 1);
 
           if (isusedandselfcontained(num, d))
           {
@@ -2238,7 +2238,7 @@ void findtableduplicates(int num)
 
 int isusedandselfcontained(int num, int start)
 {
-  int len = gettablepartlen(num, start - 1);
+  int len = song.gettablepartlen(num, start - 1);
   int end = start + len - 1;
 
   // Don't use jumps only

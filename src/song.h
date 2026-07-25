@@ -33,6 +33,11 @@ struct Song
     char title[MAX_STR];
     char author[MAX_STR];
     char released[MAX_STR];
+
+public:
+    int gettablelen(int num);
+    int gettablepartlen(int num, int pos);
+    int findfreespeedtable();
 };
 
 

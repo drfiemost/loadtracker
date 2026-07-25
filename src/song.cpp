@@ -54,6 +54,45 @@ int highestusedinstr;
 
 int determinechannels(FILE* handle);
 
+int Song::gettablelen(int num)
+{
+  int c;
+  for (c = MAX_TABLELEN-1; c >= 0; c--)
+  {
+    if (ltable[num][c] | rtable[num][c]) break;
+  }
+  return c+1;
+}
+
+int Song::gettablepartlen(int num, int pos)
+{
+  if (pos < 0) return 0;
+  if (num == STBL) return 1;
+
+  int c;
+  for (c = pos; c < MAX_TABLELEN; c++)
+  {
+    if (ltable[num][c] == 0xff)
+    {
+      c++;
+      break;
+    }
+  }
+  return c-pos;
+}
+
+int Song::findfreespeedtable()
+{
+  for (int c = 0; c < MAX_TABLELEN; c++)
+  {
+    if ((!ltable[STBL][c]) && (!rtable[STBL][c]))
+    {
+      return c;
+    }
+  }
+  return -1;
+}
+
 bool savesong()
 {
   const char ident[] = {'G', 'T', 'S', '5'};
@@ -134,7 +173,7 @@ bool savesong()
     // Write tables
     for (int c = 0; c < MAX_TABLES; c++)
     {
-      int writebytes = gettablelen(c);
+      int writebytes = song.gettablelen(c);
       fwrite8(handle, writebytes);
       std::fwrite(song.ltable[c], writebytes, 1, handle);
       std::fwrite(song.rtable[c], writebytes, 1, handle);
@@ -190,7 +229,7 @@ bool saveinstrument()
       if (song.instr[einum].ptr[c])
       {
         int pos = song.instr[einum].ptr[c] - 1;
-        int len = gettablepartlen(c, pos);
+        int len = song.gettablepartlen(c, pos);
         fwrite8(handle, len);
         std::fwrite(&song.ltable[c][pos], len, 1, handle);
         std::fwrite(&song.rtable[c][pos], len, 1, handle);
@@ -945,7 +984,7 @@ void loadinstrument()
       // Load new tabledata
       for (int c = 0; c < MAX_TABLES; c++)
       {
-        int start = gettablelen(c);
+        int start = song.gettablelen(c);
         int len = fread8(handle);
 
         if (len)
@@ -1009,7 +1048,7 @@ void loadinstrument()
       // Load new tabledata
       for (int c = 0; c < MAX_TABLES-1; c++)
       {
-        int start = gettablelen(c);
+        int start = song.gettablelen(c);
         int len = fread8(handle);
 
         if (len)
@@ -1295,16 +1334,16 @@ PULSEDONE:
 
 void clearsong(bool cs, bool cp, bool ci, bool ct, bool cn)
 {
-  int maxChns = getMaxChannels();
-
   if (!(cs | cp | ci | ct | cn)) return;
 
   stopsong();
 
-  masterfader = 0x0f;
+  resetmasterfader();
   epmark.chn = -1;
   tables.clear();
   esmark.chn = -1;
+
+  int maxChns = getMaxChannels();
 
   for (int c = 0; c < maxChns; c++)
   {
@@ -1578,7 +1617,7 @@ void mergesong()
 
   for (int c = 0; c < MAX_TABLES; c++)
   {
-    tablebase[c] = gettablelen(c);
+    tablebase[c] = song.gettablelen(c);
   }
 
   char ident[4];

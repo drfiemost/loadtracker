@@ -465,7 +465,7 @@ void tablecommands()
         }
         else
         {
-          int pos = findfreespeedtable();
+          int pos = song.findfreespeedtable();
           if (pos >= 0)
           {
             song.rtable[tables.num()][tables.pos()] = pos + 1;
@@ -486,7 +486,7 @@ void tablecommands()
         {
           if (shiftpressed)
           {
-            int pos = gettablelen(table);
+            int pos = song.gettablelen(table);
             if (pos >= MAX_TABLELEN-1) pos = MAX_TABLELEN - 1;
             song.rtable[tables.num()][tables.pos()] = pos + 1;
             gototable(table, pos);
@@ -766,33 +766,6 @@ void inserttable(int num, int pos, int mode)
   }
 }
 
-int gettablelen(int num)
-{
-  int c;
-  for (c = MAX_TABLELEN-1; c >= 0; c--)
-  {
-    if (song.ltable[num][c] | song.rtable[num][c]) break;
-  }
-  return c+1;
-}
-
-int gettablepartlen(int num, int pos)
-{
-  if (pos < 0) return 0;
-  if (num == STBL) return 1;
-
-  int c;
-  for (c = pos; c < MAX_TABLELEN; c++)
-  {
-    if (song.ltable[num][c] == 0xff)
-    {
-      c++;
-      break;
-    }
-  }
-  return c-pos;
-}
-
 void optimizetable(int num)
 {
   std::memset(tableused, 0, sizeof tableused);
@@ -926,7 +899,7 @@ void deleteinstrtable(int i)
     if (song.instr[i].ptr[c])
     {
       int pos = song.instr[i].ptr[c]-1;
-      int len = gettablepartlen(c, pos);
+      int len = song.gettablepartlen(c, pos);
 
       // Check that this table area isn't used by another instrument
       for (int d = 1; d < MAX_INSTR; d++)
@@ -980,18 +953,6 @@ void exectable(int num, int ptr)
     }
     else break;
   }
-}
-
-int findfreespeedtable()
-{
-  for (int c = 0; c < MAX_TABLELEN; c++)
-  {
-    if ((!song.ltable[STBL][c]) && (!song.rtable[STBL][c]))
-    {
-      return c;
-    }
-  }
-  return -1;
 }
 
 void gototable(int num, int pos)

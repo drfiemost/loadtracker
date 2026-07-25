@@ -31,11 +31,6 @@ enum
   PLAY_STOPPED    = 0x80
 };
 
-#ifndef PLAY_C
-extern unsigned char masterfader;
-extern int lastsonginit;
-#endif
-
 void initsong(int num, int playmode);
 void initsongpos(int num, int playmode, int pattpos);
 void stopsong();
@@ -46,7 +41,7 @@ void mutechannel(int chnnum);
 bool isplaying();
 void playroutine();
 void playroutine_stereo();
-
-void gettime(char *buf);
+void resetmasterfader();
+int getlastsonginit();
 
 #endif
