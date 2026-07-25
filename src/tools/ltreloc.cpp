@@ -29,10 +29,10 @@
 #include "channels.h"
 #include "colors.h"
 #include "console.h"
-#include "freqtbl.h"
 #include "pattern.h"
 #include "reloc.h"
 #include "song.h"
+#include "tuning.h"
 
 #include "bme_io.h"
 #include "bme_win.h"

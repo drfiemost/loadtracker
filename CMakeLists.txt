@@ -50,7 +50,7 @@ set(LOADTRK_SOURCES
     src/console.cpp
     src/colors.cpp
     src/channels.cpp
-    src/freqtbl.cpp
+    src/tuning.cpp
     src/timer.cpp
     src/sid.cpp
     src/ltlog.cpp
@@ -104,7 +104,7 @@ set(LTRELOC_SOURCES
     src/console.cpp
     src/colors.cpp
     src/channels.cpp
-    src/freqtbl.cpp
+    src/tuning.cpp
     src/timer.cpp
     src/ltlog.cpp
     src/bme/bme_win.cpp

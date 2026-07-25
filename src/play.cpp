@@ -27,19 +27,13 @@
 #include "configfile.h"
 #include "channels.h"
 #include "display.h"
-#include "freqtbl.h"
 #include "order.h"
 #include "pattern.h"
 #include "sid.h"
 #include "song.h"
 #include "sound.h"
 #include "timer.h"
-
-#ifdef LTRELOC
-#  include "tools/ltreloc.h"
-#else
-#  include "loadtrk.h"
-#endif
+#include "tuning.h"
 
 #include <cstdio>
 #include <cstring>

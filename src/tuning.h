@@ -16,14 +16,15 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#ifndef FREQTBL_H
-#define FREQTBL_H
+#ifndef TUNING_H
+#define TUNING_H
 
 #ifndef FREQTBL_C
 extern unsigned char freqtbllo[];
 extern unsigned char freqtblhi[];
 #endif
 
+void readscalatuningfile(const char *filepath, char *specialnotenames);
 void calculatefreqtable(double basepitch, double equaldivisionsperoctave);
 
 #endif

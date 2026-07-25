@@ -25,7 +25,6 @@
 #include "configfile.h"
 #include "console.h"
 #include "display.h"
-#include "freqtbl.h"
 #include "instr.h"
 #include "order.h"
 #include "pattern.h"
@@ -33,6 +32,7 @@
 #include "reloc.h"
 #include "song.h"
 #include "table.h"
+#include "tuning.h"
 
 #include "bme_main.h"
 

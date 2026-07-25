@@ -27,7 +27,6 @@
 #include "configfile.h"
 #include "console.h"
 #include "display.h"
-#include "freqtbl.h"
 #include "instr.h"
 #include "order.h"
 #include "pattern.h"
@@ -37,6 +36,7 @@
 #include "sound.h"
 #include "table.h"
 #include "timer.h"
+#include "tuning.h"
 
 #include "bme_main.h"
 #include "bme_win.h"
@@ -60,10 +60,6 @@ bool writer = false;
 char loadedsongfilename[MAX_FILENAME];
 char songfilename[MAX_FILENAME];
 char instrfilename[MAX_FILENAME];
-
-int tuningcount = 0;
-double tuning[96];
-char tuningname[64];
 
 extern char *notename[];
 const char *programname = "LoadTracker " PACKAGE_VERSION;
@@ -119,9 +115,7 @@ void prevmultiplier();
 void nextmultiplier();
 void editadsr(int col);
 void editbpm(int col);
-void readscalatuningfile();
 void setspecialnotenames();
-void calculatefreqtable();
 void switchMode();
 void optimizeeverything();
 void findduplicatepatterns();
@@ -309,14 +303,14 @@ int main(int argc, char **argv)
   // Read Scala tuning file
   if (scalatuningfilepath[0] != '0' && scalatuningfilepath[1] != '\0')
   {
-    readscalatuningfile();
+    readscalatuningfile(scalatuningfilepath, specialnotenames);
   }
 
   // Calculate frequencytable if necessary
   if (basepitch < 0.0f)
     basepitch = 0.0f;
   if (basepitch > 0.0f)
-    calculatefreqtable();
+    calculatefreqtable(basepitch, equaldivisionsperoctave);
 
   // Set special note names
   if (specialnotenames[1] != '\0')
@@ -1623,38 +1617,6 @@ void nextmultiplier()
   }
 }
 
-void calculatefreqtable()
-{
-  if (tuningcount)
-  {
-    double basefreq = (double)basepitch * (16777216.0 / 985248.0) * std::pow(2.0, 0.25) / 32.0;
-    double cyclebasefreq = basefreq;
-    double freq = basefreq;
-    int c = 0;
-    while (c < 96)
-    {
-      for (int i = 0; i < tuningcount; i++)
-      {
-        if (c < 96)
-        {
-          int intfreq = static_cast<int>(freq + 0.5);
-          if (intfreq > 0xffff)
-              intfreq = 0xffff;
-          freqtbllo[c] = intfreq & 0xff;
-          freqtblhi[c] = intfreq >> 8;
-          freq = cyclebasefreq * tuning[i];
-          c++;
-        }
-      }
-      cyclebasefreq = freq;
-    }
-  }
-  else
-  {
-    calculatefreqtable(basepitch, equaldivisionsperoctave);
-  }
-}
-
 void setspecialnotenames()
 {
   char octave[11];
@@ -1678,88 +1640,6 @@ void setspecialnotenames()
       }
     }
     oct++;
-  }
-}
-
-void readscalatuningfile()
-{
-  FILE *scalatuningfile = fopen(scalatuningfilepath, "rt");
-  if (scalatuningfile)
-  {
-    char configbuf[MAX_PATHNAME];
-    char *configptr;
-    char strbuf[64];
-    char name[3];
-
-    // Tuning name
-    for (;;)
-    {
-      if (feof(scalatuningfile)) return;
-      std::fgets(configbuf, MAX_PATHNAME, scalatuningfile);
-      if ((configbuf[0]) && (configbuf[0] != '!') && (configbuf[0] != 13) && (configbuf[0] != 10)) break;
-    }
-    configptr = configbuf;
-    std::sscanf(configptr, "%63[^\t\n]", tuningname);
-
-    // Tuning count
-    for (;;)
-    {
-      if (feof(scalatuningfile)) return;
-      std::fgets(configbuf, MAX_PATHNAME, scalatuningfile);
-      if ((configbuf[0]) && (configbuf[0] != '!') && (configbuf[0] != 13) && (configbuf[0] != 10)) break;
-    }
-    configptr = configbuf;
-    std::sscanf(configptr, "%d", &tuningcount);
-
-    // Tunings 
-    for (int i = 0; i < tuningcount; i++)
-    {
-      for (;;)
-      {
-        if (feof(scalatuningfile)) return;
-        std::fgets(configbuf, MAX_PATHNAME, scalatuningfile);
-        if ((configbuf[0]) && (configbuf[0] != '!') && (configbuf[0] != 13) && (configbuf[0] != 10)) break;
-      }
-      configptr = configbuf;
-      name[0] = '\0';
-      std::sscanf(configptr, "%63s %2s", strbuf, name);
-      if (!i)
-      {
-        std::strcpy(specialnotenames, name);
-      }
-      else
-      {
-        if (i == tuningcount - 1)
-        {
-          char *tmp = strdup(specialnotenames);
-          std::strcpy(specialnotenames, name);
-          std::strcat(specialnotenames, tmp);
-          std::free(tmp);
-        }
-        else
-        {
-          std::strcat(specialnotenames, name);
-        }
-      }
-      if (!std::strchr(strbuf, '.'))
-      {
-        double numerator;
-        double denominator;
-        std::sscanf(strbuf, "%lf", &numerator);
-        if (std::strchr(strbuf, '/'))
-        {
-          std::sscanf(std::strchr(strbuf, '/') + 1, "%lf", &denominator);
-          tuning[i] = numerator / denominator;
-        }
-      }
-      else
-      {
-        double centvalue;
-        std::sscanf(configptr, "%lf", &centvalue);
-        tuning[i] = std::pow(2.0, centvalue / 1200.0);
-      }
-    }
-    std::fclose(scalatuningfile);
   }
 }
 

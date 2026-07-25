@@ -28,10 +28,10 @@
 #include "configfile.h"
 #include "console.h"
 #include "display.h"
-#include "freqtbl.h"
 #include "play.h"
 #include "song.h"
 #include "table.h"
+#include "tuning.h"
 
 #include "bme_main.h"
 #include "bme_end.h"
