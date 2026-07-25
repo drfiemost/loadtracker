@@ -23,10 +23,15 @@
 #include "colors.h"
 #include "console.h"
 #include "display.h"
-#include "loadtrk.h"
 
 #include "bme_main.h"
 #include "bme_win.h"
+
+#ifdef LTRELOC
+#  include "tools/ltreloc.h"
+#else
+#  include "loadtrk.h"
+#endif
 
 #include <cstdio>
 

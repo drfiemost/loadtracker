@@ -19,6 +19,8 @@
 #ifndef LTRELOC_H
 #define LTRELOC_H
 
+#include "common.h"
+
 #ifndef LTRELOC_C
 #  ifdef _WIN32
 #    include <cstdio>
@@ -30,6 +32,14 @@
 extern const char *programname;
 extern bool exitprogram;
 extern bool followplay;
+extern bool menu;
+extern bool monomode;
+
+extern bool recordmode;
+extern int editmode;
+extern int hexnybble;
+extern int eacolumn;
+extern EditHdr ehmode;
 
 extern char loadedsongfilename[MAX_FILENAME];
 extern char songfilename[MAX_FILENAME];

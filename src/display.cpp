@@ -24,11 +24,11 @@
 
 #include "display.h"
 
+#include "common.h"
 #include "colors.h"
 #include "configfile.h"
 #include "console.h"
 #include "instr.h"
-#include "loadtrk.h"
 #include "order.h"
 #include "pattern.h"
 #include "play.h"
@@ -38,6 +38,12 @@
 #include "bme_main.h"
 #include "bme_snd.h"
 #include "bme_win.h"
+
+#ifdef LTRELOC
+#  include "tools/ltreloc.h"
+#else
+#  include "loadtrk.h"
+#endif
 
 #include <utility>
 #include <string>

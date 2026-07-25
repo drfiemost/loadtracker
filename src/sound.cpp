@@ -25,12 +25,17 @@
 #include "sound.h"
 
 #include "configfile.h"
-#include "loadtrk.h"
 #include "ltmidi.h"
 #include "play.h"
 #include "sid.h"
 
 #include "bme_snd.h"
+
+#ifdef LTRELOC
+#  include "tools/ltreloc.h"
+#else
+#  include "loadtrk.h"
+#endif
 
 #include <SDL3/SDL.h>
 

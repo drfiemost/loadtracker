@@ -81,6 +81,16 @@ void getparam(FILE *handle, unsigned *value);
 void getfloatparam(FILE *handle, float *value);
 void getstringparam(FILE *handle, char *value);
 
+int getMaxChannels()
+{
+    return (numsids == 1) ? MAX_CHN_MONO : MAX_CHN;
+}
+
+int getVisibleOrderlist()
+{
+    return (numsids == 1) ? 23 : 14;
+}
+
 void getFilename(char filename[MAX_PATHNAME], bool createdir)
 {
 #ifdef _WIN32

@@ -60,4 +60,7 @@ void loadconfig();
 void saveconfig();
 void validateconfig();
 
+int getMaxChannels();
+int getVisibleOrderlist();
+
 #endif

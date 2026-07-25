@@ -26,7 +26,6 @@
 
 #include "colors.h"
 #include "configfile.h"
-#include "loadtrk.h"
 
 #include "bme_main.h"
 #include "bme_win.h"

@@ -1908,13 +1908,3 @@ void findduplicatepatterns()
 
   findusedpatterns();
 }
-
-int getMaxChannels()
-{
-    return (numsids == 1) ? MAX_CHN_MONO : MAX_CHN;
-}
-
-int getVisibleOrderlist()
-{
-    return (numsids == 1) ? 23 : 14;
-}

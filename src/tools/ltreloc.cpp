@@ -26,7 +26,6 @@
 
 #include "config.h"
 
-#include "common.h"
 #include "colors.h"
 #include "console.h"
 #include "pattern.h"
@@ -48,13 +47,6 @@
 #include <cstdlib>
 
 #if 1
-enum class EditHdr
-{
-  NONE    = 0,
-  ADSR    = 1,
-  BPM     = 2
-};
-
 int editmode = 0;
 bool recordmode = true;
 int hexnybble = -1;

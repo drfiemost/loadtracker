@@ -22,24 +22,6 @@
 #include "common.h"
 #include "file.h"
 
-enum
-{
-  EDIT_PATTERN      = 0,
-  EDIT_ORDERLIST    = 1,
-  EDIT_INSTRUMENT   = 2,
-  EDIT_TABLES       = 3,
-  EDIT_NAMES        = 4
-};
-
-enum class EditHdr
-{
-  NONE    = 0,
-  ADSR    = 1,
-  BPM     = 2
-};
-
-#define PGUPDNREPEAT 8
-
 #ifndef LOADTRK_C
 extern bool menu;
 extern int editmode;
@@ -63,8 +45,5 @@ void waitkeymouse();
 void waitkeynoupdate();
 void waitkeymousenoupdate();
 void onlinehelp(int standalone, int context);
-
-int getMaxChannels();
-int getVisibleOrderlist();
 
 #endif

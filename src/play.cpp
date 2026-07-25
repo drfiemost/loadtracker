@@ -26,12 +26,17 @@
 
 #include "configfile.h"
 #include "display.h"
-#include "loadtrk.h"
 #include "order.h"
 #include "pattern.h"
 #include "sid.h"
 #include "song.h"
 #include "sound.h"
+
+#ifdef LTRELOC
+#  include "tools/ltreloc.h"
+#else
+#  include "loadtrk.h"
+#endif
 
 #include <cstdio>
 #include <cstring>
