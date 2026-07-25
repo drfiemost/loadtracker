@@ -23,6 +23,15 @@
 
 #ifndef DISPLAY_C
 extern char textbuffer[MAX_PATHNAME];
+
+extern bool menu;
+extern int editmode;
+extern bool recordmode;
+extern bool followplay;
+extern int hexnybble;
+extern bool exitprogram;
+extern int eacolumn;
+extern EditHdr ehmode;
 #endif
 
 void printmainscreen();

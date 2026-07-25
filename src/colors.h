@@ -19,32 +19,12 @@
 #ifndef COLORS_H
 #define COLORS_H
 
-enum
-{
-  CBLACK  = 0x0,
-  CWHITE  = 0x1,
-  CDRED   = 0x2,
-  CCYAN   = 0x3,
-  CPURPLE = 0x4,
-  CDGREEN = 0x5,
-  CDBLUE  = 0x6,
-  CYELLOW = 0x7,
-  CLBROWN = 0x8,
-  CDBROWN = 0x9,
-  CLRED   = 0xA,
-  CDGREY  = 0xB,
-  CGREY   = 0xC,
-  CLGREEN = 0xD,
-  CLBLUE  = 0xE,
-  CLGREY  = 0xF
-};
-
 class Colorscheme
 {
 private:
     int rainbowtable[5];
 
-public: // FIXME
+public: // FIXME make private and add getters
     unsigned char CBKGND;
     unsigned char CNORMAL;
     unsigned char CMUTE;
@@ -60,6 +40,8 @@ public: // FIXME
 
 public:
     void init(bool dark);
+
+    int getAutoadvanceColor(int autoadvance);
 
     int getCursorColor(int i);
 

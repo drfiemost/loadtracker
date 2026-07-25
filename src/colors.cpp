@@ -18,6 +18,26 @@
 
 #include "colors.h"
 
+enum
+{
+  CBLACK  = 0x0,
+  CWHITE  = 0x1,
+  CDRED   = 0x2,
+  CCYAN   = 0x3,
+  CPURPLE = 0x4,
+  CDGREEN = 0x5,
+  CDBLUE  = 0x6,
+  CYELLOW = 0x7,
+  CLBROWN = 0x8,
+  CDBROWN = 0x9,
+  CLRED   = 0xA,
+  CDGREY  = 0xB,
+  CGREY   = 0xC,
+  CLGREEN = 0xD,
+  CLBLUE  = 0xE,
+  CLGREY  = 0xF
+};
+
 Colorscheme colors;
 
 int cursorcolortable[4] = { CWHITE, CLGREY, CGREY, CLGREY };
@@ -46,6 +66,17 @@ void Colorscheme::init(bool dark)
   rainbowtable[2] = CYELLOW;
   rainbowtable[3] = CLBROWN;
   rainbowtable[4] = CDRED;
+}
+
+int Colorscheme::getAutoadvanceColor(int autoadvance)
+{
+  switch(autoadvance)
+  {
+    default: // unreachable
+    case 0: return CLRED;
+    case 1: return CLBLUE;
+    case 2: return CGREY;
+  }
 }
 
 int Colorscheme::getCursorColor(int i)

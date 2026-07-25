@@ -47,22 +47,13 @@
 #include <cstdlib>
 
 #if 1
-int editmode = 0;
-bool recordmode = true;
-int hexnybble = -1;
 int stepsize = 4;
-bool exitprogram = false;
-int eacolumn = 0;
-int eamode = 0;
-EditHdr ehmode = EditHdr::NONE;
 
 #define NUMSIDREGS 0x19
 unsigned char sidreg[NUMSIDREGS];
 unsigned char sidreg2[NUMSIDREGS];
 #endif
 
-bool menu = false;
-bool followplay = false;
 int defaultpatternlength = 64;
 
 unsigned keypreset = KEY_TRACKER;

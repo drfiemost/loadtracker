@@ -24,6 +24,7 @@
 
 #include "configfile.h"
 #include "console.h"
+#include "display.h"
 #include "freqtbl.h"
 #include "instr.h"
 #include "order.h"
@@ -34,12 +35,6 @@
 #include "table.h"
 
 #include "bme_main.h"
-
-#ifdef LTRELOC
-#  include "tools/ltreloc.h"
-#else
-#  include "loadtrk.h"
-#endif
 
 #include <utility>
 

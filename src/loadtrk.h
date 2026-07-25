@@ -23,14 +23,6 @@
 #include "file.h"
 
 #ifndef LOADTRK_C
-extern bool menu;
-extern int editmode;
-extern bool recordmode;
-extern bool followplay;
-extern int hexnybble;
-extern bool exitprogram;
-extern int eacolumn;
-extern EditHdr ehmode;
 
 extern bool monomode;
 extern char loadedsongfilename[MAX_FILENAME];

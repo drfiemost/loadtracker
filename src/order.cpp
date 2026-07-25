@@ -27,17 +27,12 @@
 #include "common.h"
 #include "configfile.h"
 #include "console.h"
+#include "display.h"
 #include "pattern.h"
 #include "play.h"
 #include "song.h"
 
 #include "bme_main.h"
-
-#ifdef LTRELOC
-#  include "tools/ltreloc.h"
-#else
-#  include "loadtrk.h"
-#endif
 
 #include <utility>
 

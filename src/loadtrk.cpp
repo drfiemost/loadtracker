@@ -54,15 +54,6 @@
 
 constexpr int HOLDDELAY = 24;
 
-bool menu = false;
-int editmode = EDIT_PATTERN;
-bool recordmode = true;
-bool followplay = false;
-int hexnybble = -1;
-bool exitprogram = false;
-int eacolumn = 0;
-EditHdr ehmode = EditHdr::NONE;
-
 bool monomode = true;
 bool writer = false;
 

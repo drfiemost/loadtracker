@@ -1305,7 +1305,6 @@ void clearsong(bool cs, bool cp, bool ci, bool ct, bool cn)
   epmark.chn = -1;
   tables.clear();
   esmark.chn = -1;
-  followplay = false;
 
   for (int c = 0; c < maxChns; c++)
   {
