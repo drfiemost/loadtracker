@@ -44,7 +44,6 @@
 #include "bme_io.h"
 
 #include <cctype>
-#include <cmath>
 #include <cstring>
 #include <cstdio>
 #include <cstdlib>

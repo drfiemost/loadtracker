@@ -61,9 +61,11 @@ char tuningname[64];
 
 void calculatefreqtable(double basepitch, double equaldivisionsperoctave)
 {
+  // FIXME this is tailored to PAL frequency
+  double basefreq = basepitch * (16777216.0 / 985248.0) * std::pow(2.0, 0.25) / 32.0;
+
   if (tuningcount)
   {
-    double basefreq = (double)basepitch * (16777216.0 / 985248.0) * std::pow(2.0, 0.25) / 32.0;
     double cyclebasefreq = basefreq;
     double freq = basefreq;
     int c = 0;
@@ -87,8 +89,6 @@ void calculatefreqtable(double basepitch, double equaldivisionsperoctave)
   }
   else
   {
-    double basefreq = basepitch * (16777216.0 / 985248.0) * std::pow(2.0, 0.25) / 32.0;
-
     for (int c = 0; c < 8*12 ; c++)
     {
         double note = c;

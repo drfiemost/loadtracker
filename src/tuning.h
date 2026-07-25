@@ -19,7 +19,7 @@
 #ifndef TUNING_H
 #define TUNING_H
 
-#ifndef FREQTBL_C
+#ifndef TUNING_C
 extern unsigned char freqtbllo[];
 extern unsigned char freqtblhi[];
 #endif
