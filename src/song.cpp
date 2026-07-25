@@ -27,7 +27,6 @@
 #include "common.h"
 #include "channels.h"
 #include "configfile.h"
-#include "file.h"
 #include "instr.h"
 #include "order.h"
 #include "pattern.h"
@@ -91,6 +90,245 @@ int Song::findfreespeedtable()
     }
   }
   return -1;
+}
+
+void Song::inserttable(int num, int pos, int mode)
+{
+  // Shift tablepointers in instruments
+  for (int c = 1; c < MAX_INSTR; c++)
+  {
+    if (!mode)
+    {
+      if ((instr[c].ptr[num]-1) >= pos) instr[c].ptr[num]++;
+    }
+    else
+    {
+      if ((instr[c].ptr[num]-1) > pos) instr[c].ptr[num]++;
+    }
+  }
+
+  // Shift tablepointers in wavetable commands
+  for (int c = 0; c < MAX_TABLELEN; c++)
+  {
+    if ((ltable[WTBL][c] >= WAVECMD) && (ltable[WTBL][c] <= WAVELASTCMD))
+    {
+      int cmd = ltable[WTBL][c] & 0xf;
+
+      if (num < STBL)
+      {
+        if (cmd == CMD_SETWAVEPTR+num)
+        {
+          if (!mode)
+          {
+            if ((rtable[WTBL][c]-1) >= pos) rtable[WTBL][c]++;
+          }
+          else
+          {
+            if ((rtable[WTBL][c]-1) > pos) rtable[WTBL][c]++;
+          }
+        }
+      }
+      else
+      {
+        if ((cmd == CMD_FUNKTEMPO) || ((cmd >= CMD_PORTAUP) && (cmd <= CMD_VIBRATO)))
+        {
+          if (!mode)
+          {
+            if ((rtable[WTBL][c]-1) >= pos) rtable[WTBL][c]++;
+          }
+          else
+          {
+            if ((rtable[WTBL][c]-1) > pos) rtable[WTBL][c]++;
+          }
+        }
+      }
+    }
+  }
+
+
+  // Shift tablepointers in patterns
+  for (int c = 0; c < MAX_PATT; c++)
+  {
+    for (int d = 0; d <= MAX_PATTROWS; d++)
+    {
+      if (num < STBL)
+      {
+        if (pattern[c][d*4+2] == CMD_SETWAVEPTR+num)
+        {
+          if (!mode)
+          {
+            if ((pattern[c][d*4+3]-1) >= pos) pattern[c][d*4+3]++;
+          }
+          else
+          {
+            if ((pattern[c][d*4+3]-1) > pos) pattern[c][d*4+3]++;
+          }
+        }
+      }
+      else
+      {
+        if ((pattern[c][d*4+2] == CMD_FUNKTEMPO) ||
+           ((pattern[c][d*4+2] >= CMD_PORTAUP) && (pattern[c][d*4+2] <= CMD_VIBRATO)))
+        {
+          if (!mode)
+          {
+            if ((pattern[c][d*4+3]-1) >= pos) pattern[c][d*4+3]++;
+          }
+          else
+          {
+            if ((pattern[c][d*4+3]-1) > pos) pattern[c][d*4+3]++;
+          }
+        }
+      }
+    }
+  }
+
+  // Shift jumppointers in the table itself
+  if (num != STBL)
+  {
+    for (int c = 0; c < MAX_TABLELEN; c++)
+    {
+      if (ltable[num][c] == 0xff)
+      {
+        if (!mode)
+        {
+          if ((rtable[num][c]-1) >= pos) rtable[num][c]++;
+        }
+        else
+        {
+          if ((rtable[num][c]-1) > pos) rtable[num][c]++;
+        }
+      }
+    }
+  }
+
+  for (int c = MAX_TABLELEN-1; c >= pos; c--)
+  {
+    if (c > pos)
+    {
+      ltable[num][c] = ltable[num][c-1];
+      rtable[num][c] = rtable[num][c-1];
+    }
+    else
+    {
+      if ((num == WTBL) && (mode == 1))
+      {
+        ltable[num][c] = 0xe9;
+        rtable[num][c] = 0;
+      }
+      else
+      {
+        ltable[num][c] = 0;
+        rtable[num][c] = 0;
+      }
+    }
+  }
+}
+
+void Song::deletetable(int num, int pos)
+{
+  // Shift tablepointers in instruments
+  for (int c = 1; c < MAX_INSTR; c++)
+  {
+    if ((instr[c].ptr[num]-1) > pos) instr[c].ptr[num]--;
+  }
+
+  // Shift tablepointers in wavetable commands
+  for (int c = 0; c < MAX_TABLELEN; c++)
+  {
+    if ((ltable[WTBL][c] >= WAVECMD) && (ltable[WTBL][c] <= WAVELASTCMD))
+    {
+      int cmd = ltable[WTBL][c] & 0xf;
+
+      if (num < STBL)
+      {
+        if (cmd == CMD_SETWAVEPTR+num)
+        {
+          if ((rtable[WTBL][c]-1) > pos) rtable[WTBL][c]--;
+        }
+      }
+      else
+      {
+        if ((cmd == CMD_FUNKTEMPO) || ((cmd >= CMD_PORTAUP) && (cmd <= CMD_VIBRATO)))
+        {
+          if ((rtable[WTBL][c]-1) > pos) rtable[WTBL][c]--;
+        }
+      }
+    }
+  }
+
+  // Shift tablepointers in patterns
+  for (int c = 0; c < MAX_PATT; c++)
+  {
+    for (int d = 0; d <= MAX_PATTROWS; d++)
+    {
+      if (num < STBL)
+      {
+        if (pattern[c][d*4+2] == CMD_SETWAVEPTR+num)
+        {
+          if ((pattern[c][d*4+3]-1) > pos) pattern[c][d*4+3]--;
+        }
+      }
+      else
+      {
+        if ((pattern[c][d*4+2] == CMD_FUNKTEMPO) ||
+           ((pattern[c][d*4+2] >= CMD_PORTAUP) && (pattern[c][d*4+2] <= CMD_VIBRATO)))
+        {
+          if ((pattern[c][d*4+3]-1) > pos) pattern[c][d*4+3]--;
+        }
+      }
+    }
+  }
+
+  // Shift jumppointers in the table itself
+  for (int c = 0; c < MAX_TABLELEN; c++)
+  {
+    if (num != STBL)
+    {
+      if (ltable[num][c] == 0xff)
+        if ((rtable[num][c]-1) > pos) rtable[num][c]--;
+    }
+  }
+
+  for (int c = pos; c < MAX_TABLELEN; c++)
+  {
+    if (c+1 < MAX_TABLELEN)
+    {
+      ltable[num][c] = ltable[num][c+1];
+      rtable[num][c] = rtable[num][c+1];
+    }
+    else
+    {
+      ltable[num][c] = 0;
+      rtable[num][c] = 0;
+    }
+  }
+}
+
+void Song::deleteinstrtable(int i)
+{
+  bool eraseok = true;
+
+  for (int c = 0; c < MAX_TABLES; c++)
+  {
+    if (instr[i].ptr[c])
+    {
+      int pos = instr[i].ptr[c]-1;
+      int len = gettablepartlen(c, pos);
+
+      // Check that this table area isn't used by another instrument
+      for (int d = 1; d < MAX_INSTR; d++)
+      {
+        if ((d != i) && (instr[d].ptr[c]))
+        {
+          int cmppos = instr[d].ptr[c]-1;
+          if ((cmppos >= pos) && (cmppos < pos+len)) eraseok = false;
+        }
+      }
+      if (eraseok)
+        while (len--) deletetable(c, pos);
+    }
+  }
 }
 
 bool savesong()
@@ -979,7 +1217,7 @@ void loadinstrument()
       std::fread(&song.instr[einum].name, MAX_INSTRNAMELEN, 1, handle);
 
       // Erase old tabledata
-      deleteinstrtable(einum);
+      song.deleteinstrtable(einum);
 
       // Load new tabledata
       for (int c = 0; c < MAX_TABLES; c++)
@@ -1043,7 +1281,7 @@ void loadinstrument()
       std::fread(&song.instr[einum].name, MAX_INSTRNAMELEN, 1, handle);
 
       // Erase old tabledata
-      deleteinstrtable(einum);
+      song.deleteinstrtable(einum);
 
       // Load new tabledata
       for (int c = 0; c < MAX_TABLES-1; c++)

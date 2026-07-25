@@ -52,7 +52,7 @@ void instrumentcommands()
     case KEY_DEL:
     if ((einum) && (shiftpressed) && (eipos < 9))
     {
-      deleteinstrtable(einum);
+      song.deleteinstrtable(einum);
       clearinstr(einum);
     }
     break;

@@ -38,6 +38,9 @@ public:
     int gettablelen(int num);
     int gettablepartlen(int num, int pos);
     int findfreespeedtable();
+    void inserttable(int num, int pos, int mode);
+    void deletetable(int num, int pos);
+    void deleteinstrtable(int i);
 };
 
 

@@ -50,8 +50,6 @@ int tablecopyrows = 0;
 
 Tables tables;
 
-void inserttable(int num, int pos, int mode);
-
 void tablecommands()
 {
   switch(rawkey)
@@ -301,7 +299,7 @@ void tablecommands()
       if (targetpulse < currentpulse) speed = -speed;
 
       // Make room in the table
-      for (c = steps; c > 1; c--) inserttable(tables.num(), tables.pos(), 1);
+      for (c = steps; c > 1; c--) song.inserttable(tables.num(), tables.pos(), 1);
 
       while (time)
       {
@@ -360,7 +358,7 @@ void tablecommands()
       if (targetfilter < currentfilter) speed = -speed;
 
       // Make room in the table
-      for (c = steps; c > 1; c--) inserttable(tables.num(), tables.pos(), 1);
+      for (c = steps; c > 1; c--) song.inserttable(tables.num(), tables.pos(), 1);
 
       while (time)
       {
@@ -396,11 +394,11 @@ void tablecommands()
     break;
 
     case KEY_DEL:
-    deletetable(tables.num(), tables.pos());
+    song.deletetable(tables.num(), tables.pos());
     break;
 
     case KEY_INS:
-    inserttable(tables.num(), tables.pos(), shiftpressed);
+    song.inserttable(tables.num(), tables.pos(), shiftpressed);
     break;
 
     case KEY_ENTER:
@@ -552,219 +550,6 @@ void tablecommands()
   tables.validatetableview();
 }
 
-void deletetable(int num, int pos)
-{
-  // Shift tablepointers in instruments
-  for (int c = 1; c < MAX_INSTR; c++)
-  {
-    if ((song.instr[c].ptr[num]-1) > pos) song.instr[c].ptr[num]--;
-  }
-
-  // Shift tablepointers in wavetable commands
-  for (int c = 0; c < MAX_TABLELEN; c++)
-  {
-    if ((song.ltable[WTBL][c] >= WAVECMD) && (song.ltable[WTBL][c] <= WAVELASTCMD))
-    {
-      int cmd = song.ltable[WTBL][c] & 0xf;
-
-      if (num < STBL)
-      {
-        if (cmd == CMD_SETWAVEPTR+num)
-        {
-          if ((song.rtable[WTBL][c]-1) > pos) song.rtable[WTBL][c]--;
-        }
-      }
-      else
-      {
-        if ((cmd == CMD_FUNKTEMPO) || ((cmd >= CMD_PORTAUP) && (cmd <= CMD_VIBRATO)))
-        {
-          if ((song.rtable[WTBL][c]-1) > pos) song.rtable[WTBL][c]--;
-        }
-      }
-    }
-  }
-
-  // Shift tablepointers in patterns
-  for (int c = 0; c < MAX_PATT; c++)
-  {
-    for (int d = 0; d <= MAX_PATTROWS; d++)
-    {
-      if (num < STBL)
-      {
-        if (song.pattern[c][d*4+2] == CMD_SETWAVEPTR+num)
-        {
-          if ((song.pattern[c][d*4+3]-1) > pos) song.pattern[c][d*4+3]--;
-        }
-      }
-      else
-      {
-        if ((song.pattern[c][d*4+2] == CMD_FUNKTEMPO) ||
-           ((song.pattern[c][d*4+2] >= CMD_PORTAUP) && (song.pattern[c][d*4+2] <= CMD_VIBRATO)))
-        {
-          if ((song.pattern[c][d*4+3]-1) > pos) song.pattern[c][d*4+3]--;
-        }
-      }
-    }
-  }
-
-  // Shift jumppointers in the table itself
-  for (int c = 0; c < MAX_TABLELEN; c++)
-  {
-    if (num != STBL)
-    {
-      if (song.ltable[num][c] == 0xff)
-        if ((song.rtable[num][c]-1) > pos) song.rtable[num][c]--;
-    }
-  }
-
-  for (int c = pos; c < MAX_TABLELEN; c++)
-  {
-    if (c+1 < MAX_TABLELEN)
-    {
-      song.ltable[num][c] = song.ltable[num][c+1];
-      song.rtable[num][c] = song.rtable[num][c+1];
-    }
-    else
-    {
-      song.ltable[num][c] = 0;
-      song.rtable[num][c] = 0;
-    }
-  }
-}
-
-void inserttable(int num, int pos, int mode)
-{
-  // Shift tablepointers in instruments
-  for (int c = 1; c < MAX_INSTR; c++)
-  {
-    if (!mode)
-    {
-      if ((song.instr[c].ptr[num]-1) >= pos) song.instr[c].ptr[num]++;
-    }
-    else
-    {
-      if ((song.instr[c].ptr[num]-1) > pos) song.instr[c].ptr[num]++;
-    }
-  }
-
-  // Shift tablepointers in wavetable commands
-  for (int c = 0; c < MAX_TABLELEN; c++)
-  {
-    if ((song.ltable[WTBL][c] >= WAVECMD) && (song.ltable[WTBL][c] <= WAVELASTCMD))
-    {
-      int cmd = song.ltable[WTBL][c] & 0xf;
-
-      if (num < STBL)
-      {
-        if (cmd == CMD_SETWAVEPTR+num)
-        {
-          if (!mode)
-          {
-            if ((song.rtable[WTBL][c]-1) >= pos) song.rtable[WTBL][c]++;
-          }
-          else
-          {
-            if ((song.rtable[WTBL][c]-1) > pos) song.rtable[WTBL][c]++;
-          }
-        }
-      }
-      else
-      {
-        if ((cmd == CMD_FUNKTEMPO) || ((cmd >= CMD_PORTAUP) && (cmd <= CMD_VIBRATO)))
-        {
-          if (!mode)
-          {
-            if ((song.rtable[WTBL][c]-1) >= pos) song.rtable[WTBL][c]++;
-          }
-          else
-          {
-            if ((song.rtable[WTBL][c]-1) > pos) song.rtable[WTBL][c]++;
-          }
-        }
-      }
-    }
-  }
-
-
-  // Shift tablepointers in patterns
-  for (int c = 0; c < MAX_PATT; c++)
-  {
-    for (int d = 0; d <= MAX_PATTROWS; d++)
-    {
-      if (num < STBL)
-      {
-        if (song.pattern[c][d*4+2] == CMD_SETWAVEPTR+num)
-        {
-          if (!mode)
-          {
-            if ((song.pattern[c][d*4+3]-1) >= pos) song.pattern[c][d*4+3]++;
-          }
-          else
-          {
-            if ((song.pattern[c][d*4+3]-1) > pos) song.pattern[c][d*4+3]++;
-          }
-        }
-      }
-      else
-      {
-        if ((song.pattern[c][d*4+2] == CMD_FUNKTEMPO) ||
-           ((song.pattern[c][d*4+2] >= CMD_PORTAUP) && (song.pattern[c][d*4+2] <= CMD_VIBRATO)))
-        {
-          if (!mode)
-          {
-            if ((song.pattern[c][d*4+3]-1) >= pos) song.pattern[c][d*4+3]++;
-          }
-          else
-          {
-            if ((song.pattern[c][d*4+3]-1) > pos) song.pattern[c][d*4+3]++;
-          }
-        }
-      }
-    }
-  }
-
-  // Shift jumppointers in the table itself
-  if (num != STBL)
-  {
-    for (int c = 0; c < MAX_TABLELEN; c++)
-    {
-      if (song.ltable[num][c] == 0xff)
-      {
-        if (!mode)
-        {
-          if ((song.rtable[num][c]-1) >= pos) song.rtable[num][c]++;
-        }
-        else
-        {
-          if ((song.rtable[num][c]-1) > pos) song.rtable[num][c]++;
-        }
-      }
-    }
-  }
-
-  for (int c = MAX_TABLELEN-1; c >= pos; c--)
-  {
-    if (c > pos)
-    {
-      song.ltable[num][c] = song.ltable[num][c-1];
-      song.rtable[num][c] = song.rtable[num][c-1];
-    }
-    else
-    {
-      if ((num == WTBL) && (mode == 1))
-      {
-        song.ltable[num][c] = 0xe9;
-        song.rtable[num][c] = 0;
-      }
-      else
-      {
-        song.ltable[num][c] = 0;
-        song.rtable[num][c] = 0;
-      }
-    }
-  }
-}
-
 int makespeedtable(unsigned data, int mode, bool makenew)
 {
   if (!data) return -1;
@@ -820,32 +605,6 @@ int makespeedtable(unsigned data, int mode, bool makenew)
     }
   }
   return -1;
-}
-
-void deleteinstrtable(int i)
-{
-  bool eraseok = true;
-
-  for (int c = 0; c < MAX_TABLES; c++)
-  {
-    if (song.instr[i].ptr[c])
-    {
-      int pos = song.instr[i].ptr[c]-1;
-      int len = song.gettablepartlen(c, pos);
-
-      // Check that this table area isn't used by another instrument
-      for (int d = 1; d < MAX_INSTR; d++)
-      {
-        if ((d != i) && (song.instr[d].ptr[c]))
-        {
-          int cmppos = song.instr[d].ptr[c]-1;
-          if ((cmppos >= pos) && (cmppos < pos+len)) eraseok = false;
-        }
-      }
-      if (eraseok)
-        while (len--) deletetable(c, pos);
-    }
-  }
 }
 
 void gototable(int num, int pos)

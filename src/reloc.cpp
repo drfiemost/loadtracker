@@ -3966,6 +3966,6 @@ void optimizetable(int num)
   }
   for (; c >= 0; c--)
   {
-    if (!tableused[num][c+1]) deletetable(num, c);
+    if (!tableused[num][c+1]) song.deletetable(num, c);
   }
 }
