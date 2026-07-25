@@ -25,6 +25,7 @@
 #include "display.h"
 
 #include "common.h"
+#include "channels.h"
 #include "colors.h"
 #include "configfile.h"
 #include "console.h"
@@ -34,6 +35,7 @@
 #include "play.h"
 #include "song.h"
 #include "table.h"
+#include "timer.h"
 
 #include "bme_main.h"
 #include "bme_snd.h"
@@ -531,7 +533,7 @@ void printstatus()
   const char *playmode = isplaying() ? "PLAYING" : "STOPPED";
   printtext(dpos.octaveX+10, dpos.octaveY, colors.CTITLE, playmode);
 
-  gettime(textbuffer);
+  timer.get(textbuffer);
   color = isplaying() ? colors.CEDIT : colors.CMUTE;
   printtext(dpos.octaveX+10, dpos.octaveY+1, color, textbuffer);
 

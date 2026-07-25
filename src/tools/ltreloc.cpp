@@ -26,11 +26,12 @@
 
 #include "config.h"
 
+#include "channels.h"
 #include "colors.h"
 #include "console.h"
+#include "freqtbl.h"
 #include "pattern.h"
 #include "reloc.h"
-#include "play.h"
 #include "song.h"
 
 #include "bme_io.h"
@@ -41,7 +42,6 @@
 #endif
 
 #include <cctype>
-#include <cmath>
 #include <cstdio>
 #include <cstring>
 #include <cstdlib>
@@ -94,8 +94,6 @@ char instrfilename[MAX_FILENAME];
 const char *programname = "LTReloc v" PACKAGE_VERSION;
 
 extern unsigned char datafile[];
-
-void calculatefreqtable();
 
 #ifdef _WIN32
 FILE *STDOUT, *STDERR;
@@ -362,7 +360,7 @@ int main(int argc, char **argv)
   if (basepitch < 0.0f)
     basepitch = 0.0f;
   if (basepitch > 0.0f)
-    calculatefreqtable();
+    calculatefreqtable(basepitch, 12.);
 
   // perform relocation
   relocator(packedsongname);
@@ -380,22 +378,7 @@ void waitkeynoupdate()
 {
 }
 
-void calculatefreqtable()
-{
-  double basefreq = (double)basepitch * (16777216.0 / 985248.0) * std::pow(2.0, 0.25) / 32.0;
-
-  for (int c = 0; c < 8*12 ; c++)
-  {
-    double note = c;
-    double freq = basefreq * std::pow(2.0, note/12.0);
-    int intfreq = freq + 0.5;
-    if (intfreq > 0xffff)
-        intfreq = 0xffff;
-    freqtbllo[c] = intfreq & 0xff;
-    freqtblhi[c] = intfreq >> 8;
-  }
-}
-
+// FIXME remove
 int getMaxChannels()
 {
     return (numsids == 1) ? MAX_CHN_MONO : MAX_CHN;

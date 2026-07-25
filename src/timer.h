@@ -1,5 +1,5 @@
 /*
- * LTReloc
+ * LoadTracker
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,37 +16,28 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#ifndef LTRELOC_H
-#define LTRELOC_H
+#ifndef TIMER_H
+#define TIMER_H
 
-#include "common.h"
+class Timer
+{
+private:
+    int timemin = 0;
+    int timesec = 0;
+    unsigned timeframe = 0;
 
-#ifndef LTRELOC_C
-#  ifdef _WIN32
-#    include <cstdio>
-     extern FILE *STDOUT, *STDERR;
-#  else
-#    define STDOUT stdout
-#    define STDERR stderr
-#  endif
-extern const char *programname;
-extern bool exitprogram;
-extern bool followplay;
-extern bool menu;
-extern bool monomode;
+    unsigned m_ntsc;
+    unsigned m_multiplier;
 
-extern bool recordmode;
-extern int editmode;
-extern int hexnybble;
-extern int eacolumn;
-extern EditHdr ehmode;
+public:
+    void get(char *buf);
+    void reset();
+    void increment();
 
-extern char loadedsongfilename[MAX_FILENAME];
-extern char songfilename[MAX_FILENAME];
-extern char instrfilename[MAX_FILENAME];
-#endif
+    void setfreq(unsigned ntsc) { m_ntsc = ntsc; }
+    void setmult(unsigned multiplier) { m_multiplier = multiplier; }
+};
 
-void waitkeymousenoupdate();
-void waitkeynoupdate();
+extern Timer timer;
 
 #endif

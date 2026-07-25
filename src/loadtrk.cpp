@@ -22,10 +22,12 @@
 
 #include "config.h"
 
+#include "channels.h"
 #include "colors.h"
 #include "configfile.h"
 #include "console.h"
 #include "display.h"
+#include "freqtbl.h"
 #include "instr.h"
 #include "order.h"
 #include "pattern.h"
@@ -34,6 +36,7 @@
 #include "song.h"
 #include "sound.h"
 #include "table.h"
+#include "timer.h"
 
 #include "bme_main.h"
 #include "bme_win.h"
@@ -337,6 +340,9 @@ int main(int argc, char **argv)
   // Reset channels/song
   initchannels();
   clearsong(true, true, true, true, true);
+
+  timer.setfreq(ntsc);
+  timer.setmult(multiplier);
 
   // Init sound
   if (!sound_init(mr, writer, sidmodel, ntsc, multiplier, interpolate, customclockrate, exsid, filterbias, combwaves))
@@ -958,6 +964,7 @@ void mousecommands()
       if ((mousex >= dpos.statusTopFvX+9) && (mousex <= dpos.statusTopFvX+12))
       {
         ntsc ^= 1;
+        timer.setfreq(ntsc);
         sound_init(mr, writer, sidmodel, ntsc, multiplier, interpolate, customclockrate, exsid, filterbias, combwaves);
       }
       if ((mousex >= dpos.statusTopFvX+14) && (mousex <= dpos.statusTopFvX+17))
@@ -1610,6 +1617,7 @@ void prevmultiplier()
   if (multiplier > 0)
   {
     multiplier--;
+    timer.setmult(multiplier);
     sound_init(mr, writer, sidmodel, ntsc, multiplier, interpolate, customclockrate, exsid, filterbias, combwaves);
   }
 }
@@ -1619,18 +1627,18 @@ void nextmultiplier()
   if (multiplier < 16)
   {
     multiplier++;
+    timer.setmult(multiplier);
     sound_init(mr, writer, sidmodel, ntsc, multiplier, interpolate, customclockrate, exsid, filterbias, combwaves);
   }
 }
 
 void calculatefreqtable()
 {
-  double basefreq = (double)basepitch * (16777216.0 / 985248.0) * std::pow(2.0, 0.25) / 32.0;
-  double cyclebasefreq = basefreq;
-  double freq = basefreq;
-
   if (tuningcount)
   {
+    double basefreq = (double)basepitch * (16777216.0 / 985248.0) * std::pow(2.0, 0.25) / 32.0;
+    double cyclebasefreq = basefreq;
+    double freq = basefreq;
     int c = 0;
     while (c < 96)
     {
@@ -1638,7 +1646,7 @@ void calculatefreqtable()
       {
         if (c < 96)
         {
-          int intfreq = freq + 0.5;
+          int intfreq = static_cast<int>(freq + 0.5);
           if (intfreq > 0xffff)
               intfreq = 0xffff;
           freqtbllo[c] = intfreq & 0xff;
@@ -1652,16 +1660,7 @@ void calculatefreqtable()
   }
   else
   {
-    for (int c = 0; c < 8*12 ; c++)
-    {
-      double note = c;
-      double freq = basefreq * std::pow(2.0, note/(double)equaldivisionsperoctave);
-      int intfreq = freq + 0.5;
-      if (intfreq > 0xffff)
-          intfreq = 0xffff;
-      freqtbllo[c] = intfreq & 0xff;
-      freqtblhi[c] = intfreq >> 8;
-    }
+    calculatefreqtable(basepitch, equaldivisionsperoctave);
   }
 }
 

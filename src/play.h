@@ -31,46 +31,11 @@ enum
   PLAY_STOPPED    = 0x80
 };
 
-struct Chn
-{
-  unsigned char trans;
-  unsigned char instr;
-  unsigned char note;
-  unsigned char lastnote;
-  unsigned char newnote;
-  int pattptr;
-  unsigned char pattnum;
-  unsigned char songptr;
-  unsigned char repeat;
-  unsigned short freq;
-  unsigned char gate;
-  unsigned char wave;
-  unsigned short pulse;
-  unsigned char ptr[2];
-  unsigned char pulsetime;
-  unsigned char wavetime;
-  unsigned char vibtime;
-  unsigned char vibdelay;
-  unsigned char command;
-  unsigned char cmddata;
-  unsigned char newcommand;
-  unsigned char newcmddata;
-  unsigned char tick;
-  unsigned char tempo;
-  unsigned char mute;
-  unsigned char advance;
-  unsigned char gatetimer;
-};
-
 #ifndef PLAY_C
-extern Chn chn[MAX_CHN];
 extern unsigned char masterfader;
-extern unsigned char freqtbllo[];
-extern unsigned char freqtblhi[];
 extern int lastsonginit;
 #endif
 
-void initchannels();
 void initsong(int num, int playmode);
 void initsongpos(int num, int playmode, int pattpos);
 void stopsong();

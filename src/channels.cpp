@@ -1,5 +1,5 @@
 /*
- * LTReloc
+ * LoadTracker
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,37 +16,41 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#ifndef LTRELOC_H
-#define LTRELOC_H
+#include "channels.h"
 
-#include "common.h"
+#include "configfile.h"
 
-#ifndef LTRELOC_C
-#  ifdef _WIN32
-#    include <cstdio>
-     extern FILE *STDOUT, *STDERR;
-#  else
-#    define STDOUT stdout
-#    define STDERR stderr
-#  endif
-extern const char *programname;
-extern bool exitprogram;
-extern bool followplay;
-extern bool menu;
-extern bool monomode;
+#include <cstring>
 
-extern bool recordmode;
-extern int editmode;
-extern int hexnybble;
-extern int eacolumn;
-extern EditHdr ehmode;
+Chn chn[MAX_CHN];
+unsigned char funktable[2];
 
-extern char loadedsongfilename[MAX_FILENAME];
-extern char songfilename[MAX_FILENAME];
-extern char instrfilename[MAX_FILENAME];
-#endif
+void initchannels()
+{
+  int maxChns = getMaxChannels();
+  Chn *cptr = &chn[0];
 
-void waitkeymousenoupdate();
-void waitkeynoupdate();
+  std::memset(chn, 0, sizeof chn);
 
-#endif
+  for (int c = 0; c < maxChns; c++)
+  {
+    chn[c].trans = 0;
+    chn[c].instr = 1;
+    if (multiplier)
+      cptr->tempo = 6*multiplier-1;
+    else
+      cptr->tempo = 6-1;
+    cptr++;
+  }
+
+  if (multiplier)
+  {
+    funktable[0] = 9*multiplier-1;
+    funktable[1] = 6*multiplier-1;
+  }
+  else
+  {
+    funktable[0] = 9-1;
+    funktable[1] = 6-1;
+  }
+}
