@@ -67,7 +67,7 @@ enum class Cause
 
 #define MAX_BYTES_PER_ROW 16
 
-const char *playeroptname[] =
+const char *playeroptname[MAX_OPTIONS] =
 {
   "Buffered SID-writes",
   "Sound effect support",
@@ -78,17 +78,21 @@ const char *playeroptname[] =
   "Full SID buffering"
 };
 
-const char *tableleftname[] = {
+const char *tableleftname[MAX_TABLES] =
+{
   "mt_wavetbl",
   "mt_pulsetimetbl",
   "mt_filttimetbl",
-  "mt_speedlefttbl"};
+  "mt_speedlefttbl"
+};
 
-const char *tablerightname[] = {
+const char *tablerightname[MAX_TABLES] =
+{
   "mt_notetbl",
   "mt_pulsespdtbl",
   "mt_filtspdtbl",
-  "mt_speedrighttbl"};
+  "mt_speedrighttbl"
+};
 
 unsigned char chnused[MAX_CHN];
 unsigned char pattused[MAX_PATT];
@@ -1269,13 +1273,13 @@ TABLETYPE:
 
   // Insert songtable
   insertlabel("mt_songtbllo");
-  for (int c = 0; c < songs*3; c++)
+  for (int c = 0; c < songs*maxChns; c++)
   {
     std::snprintf(textbuffer, MAX_PATHNAME, "mt_song%d", c);
     insertaddrlo(textbuffer);
   }
   insertlabel("mt_songtblhi");
-  for (int c = 0; c < songs*3; c++)
+  for (int c = 0; c < songs*maxChns; c++)
   {
     std::snprintf(textbuffer, MAX_PATHNAME, "mt_song%d", c);
     insertaddrhi(textbuffer);
@@ -1464,7 +1468,7 @@ TABLETYPE:
   {
     for (int d = 0; d < maxChns; d++)
     {
-      std::snprintf(textbuffer, MAX_PATHNAME, "mt_song%d", c*3+d);
+      std::snprintf(textbuffer, MAX_PATHNAME, "mt_song%d", c*maxChns+d);
       insertlabel(textbuffer);
       insertbytes(&songwork[songoffset[c][d]], songsize[c][d]);
     }
@@ -1477,13 +1481,13 @@ TABLETYPE:
     insertlabel(textbuffer);
     insertbytes(&pattwork[pattoffset[c]], pattsize[c]);
   }
-
-  /*  {
+#ifndef NDEBUG
+  {
     FILE *handle = std::fopen("debug.s", "wb");
     std::fwrite(buf_data(&src), buf_size(&src), 1, handle);
     std::fclose(handle);
-  } */
-
+  }
+#endif
   // Assemble; on error fail in a rude way (the parser does so too)
   if (assemble(&src, &dest)) exit(1);
 
@@ -3341,13 +3345,13 @@ TABLETYPE_S:
 
     // Insert songtable
     insertlabel("mt_songtbllo");
-    for (int c = 0; c < songs*6; c++)
+    for (int c = 0; c < songs*maxChns; c++)
     {
         std::snprintf(textbuffer, MAX_PATHNAME, "mt_song%d", c);
         insertaddrlo(textbuffer);
     }
     insertlabel("mt_songtblhi");
-    for (int c = 0; c < songs*6; c++)
+    for (int c = 0; c < songs*maxChns; c++)
     {
         std::snprintf(textbuffer, MAX_PATHNAME, "mt_song%d", c);
         insertaddrhi(textbuffer);
@@ -3537,7 +3541,7 @@ SKIPTABLE_S:
     {
         for (int d = 0; d < maxChns; d++)
         {
-            std::snprintf(textbuffer, MAX_PATHNAME, "mt_song%d", c*6+d);
+            std::snprintf(textbuffer, MAX_PATHNAME, "mt_song%d", c*maxChns+d);
             insertlabel(textbuffer);
             insertbytes(&songwork[songoffset[c][d]], songsize[c][d]);
         }
@@ -3550,13 +3554,13 @@ SKIPTABLE_S:
         insertlabel(textbuffer);
         insertbytes(&pattwork[pattoffset[c]], pattsize[c]);
     }
-
-    //{
-    //  FILE *handle = std::fopen("debug.s", "wb");
-    //  std::fwrite(buf_get(&src), buf_memlen(&src), 1, handle);
-    //  std::fclose(handle);
-    //}
-
+#ifndef NDEBUG
+    {
+      FILE *handle = std::fopen("debug.s", "wb");
+      std::fwrite(buf_data(&src), buf_size(&src), 1, handle);
+      std::fclose(handle);
+    }
+#endif
     // Assemble; on error fail in a rude way (the parser does so too)
     if (assemble(&src, &dest)) exit(1);
 
