@@ -56,18 +56,11 @@ char ident[] = {'G', 'T', 'S', '!'};
 
 char zeroarray[32] = {0};
 
-int maxpatt = 0;
-int orderlen;
-int leaveout = 3;
-int transpose = 0;
-int goatchan = 0;
-int goatpatt = 0;
-
 int main(int argc, char **argv)
 {
   if (argc < 3)
   {
-    printf("Usage: mod2sng <mod> <sng> [channel] [transpose]\n"
+    std::printf("Usage: mod2sng <mod> <sng> [channel] [transpose]\n"
            "[channel] is the channel to leave out (1-4), default 4\n"
            "[transpose] is the halfstep transpose added to notes, default 0\n");
 
@@ -77,23 +70,27 @@ int main(int argc, char **argv)
   FILE *in = std::fopen(argv[1], "rb");
   if (!in)
   {
-    printf("Source open error.\n");
+    std::printf("Source open error.\n");
     return EXIT_FAILURE;
   }
   FILE *out = std::fopen(argv[2], "wb");
   if (!out)
   {
-    printf("Destination open error.\n");
+    std::printf("Destination open error.\n");
     std::fclose(in);
     return EXIT_FAILURE;
   }
+
+  int leaveout = 3;
+  int transpose = 0;
+
   if (argc > 3)
   {
     std::sscanf(argv[3], "%d", &leaveout);
     leaveout--;
     if ((leaveout < 0) || (leaveout > 3))
     {
-      printf("Illegal channel number.\n");
+      std::printf("Illegal channel number.\n");
       std::fclose(in);
       std::fclose(out);
       return EXIT_FAILURE;
@@ -104,6 +101,9 @@ int main(int argc, char **argv)
   {
     std::sscanf(argv[4], "%d", &transpose);
   }
+
+  int maxpatt = 0;
+  int orderlen;
 
   for (int c = 0; c < 1084; c++)
   {
@@ -155,6 +155,9 @@ int main(int argc, char **argv)
     srcptr += 4;
     destptr++;
   }
+
+  int goatchan = 0;
+  int goatpatt = 0;
 
   // Convert patterns into goatpatterns, and create orderlists
   for (int c = 0; c < 4; c++)
@@ -249,7 +252,7 @@ int main(int argc, char **argv)
         {
           if (goatpatt >= 208)
           {
-            printf("208 patterns exceeded!\n");
+            std::printf("208 patterns exceeded!\n");
             return EXIT_FAILURE;
           }
           for (int f = 0; f < 65; f++)
@@ -311,6 +314,6 @@ int main(int argc, char **argv)
     }
   }
   std::fclose(out);
-  printf("Converted successfully.\n");
+  std::printf("Converted successfully.\n");
   return EXIT_SUCCESS;
 }

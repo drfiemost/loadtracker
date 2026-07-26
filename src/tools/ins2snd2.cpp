@@ -194,14 +194,14 @@ int main(int argc, char **argv)
     }
     if (wavetable[c*2+1] < 0x82)
     {
-      printf("ERROR: Relative note or absolute C-0, C#0 found\n");
-      fclose(out);
+      std::printf("ERROR: Relative note or absolute C-0, C#0 found\n");
+      std::fclose(out);
       return EXIT_FAILURE;
     }
     if (wavetable[c*2] > 0x81)
     {
-      printf("ERROR: Waveform greater than $81 found\n");
-      fclose(out);
+      std::printf("ERROR: Waveform greater than $81 found\n");
+      std::fclose(out);
       return EXIT_FAILURE;
     }
     if (wavetable[c*2])
@@ -220,7 +220,7 @@ int main(int argc, char **argv)
   if (d > 255)
   {
     std::fclose(out);
-    printf("ERROR: Sound effect exceeds 255 bytes\n");
+    std::printf("ERROR: Sound effect exceeds 255 bytes\n");
     return EXIT_FAILURE;
   }
   std::fclose(out);

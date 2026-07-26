@@ -89,7 +89,7 @@ int main(int argc, char **argv)
   return EXIT_SUCCESS;
 }
 
-int processsong(void)
+int processsong()
 {
   int splitsize;
   int songs;

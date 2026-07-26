@@ -49,11 +49,11 @@ extern Song song;
 #endif
 
 void loadsong();
-void mergesong();
-void loadinstrument();
 bool savesong();
-bool saveinstrument();
+void mergesong();
 void clearsong(bool cs, bool cp, bool ci, bool cf, bool cn);
+void loadinstrument();
+bool saveinstrument();
 void countpatternlengths();
 void countthispattern();
 void clearpattern(int p);
