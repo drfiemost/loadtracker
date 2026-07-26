@@ -368,7 +368,7 @@ void waitkey()
   {
     displayupdate();
     getkey();
-    if ((rawkey) || (key)) break;
+    if ((input.rawkey) || (input.key)) break;
     if (win_quitted) break;
   }
 
@@ -382,9 +382,9 @@ void waitkeymouse()
     displayupdate();
     tooltips();
     getkey();
-    if ((rawkey) || (key)) break;
+    if ((input.rawkey) || (input.key)) break;
     if (win_quitted) break;
-    if (mouseb || (win_mouseywheel != 0.f)) break;
+    if (input.mouseb || (win_mouseywheel != 0.f)) break;
   }
 
   converthex();
@@ -396,9 +396,9 @@ void waitkeymousenoupdate()
   {
     fliptoscreen();
     getkey();
-    if ((rawkey) || (key)) break;
+    if ((input.rawkey) || (input.key)) break;
     if (win_quitted) break;
-    if (mouseb) break;
+    if (input.mouseb) break;
   }
 
   converthex();
@@ -410,8 +410,8 @@ void waitkeynoupdate()
   {
     fliptoscreen();
     getkey();
-    if ((rawkey) || (key)) break;
-    if ((mouseb) && (!prevmouseb)) break;
+    if ((input.rawkey) || (input.key)) break;
+    if ((input.mouseb) && (!input.prevmouseb)) break;
     if (win_quitted) break;
   }
 }
@@ -421,11 +421,11 @@ void converthex()
   hexnybble = -1;
   for (int c = 0; c < 16; c++)
   {
-    if (std::tolower(key) == hexkeytbl[c])
+    if (std::tolower(input.key) == hexkeytbl[c])
     {
       if (c >= 10)
       {
-        if (!shiftpressed) hexnybble = c;
+        if (!input.shiftpressed) hexnybble = c;
       }
       else
       {
@@ -475,58 +475,58 @@ void tooltips()
   // Titlebar
   if (!menu)
   {
-    if (mousey == dpos.statusTopY)
+    if (input.mousey == dpos.statusTopY)
     {
-      if ((mousex >= dpos.statusTopFvX-3) && (mousex <= dpos.statusTopFvX-2) && (numsids == 2))
+      if ((input.mousex >= dpos.statusTopFvX-3) && (input.mousex <= dpos.statusTopFvX-2) && (numsids == 2))
       {
         settooltip("Stereo mode");
         return;
       }
-      if ((mousex >= dpos.statusTopFvX) && (mousex <= dpos.statusTopFvX+1))
+      if ((input.mousex >= dpos.statusTopFvX) && (input.mousex <= dpos.statusTopFvX+1))
       {
         settooltip("Fine vibrato");
         return;
       }
-      if ((mousex >= dpos.statusTopFvX+3) && (mousex <= dpos.statusTopFvX+4))
+      if ((input.mousex >= dpos.statusTopFvX+3) && (input.mousex <= dpos.statusTopFvX+4))
       {
         settooltip("Optimize pulse");
         return;
       }
-      if ((mousex >= dpos.statusTopFvX+6) && (mousex <= dpos.statusTopFvX+7))
+      if ((input.mousex >= dpos.statusTopFvX+6) && (input.mousex <= dpos.statusTopFvX+7))
       {
         settooltip("Optimize realtime");
         return;
       }
-      if ((mousex >= dpos.statusTopFvX+9) && (mousex <= dpos.statusTopFvX+12))
+      if ((input.mousex >= dpos.statusTopFvX+9) && (input.mousex <= dpos.statusTopFvX+12))
       {
         settooltip("Video frequency");
         return;
       }
-      if ((mousex >= dpos.statusTopFvX+14) && (mousex <= dpos.statusTopFvX+17))
+      if ((input.mousex >= dpos.statusTopFvX+14) && (input.mousex <= dpos.statusTopFvX+17))
       {
         settooltip("SID model");
         return;
       }
-      if ((mousex >= dpos.statusTopFvX+22) &&
-          (mousex <= dpos.statusTopFvX+25))
+      if ((input.mousex >= dpos.statusTopFvX+22) &&
+          (input.mousex <= dpos.statusTopFvX+25))
       {
         settooltip("Hard restart ADSR");
         return;
       }
-      if ((mousex >= dpos.statusTopFvX+27) &&
-          (mousex <= dpos.statusTopFvX+30))
+      if ((input.mousex >= dpos.statusTopFvX+27) &&
+          (input.mousex <= dpos.statusTopFvX+30))
       {
         settooltip("Speed multiplier");
         return;
       }
-      if ((mousex >= dpos.statusTopFvX+31) &&
-          (mousex <= dpos.statusTopFvX+33))
+      if ((input.mousex >= dpos.statusTopFvX+31) &&
+          (input.mousex <= dpos.statusTopFvX+33))
       {
         settooltip("BPM");
         return;
       }
-      if ((mousex >= dpos.statusTopEndX-8) &&
-          (mousex <= dpos.statusTopEndX-1))
+      if ((input.mousex >= dpos.statusTopEndX-8) &&
+          (input.mousex <= dpos.statusTopEndX-1))
       {
         settooltip("Online help");
         return;
@@ -535,66 +535,66 @@ void tooltips()
   }
 
   // Instruments
-  if (mousey == dpos.instrumentsY)
+  if (input.mousey == dpos.instrumentsY)
   {
-    if ((mousex >= (dpos.instrumentsX+20)) &&
-        (mousex <= (dpos.instrumentsX+21)))
+    if ((input.mousex >= (dpos.instrumentsX+20)) &&
+        (input.mousex <= (dpos.instrumentsX+21)))
       {
         settooltip("Attack/Decay");
         return;
       }
-    if ((mousex >= (dpos.instrumentsX+23)) &&
-        (mousex <= (dpos.instrumentsX+24)))
+    if ((input.mousex >= (dpos.instrumentsX+23)) &&
+        (input.mousex <= (dpos.instrumentsX+24)))
       {
         settooltip("Sustain/Release");
         return;
       }
-    if ((mousex >= (dpos.instrumentsX+26)) &&
-        (mousex <= (dpos.instrumentsX+27)))
+    if ((input.mousex >= (dpos.instrumentsX+26)) &&
+        (input.mousex <= (dpos.instrumentsX+27)))
       {
         settooltip("Wave table position");
         return;
       }
-    if ((mousex >= (dpos.instrumentsX+29)) &&
-        (mousex <= (dpos.instrumentsX+30)))
+    if ((input.mousex >= (dpos.instrumentsX+29)) &&
+        (input.mousex <= (dpos.instrumentsX+30)))
       {
         settooltip("Pulse table position");
         return;
       }
-    if ((mousex >= (dpos.instrumentsX+32)) &&
-        (mousex <= (dpos.instrumentsX+33)))
+    if ((input.mousex >= (dpos.instrumentsX+32)) &&
+        (input.mousex <= (dpos.instrumentsX+33)))
       {
         settooltip("Filter table position");
         return;
       }
-    if ((mousex >= (dpos.instrumentsX+35)) &&
-        (mousex <= (dpos.instrumentsX+36)))
+    if ((input.mousex >= (dpos.instrumentsX+35)) &&
+        (input.mousex <= (dpos.instrumentsX+36)))
       {
         settooltip("Speed table position (vibrato)");
         return;
       }
-    if ((mousex >= (dpos.instrumentsX+38)) &&
-        (mousex <= (dpos.instrumentsX+39)))
+    if ((input.mousex >= (dpos.instrumentsX+38)) &&
+        (input.mousex <= (dpos.instrumentsX+39)))
       {
         settooltip("Vibrato delay");
         return;
       }
-    if ((mousex >= (dpos.instrumentsX+41)) &&
-        (mousex <= (dpos.instrumentsX+42)))
+    if ((input.mousex >= (dpos.instrumentsX+41)) &&
+        (input.mousex <= (dpos.instrumentsX+42)))
       {
         settooltip("Gate timer");
         return;
       }
-    if ((mousex >= (dpos.instrumentsX+44)) &&
-        (mousex <= (dpos.instrumentsX+45)))
+    if ((input.mousex >= (dpos.instrumentsX+44)) &&
+        (input.mousex <= (dpos.instrumentsX+45)))
       {
         settooltip("First wave");
         return;
       }
   }
-  if ((mousey == dpos.channelsY+1) &&
-      (mousex >= dpos.channelsX-5) &&
-      (mousex <= dpos.channelsX-2))
+  if ((input.mousey == dpos.channelsY+1) &&
+      (input.mousex >= dpos.channelsX-5) &&
+      (input.mousex <= dpos.channelsX-2))
   {
     settooltip("Lock/unlock tables");
     return;
@@ -610,10 +610,10 @@ void mousecommands()
   if (win_mouseywheel != 0.f)
   {
     // Scroll patterns
-    if ((mousey >= dpos.patternsY) &&
-        (mousey <= dpos.statusBottomY - 1) &&
-        (mousex >= dpos.patternsX) &&
-        (mousex <= dpos.patternsX + 11 + (maxChns-1)*13))
+    if ((input.mousey >= dpos.patternsY) &&
+        (input.mousey <= dpos.statusBottomY - 1) &&
+        (input.mousex >= dpos.patternsX) &&
+        (input.mousex <= dpos.patternsX + 11 + (maxChns-1)*13))
     {
         if (win_mouseywheel > 0.f)
           patternup();
@@ -621,10 +621,10 @@ void mousecommands()
           patterndown();
     }
     // Scroll instruments
-    if ((mousey >= dpos.instrumentsY+1) &&
-        (mousey <= dpos.instrumentsY+5) &&
-        (mousex >= dpos.instrumentsX) &&
-        (mousex <= dpos.instrumentsX+46))
+    if ((input.mousey >= dpos.instrumentsY+1) &&
+        (input.mousey <= dpos.instrumentsY+5) &&
+        (input.mousex >= dpos.instrumentsX) &&
+        (input.mousex <= dpos.instrumentsX+46))
     {
         if (win_mouseywheel > 0.f)
           previnstr();
@@ -632,12 +632,12 @@ void mousecommands()
           nextinstr();
     }
     // Scroll orderlist
-    if ((mousey >= dpos.orderlistY+1) &&
-        (mousey <= dpos.orderlistY+1+maxChns) &&
-        (mousex >= dpos.orderlistX) &&
-        (mousex <= dpos.orderlistX+34+((numsids == 2)?13:34)))
+    if ((input.mousey >= dpos.orderlistY+1) &&
+        (input.mousey <= dpos.orderlistY+1+maxChns) &&
+        (input.mousex >= dpos.orderlistX) &&
+        (input.mousex <= dpos.orderlistX+34+((numsids == 2)?13:34)))
     {
-      int newchn = mousey - (dpos.orderlistY+1);
+      int newchn = input.mousey - (dpos.orderlistY+1);
       if (win_mouseywheel > 0.f)
       {
         if (esview[newchn] > 0)
@@ -656,21 +656,21 @@ void mousecommands()
       }
     }
     // Scroll tables
-    if ((mousey >= dpos.instrumentsY+8) &&
-        (mousey <= dpos.instrumentsY+8+VISIBLETABLEROWS) &&
-        (mousex >= dpos.instrumentsX) &&
-        (mousex <= dpos.instrumentsX+7+(MAX_TABLES-1)*12))
+    if ((input.mousey >= dpos.instrumentsY+8) &&
+        (input.mousey <= dpos.instrumentsY+8+VISIBLETABLEROWS) &&
+        (input.mousex >= dpos.instrumentsX) &&
+        (input.mousex <= dpos.instrumentsX+7+(MAX_TABLES-1)*12))
     {
         if (win_mouseywheel > 0.f)
-          tables.tableup(shiftpressed);
+          tables.tableup(input.shiftpressed);
         else if (win_mouseywheel < 0.f)
-          tables.tabledown(shiftpressed);
+          tables.tabledown(input.shiftpressed);
     }
     // Scroll tempo
-    if (mousey == dpos.statusTopY)
+    if (input.mousey == dpos.statusTopY)
     {
-        if ((mousex >= dpos.statusTopFvX+27) &&
-            (mousex <= dpos.statusTopFvX+31))
+        if ((input.mousex >= dpos.statusTopFvX+27) &&
+            (input.mousex <= dpos.statusTopFvX+31))
         {
             if (win_mouseywheel > 0.f)
                 nextmultiplier();
@@ -679,8 +679,8 @@ void mousecommands()
         }
         else
         if ((multiplier == 1) &&
-            (mousex >= dpos.statusTopFvX+31) &&
-            (mousex <= dpos.statusTopFvX+37))
+            (input.mousex >= dpos.statusTopFvX+31) &&
+            (input.mousex <= dpos.statusTopFvX+37))
         {
             if (win_mouseywheel > 0.f)
                 snd_bpmtempo++;
@@ -690,23 +690,23 @@ void mousecommands()
     }
   }
 
-  if (!mouseb) return;
+  if (!input.mouseb) return;
 
   // Pattern editpos & pattern number selection
   for (int c = 0; c < maxChns; c++)
   {
-    if ((mousey == dpos.patternsY) &&
-            (mousex >= dpos.patternsX + 10 + c*13) &&
-            (mousex <= dpos.patternsX + 11 + c*13))
+    if ((input.mousey == dpos.patternsY) &&
+            (input.mousex >= dpos.patternsX + 10 + c*13) &&
+            (input.mousex <= dpos.patternsX + 11 + c*13))
     {
-        if ((!prevmouseb) || (mouseheld > HOLDDELAY))
+        if ((!input.prevmouseb) || (input.mouseheld > HOLDDELAY))
         {
-        if (mouseb & MOUSEB_LEFT) 
+        if (input.mouseb & MOUSEB_LEFT) 
         {
           epchn = c;
           nextpattern();
         }
-        if (mouseb & MOUSEB_RIGHT)
+        if (input.mouseb & MOUSEB_RIGHT)
         {
           epchn = c;
           prevpattern();
@@ -715,19 +715,19 @@ void mousecommands()
     }
     else
     {
-      if ((mousey >= dpos.patternsY) &&
-                (mousey <= dpos.statusBottomY - 1) &&
-                (mousex >= dpos.patternsX + 3 + c*13) &&
-                (mousex <= dpos.patternsX + 11 + c*13))
+      if ((input.mousey >= dpos.patternsY) &&
+                (input.mousey <= dpos.statusBottomY - 1) &&
+                (input.mousex >= dpos.patternsX + 3 + c*13) &&
+                (input.mousex <= dpos.patternsX + 11 + c*13))
       {
-        int x = mousex-(dpos.patternsX + 3)-c*13;
-        int newpos = mousey-(dpos.patternsY+1)+epview[c];
+        int x = input.mousex-(dpos.patternsX + 3)-c*13;
+        int newpos = input.mousey-(dpos.patternsY+1)+epview[c];
         if (newpos < 0) newpos = 0;
         if (newpos > getPattlen(epnum[epchn])) newpos = getPattlen(epnum[epchn]);
 
         editmode = EDIT_PATTERN;
 
-        if ((mouseb & (MOUSEB_RIGHT|MOUSEB_MIDDLE)) && (!prevmouseb))
+        if ((input.mouseb & (MOUSEB_RIGHT|MOUSEB_MIDDLE)) && (!input.prevmouseb))
         {
           if ((epmark.chn != c) || (newpos != epmark.end))
           {
@@ -736,42 +736,42 @@ void mousecommands()
           }
         }
 
-        if (mouseb & MOUSEB_LEFT)
+        if (input.mouseb & MOUSEB_LEFT)
         {
           epchn = c;
           if (x < 4) epcolumn = 0;
           if (x >= 4) epcolumn = x-3;
         }
 
-        if (!prevmouseb)
+        if (!input.prevmouseb)
         {
-          if (mouseb & MOUSEB_LEFT)
+          if (input.mouseb & MOUSEB_LEFT)
             eppos = newpos;
         }
         else
         {
-            if (mouseb & MOUSEB_LEFT)
+            if (input.mouseb & MOUSEB_LEFT)
             {
-            if (mousey == dpos.patternsY) eppos--;
-            if (mousey == dpos.statusBottomY - 1) eppos++;
+            if (input.mousey == dpos.patternsY) eppos--;
+            if (input.mousey == dpos.statusBottomY - 1) eppos++;
           }
         }
         if (eppos < 0) eppos = 0;
         if (eppos > getPattlen(epnum[epchn])) eppos = getPattlen(epnum[epchn]);
 
-        if (mouseb & (MOUSEB_RIGHT|MOUSEB_MIDDLE)) epmark.end = newpos;
+        if (input.mouseb & (MOUSEB_RIGHT|MOUSEB_MIDDLE)) epmark.end = newpos;
       }
     }
   }
 
   // Song editpos & songnumber selection
-  if ((mousey >= dpos.orderlistY) &&
-        (mousey <= dpos.orderlistY + maxChns + 2) &&
-        (mousex >= dpos.orderlistX))
+  if ((input.mousey >= dpos.orderlistY) &&
+        (input.mousey <= dpos.orderlistY + maxChns + 2) &&
+        (input.mousex >= dpos.orderlistX))
   {
-    int newcolumn = (mousex-(dpos.orderlistX+4)) % 3;
-    int newchn = mousey - (dpos.orderlistY+1);
-    int newpos = esview[newchn] + (mousex-(dpos.orderlistX+4)) / 3;
+    int newcolumn = (input.mousex-(dpos.orderlistX+4)) % 3;
+    int newchn = input.mousey - (dpos.orderlistY+1);
+    int newpos = esview[newchn] + (input.mousex-(dpos.orderlistX+4)) / 3;
     if (newcolumn < 0) newcolumn = 0;
     if (newcolumn > 1) newcolumn = 1;
     if (newpos < 0)
@@ -792,7 +792,7 @@ void mousecommands()
 
     editmode = EDIT_ORDERLIST;
 
-    if ((mouseb & (MOUSEB_RIGHT|MOUSEB_MIDDLE)) && (!prevmouseb) && (newpos < currentSonglen))
+    if ((input.mouseb & (MOUSEB_RIGHT|MOUSEB_MIDDLE)) && (!input.prevmouseb) && (newpos < currentSonglen))
     {
       if ((esmark.chn != newchn) || (newpos != esmark.end))
       {
@@ -801,117 +801,117 @@ void mousecommands()
       }
     }
 
-    if (mouseb & MOUSEB_LEFT)
+    if (input.mouseb & MOUSEB_LEFT)
     {
       eschn = newchn;
       eseditpos = newpos;
       escolumn = newcolumn;
     }
 
-    if ((mouseb & (MOUSEB_RIGHT|MOUSEB_MIDDLE)) && (newpos < currentSonglen)) esmark.end = newpos;
+    if ((input.mouseb & (MOUSEB_RIGHT|MOUSEB_MIDDLE)) && (newpos < currentSonglen)) esmark.end = newpos;
   }
-  if (((!prevmouseb) || (mouseheld > HOLDDELAY)) &&
-        (mousey == dpos.orderlistY) &&
-        (mousex >= dpos.orderlistX+23) && (mousex <= dpos.orderlistX+24))
+  if (((!input.prevmouseb) || (input.mouseheld > HOLDDELAY)) &&
+        (input.mousey == dpos.orderlistY) &&
+        (input.mousex >= dpos.orderlistX+23) && (input.mousex <= dpos.orderlistX+24))
   {
-    if (mouseb & MOUSEB_LEFT) nextsong();
-    if (mouseb & MOUSEB_RIGHT) prevsong();
+    if (input.mouseb & MOUSEB_LEFT) nextsong();
+    if (input.mouseb & MOUSEB_RIGHT) prevsong();
   }
 
   // Instrument editpos
-  if ((mousey >= dpos.instrumentsY+1) &&
-        (mousey <= dpos.instrumentsY+5) &&
-        (mousex >= (dpos.instrumentsX+20)) &&
-        (mousex <= (dpos.instrumentsX+46)))
+  if ((input.mousey >= dpos.instrumentsY+1) &&
+        (input.mousey <= dpos.instrumentsY+5) &&
+        (input.mousex >= (dpos.instrumentsX+20)) &&
+        (input.mousex <= (dpos.instrumentsX+46)))
   {
     // Instr param
-    eicolumn = (mousex-(dpos.instrumentsX+20))%3;
+    eicolumn = (input.mousex-(dpos.instrumentsX+20))%3;
     if (eicolumn == 2) eicolumn--;
-    eipos = (mousex-(dpos.instrumentsX+20))/3;
-    gotoinstr(eirow+mousey-(dpos.instrumentsY+1));
+    eipos = (input.mousex-(dpos.instrumentsX+20))/3;
+    gotoinstr(eirow+input.mousey-(dpos.instrumentsY+1));
   }
-  if ((mousey >= dpos.instrumentsY+1) &&
-        (mousey <= dpos.instrumentsY+5) &&
-        (mousex >= dpos.instrumentsX+3) &&
-        (mousex <= dpos.instrumentsX+19))
+  if ((input.mousey >= dpos.instrumentsY+1) &&
+        (input.mousey <= dpos.instrumentsY+5) &&
+        (input.mousex >= dpos.instrumentsX+3) &&
+        (input.mousex <= dpos.instrumentsX+19))
   {
     // Instr name
     editmode = EDIT_INSTRUMENT;
     eipos = 9;
-    gotoinstr(eirow+mousey-(dpos.instrumentsY+1));
+    gotoinstr(eirow+input.mousey-(dpos.instrumentsY+1));
   }
 
   // Table editpos
   for (int c = 0; c < MAX_TABLES; c++)
   {
-    if ((mousey >= dpos.instrumentsY+8) &&
-            (mousey <= dpos.instrumentsY+8+VISIBLETABLEROWS) &&
-            (mousex >= dpos.instrumentsX+3+c*12) &&
-            (mousex <= dpos.instrumentsX+7+c*12))
+    if ((input.mousey >= dpos.instrumentsY+8) &&
+            (input.mousey <= dpos.instrumentsY+8+VISIBLETABLEROWS) &&
+            (input.mousex >= dpos.instrumentsX+3+c*12) &&
+            (input.mousex <= dpos.instrumentsX+7+c*12))
     {
-      int newpos = mousey-(dpos.instrumentsY+8)+tables.curview();
+      int newpos = input.mousey-(dpos.instrumentsY+8)+tables.curview();
       if (newpos < 0) newpos = 0;
       if (newpos >= MAX_TABLELEN) newpos = MAX_TABLELEN-1;
 
       editmode = EDIT_TABLES;
 
-      if ((mouseb & (MOUSEB_RIGHT|MOUSEB_MIDDLE)) && (!prevmouseb))
+      if ((input.mouseb & (MOUSEB_RIGHT|MOUSEB_MIDDLE)) && (!input.prevmouseb))
       {
         tables.setmarkstart(c, newpos);
       }
-      if (mouseb & MOUSEB_LEFT)
+      if (input.mouseb & MOUSEB_LEFT)
       {
         tables.setrow(c,
             newpos,
-            mousex-(dpos.instrumentsX+3+c*12));
+            input.mousex-(dpos.instrumentsX+3+c*12));
       }
 
-      if (mouseb & (MOUSEB_RIGHT|MOUSEB_MIDDLE)) tables.setmarkend(newpos);
+      if (input.mouseb & (MOUSEB_RIGHT|MOUSEB_MIDDLE)) tables.setmarkend(newpos);
     }
   }
 
   // Name editpos
-  if ((mousey >= dpos.instrumentsY+8+VISIBLETABLEROWS+1) &&
-        (mousey <= dpos.instrumentsY+8+VISIBLETABLEROWS+3) &&
-        (mousex >= dpos.instrumentsX+9))
+  if ((input.mousey >= dpos.instrumentsY+8+VISIBLETABLEROWS+1) &&
+        (input.mousey <= dpos.instrumentsY+8+VISIBLETABLEROWS+3) &&
+        (input.mousex >= dpos.instrumentsX+9))
   {
     editmode = EDIT_NAMES;
-    enpos = mousey - (dpos.instrumentsY+8+VISIBLETABLEROWS+1);
+    enpos = input.mousey - (dpos.instrumentsY+8+VISIBLETABLEROWS+1);
   }
 
   // Status panel
-  if ((!prevmouseb) &&
-        (mousex == dpos.octaveX+7) &&
-        (mousey == dpos.octaveY))
+  if ((!input.prevmouseb) &&
+        (input.mousex == dpos.octaveX+7) &&
+        (input.mousey == dpos.octaveY))
   {
-    if (mouseb & (MOUSEB_LEFT))
+    if (input.mouseb & (MOUSEB_LEFT))
       if (epoctave < 7) epoctave++;
-    if (mouseb & (MOUSEB_RIGHT))
+    if (input.mouseb & (MOUSEB_RIGHT))
       if (epoctave > 0) epoctave--;
   }
-  if ((!prevmouseb) && (mousex <= dpos.octaveX+7) && (mousey == dpos.octaveY+1))
+  if ((!input.prevmouseb) && (input.mousex <= dpos.octaveX+7) && (input.mousey == dpos.octaveY+1))
   {
     recordmode = !recordmode;
   }
-  if ((!prevmouseb) &&
-      (mousex >= dpos.channelsX-5) &&
-      (mousex <= dpos.channelsX-2) &&
-      (mousey == dpos.channelsY+1))
+  if ((!input.prevmouseb) &&
+      (input.mousex >= dpos.channelsX-5) &&
+      (input.mousex <= dpos.channelsX-2) &&
+      (input.mousey == dpos.channelsY+1))
   {
     tables.fliplock();
   }
   for (int c = 0; c < maxChns; c++)
   {
-    if ((!prevmouseb) &&
-            (mousey >= dpos.channelsY) &&
-            (mousex >= dpos.channelsX + 7*c) &&
-            (mousex <= dpos.channelsX+5 + 7*c))
+    if ((!input.prevmouseb) &&
+            (input.mousey >= dpos.channelsY) &&
+            (input.mousex >= dpos.channelsX + 7*c) &&
+            (input.mousex <= dpos.channelsX+5 + 7*c))
       mutechannel(c);
   }
-  if ((!prevmouseb) && (mousey == dpos.octaveY))
+  if ((!input.prevmouseb) && (input.mousey == dpos.octaveY))
   {
-    if ((mousex >= dpos.octaveX+20) &&
-        (mousex <= dpos.octaveX+23))
+    if ((input.mousex >= dpos.octaveX+20) &&
+        (input.mousex <= dpos.octaveX+23))
     {
       if (isplaying())
       {
@@ -919,7 +919,7 @@ void mousecommands()
       }
       else
       {
-        initsong(esnum, shiftpressed ? PLAY_BEGINNING : PLAY_POS);
+        initsong(esnum, input.shiftpressed ? PLAY_BEGINNING : PLAY_POS);
         followplay = true;
       }
     }
@@ -928,73 +928,73 @@ void mousecommands()
   // Titlebar actions
   if (!menu)
   {
-    if ((mousey == dpos.statusTopY) && (!prevmouseb) && (mouseb == MOUSEB_LEFT))
+    if ((input.mousey == dpos.statusTopY) && (!input.prevmouseb) && (input.mouseb == MOUSEB_LEFT))
     {
-      if ((mousex >= dpos.statusTopFvX-3) && (mousex <= dpos.statusTopFvX-2) && (numsids == 2))
+      if ((input.mousex >= dpos.statusTopFvX-3) && (input.mousex <= dpos.statusTopFvX-2) && (numsids == 2))
       {
         monomode = !monomode;
       }
-      if ((mousex >= dpos.statusTopFvX) && (mousex <= dpos.statusTopFvX+1))
+      if ((input.mousex >= dpos.statusTopFvX) && (input.mousex <= dpos.statusTopFvX+1))
       {
         usefinevib = !usefinevib;
       }
-      if ((mousex >= dpos.statusTopFvX+3) && (mousex <= dpos.statusTopFvX+4))
+      if ((input.mousex >= dpos.statusTopFvX+3) && (input.mousex <= dpos.statusTopFvX+4))
       {
         optimizepulse ^= 1;
       }
-      if ((mousex >= dpos.statusTopFvX+6) && (mousex <= dpos.statusTopFvX+7))
+      if ((input.mousex >= dpos.statusTopFvX+6) && (input.mousex <= dpos.statusTopFvX+7))
       {
         optimizerealtime ^= 1;
       }
-      if ((mousex >= dpos.statusTopFvX+9) && (mousex <= dpos.statusTopFvX+12))
+      if ((input.mousex >= dpos.statusTopFvX+9) && (input.mousex <= dpos.statusTopFvX+12))
       {
         ntsc ^= 1;
         timer.setfreq(ntsc);
         sound_init(mr, writer, sidmodel, ntsc, multiplier, interpolate, customclockrate, exsid, filterbias, combwaves);
       }
-      if ((mousex >= dpos.statusTopFvX+14) && (mousex <= dpos.statusTopFvX+17))
+      if ((input.mousex >= dpos.statusTopFvX+14) && (input.mousex <= dpos.statusTopFvX+17))
       {
         sidmodel ^= 1;
         sound_init(mr, writer, sidmodel, ntsc, multiplier, interpolate, customclockrate, exsid, filterbias, combwaves);
       }
-      if ((mousex >= dpos.statusTopFvX+22) &&
-          (mousex <= dpos.statusTopFvX+25)) editadsr(mousex - (dpos.statusTopFvX+22));
-      if ((mousex >= dpos.statusTopFvX+27) &&
-          (mousex <= dpos.statusTopFvX+28)) prevmultiplier();
-      if ((mousex >= dpos.statusTopFvX+29) &&
-          (mousex <= dpos.statusTopFvX+30)) nextmultiplier();
-      if ((mousex >= dpos.statusTopFvX+31) &&
-          (mousex <= dpos.statusTopFvX+33)) editbpm(mousex - (dpos.statusTopFvX+31));
-      if ((mousex >= dpos.statusTopEndX-8) &&
-          (mousex <= dpos.statusTopEndX-1)) onlinehelp(0,0);
+      if ((input.mousex >= dpos.statusTopFvX+22) &&
+          (input.mousex <= dpos.statusTopFvX+25)) editadsr(input.mousex - (dpos.statusTopFvX+22));
+      if ((input.mousex >= dpos.statusTopFvX+27) &&
+          (input.mousex <= dpos.statusTopFvX+28)) prevmultiplier();
+      if ((input.mousex >= dpos.statusTopFvX+29) &&
+          (input.mousex <= dpos.statusTopFvX+30)) nextmultiplier();
+      if ((input.mousex >= dpos.statusTopFvX+31) &&
+          (input.mousex <= dpos.statusTopFvX+33)) editbpm(input.mousex - (dpos.statusTopFvX+31));
+      if ((input.mousex >= dpos.statusTopEndX-8) &&
+          (input.mousex <= dpos.statusTopEndX-1)) onlinehelp(0,0);
     }
   }
   else
   {
-    if ((!mousey) && (mouseb & MOUSEB_LEFT) && (!(prevmouseb & MOUSEB_LEFT)))
+    if ((!input.mousey) && (input.mouseb & MOUSEB_LEFT) && (!(input.prevmouseb & MOUSEB_LEFT)))
     {
-      if ((mousex >= 0) && (mousex <= 5))
+      if ((input.mousex >= 0) && (input.mousex <= 5))
       {
         initsong(esnum, PLAY_BEGINNING);
-        followplay = shiftpressed;
+        followplay = input.shiftpressed;
       }
-      if ((mousex >= 7) && (mousex <= 15))
+      if ((input.mousex >= 7) && (input.mousex <= 15))
       {
         initsong(esnum, PLAY_POS);
-        followplay = shiftpressed;
+        followplay = input.shiftpressed;
       }
-      if ((mousex >= 17) && (mousex <= 26))
+      if ((input.mousex >= 17) && (input.mousex <= 26))
       {
         initsong(esnum, PLAY_PATTERN);
-        followplay = shiftpressed;
+        followplay = input.shiftpressed;
       }
-      if ((mousex >= 28) && (mousex <= 33))
+      if ((input.mousex >= 28) && (input.mousex <= 33))
         stopsong();
-      if ((mousex >= 35) && (mousex <= 40))
+      if ((input.mousex >= 35) && (input.mousex <= 40))
         load();
-      if ((mousex >= 42) && (mousex <= 47))
+      if ((input.mousex >= 42) && (input.mousex <= 47))
         save();
-      if ((mousex >= 49) && (mousex <= 57))
+      if ((input.mousex >= 49) && (input.mousex <= 57))
       {
         if (numsids == 1)
         {
@@ -1005,11 +1005,11 @@ void mousecommands()
           relocator_stereo(loadedsongfilename);
         }
       }
-      if ((mousex >= 59) && (mousex <= 64))
+      if ((input.mousex >= 59) && (input.mousex <= 64))
         onlinehelp(0,0);
-      if ((mousex >= 66) && (mousex <= 72))
+      if ((input.mousex >= 66) && (input.mousex <= 72))
         clear();
-      if ((mousex >= 74) && (mousex <= 79))
+      if ((input.mousex >= 74) && (input.mousex <= 79))
         quit();
     }
   }
@@ -1021,7 +1021,7 @@ void generalcommands()
   int visibleOrderlist = getVisibleOrderlist();
   int currentSonglen = 0;
 
-  switch(key)
+  switch(input.key)
   {
     case '?':
     case '-':
@@ -1102,17 +1102,17 @@ void generalcommands()
     break;
   }
   if (win_quitted) exitprogram = true;
-  switch(rawkey)
+  switch(input.rawkey)
   {
     case KEY_ESC:
-    if (!shiftpressed)
+    if (!input.shiftpressed)
       quit();
     else
       clear();
     break;
 
     case KEY_KPMULTIPLY:
-    if ((editmode != EDIT_NAMES) && (!key))
+    if ((editmode != EDIT_NAMES) && (!input.key))
     {
       if (!((editmode == EDIT_INSTRUMENT) && (eipos >= 9)))
       {
@@ -1122,7 +1122,7 @@ void generalcommands()
     break;
 
     case KEY_KPDIVIDE:
-    if ((editmode != EDIT_NAMES) && (!key))
+    if ((editmode != EDIT_NAMES) && (!input.key))
     {
       if (!((editmode == EDIT_INSTRUMENT) && (eipos >= 9)))
       {
@@ -1132,11 +1132,11 @@ void generalcommands()
     break;
 
     case KEY_F12:
-      onlinehelp(0, shiftpressed);
+      onlinehelp(0, input.shiftpressed);
     break;
 
     case KEY_TAB:
-    if (!shiftpressed) editmode++;
+    if (!input.shiftpressed) editmode++;
     else editmode--;
     if (editmode > EDIT_NAMES) editmode = EDIT_PATTERN;
     if (editmode < EDIT_PATTERN) editmode = EDIT_NAMES;
@@ -1144,21 +1144,21 @@ void generalcommands()
 
     case KEY_F1:
     initsong(esnum, PLAY_BEGINNING);
-    followplay = shiftpressed;
+    followplay = input.shiftpressed;
     break;
 
     case KEY_F2:
     initsong(esnum, PLAY_POS);
-    followplay = shiftpressed;
+    followplay = input.shiftpressed;
     break;
 
     case KEY_F3:
     initsong(esnum, PLAY_PATTERN);
-    followplay = shiftpressed;
+    followplay = input.shiftpressed;
     break;
 
     case KEY_F4:
-    if (shiftpressed)
+    if (input.shiftpressed)
       mutechannel(epchn);
     else
     {
@@ -1174,19 +1174,19 @@ void generalcommands()
     break;
 
     case KEY_F5:
-    if (!shiftpressed)
+    if (!input.shiftpressed)
       editmode = EDIT_PATTERN;
     else prevmultiplier();
     break;
 
     case KEY_F6:
-    if (!shiftpressed)
+    if (!input.shiftpressed)
       editmode = EDIT_ORDERLIST;
     else nextmultiplier();
     break;
 
     case KEY_F7:
-    if (!shiftpressed)
+    if (!input.shiftpressed)
     {
       if (editmode == EDIT_INSTRUMENT)
         editmode = EDIT_TABLES;
@@ -1197,7 +1197,7 @@ void generalcommands()
     break;
 
     case KEY_F8:
-    if (!shiftpressed)
+    if (!input.shiftpressed)
       editmode = EDIT_NAMES;
     else
     {
@@ -1207,7 +1207,7 @@ void generalcommands()
     break;
 
     case KEY_F9:
-    if (!shiftpressed)
+    if (!input.shiftpressed)
     {
         if (numsids == 1)
         {
@@ -1218,7 +1218,7 @@ void generalcommands()
           relocator_stereo(loadedsongfilename);
         }
     }
-    else if (shiftpressed && (numsids == 2))
+    else if (input.shiftpressed && (numsids == 2))
     {
         monomode = !monomode;
     }
@@ -1233,7 +1233,7 @@ void generalcommands()
     break;
 
     case KEY_M:
-    if (altpressed)
+    if (input.altpressed)
     {
       switchMode();
     }
@@ -1245,7 +1245,7 @@ void load()
 {
   if ((editmode != EDIT_INSTRUMENT) && (editmode != EDIT_TABLES))
   {
-    if (!shiftpressed)
+    if (!input.shiftpressed)
     {
       if (fileselector(songfilename, songpath, songfilter, "LOAD SONG", 0))
         loadsong();
@@ -1264,8 +1264,7 @@ void load()
         loadinstrument();
     }
   }
-  key = 0;
-  rawkey = 0;
+  input.clearkeys();
 }
 
 void save()
@@ -1314,21 +1313,19 @@ void save()
       }
     }
   }
-  key = 0;
-  rawkey = 0;
+  input.clearkeys();
 }
 
 void quit()
 {
-  if ((!shiftpressed) || (mouseb))
+  if ((!input.shiftpressed) || (input.mouseb))
   {
     printtextcp(dpos.statusBottomX+29, dpos.statusBottomY, colors.CMESSAGE, "Really Quit (y/n)?");
     waitkey();
     printblank(dpos.statusBottomX, dpos.statusBottomY, 58);
-    if ((key == 'y') || (key == 'Y')) exitprogram = true;
+    if (input.iskeyyes()) exitprogram = true;
   }
-  key = 0;
-  rawkey = 0;
+  input.clearkeys();
 }
 
 void clear()
@@ -1336,11 +1333,10 @@ void clear()
   printtextcp(dpos.statusBottomX+29, dpos.statusBottomY, colors.CMESSAGE, "Optimize everything (y/n)?");
   waitkey();
   printblank(dpos.statusBottomX, dpos.statusBottomY, 58);
-  if ((key == 'y') || (key == 'Y'))
+  if (input.iskeyyes())
   {
     optimizeeverything();
-    key = 0;
-    rawkey = 0;
+    input.clearkeys();
     return;
   }
 
@@ -1353,27 +1349,27 @@ void clear()
   printtextcp(dpos.statusBottomX+29, dpos.statusBottomY, colors.CMESSAGE, "Clear orderlists (y/n)?");
   waitkey();
   printblank(dpos.statusBottomX, dpos.statusBottomY, 58);
-  if ((key == 'y') || (key == 'Y')) cs = true;
+  if (input.iskeyyes()) cs = true;
 
   printtextcp(dpos.statusBottomX+29, dpos.statusBottomY, colors.CMESSAGE, "Clear patterns (y/n)?");
   waitkey();
   printblank(dpos.statusBottomX, dpos.statusBottomY, 58);
-  if ((key == 'y') || (key == 'Y')) cp = true;
+  if (input.iskeyyes()) cp = true;
 
   printtextcp(dpos.statusBottomX+29, dpos.statusBottomY, colors.CMESSAGE, "Clear instruments (y/n)?");
   waitkey();
   printblank(dpos.statusBottomX, dpos.statusBottomY, 58);
-  if ((key == 'y') || (key == 'Y')) ci = true;
+  if (input.iskeyyes()) ci = true;
 
   printtextcp(dpos.statusBottomX+29, dpos.statusBottomY, colors.CMESSAGE, "Clear tables (y/n)?");
   waitkey();
   printblank(dpos.statusBottomX, dpos.statusBottomY, 58);
-  if ((key == 'y') || (key == 'Y')) ct = true;
+  if (input.iskeyyes()) ct = true;
 
   printtextcp(dpos.statusBottomX+29, dpos.statusBottomY, colors.CMESSAGE, "Clear songname (y/n)?");
   waitkey();
   printblank(dpos.statusBottomX, dpos.statusBottomY, 58);
-  if ((key == 'y') || (key == 'Y')) cn = true;
+  if (input.iskeyyes()) cn = true;
 
   if (cp)
   {
@@ -1393,7 +1389,7 @@ void clear()
         }
         printtext(dpos.statusBottomX+35, dpos.statusBottomY, colors.CTITLE, textbuffer);
       waitkey();
-      switch(rawkey)
+      switch(input.rawkey)
       {
         case KEY_LEFT:
         defaultpatternlength -= 7;
@@ -1428,8 +1424,7 @@ void clear()
     std::memset(songfilename, 0, sizeof songfilename);
   clearsong(cs, cp, ci, ct, cn);
 
-  key = 0;
-  rawkey = 0;
+  input.clearkeys();
 }
 
 void editadsr(int col)
@@ -1444,16 +1439,15 @@ void editadsr(int col)
     if (win_quitted)
     {
       exitprogram = true;
-      key = 0;
-      rawkey = 0;
+      input.clearkeys();
       return;
     }
 
-    if ((mousey == dpos.statusTopY) && (!prevmouseb) && (mouseb == MOUSEB_LEFT) &&
-          (mousex >= dpos.statusTopFvX+22) &&
-          (mousex <= dpos.statusTopFvX+25))
+    if ((input.mousey == dpos.statusTopY) && (!input.prevmouseb) && (input.mouseb == MOUSEB_LEFT) &&
+          (input.mousex >= dpos.statusTopFvX+22) &&
+          (input.mousex <= dpos.statusTopFvX+25))
     {
-        eacolumn = mousex - (dpos.statusTopFvX+22);
+        eacolumn = input.mousex - (dpos.statusTopFvX+22);
         continue;
     }
 
@@ -1484,17 +1478,16 @@ void editadsr(int col)
       eacolumn++;
     }
 
-    switch(rawkey)
+    switch(input.rawkey)
     {
       case KEY_F7:
-      if (!shiftpressed) break;
+      if (!input.shiftpressed) break;
       /* fall through */
       case KEY_ESC:
       case KEY_ENTER:
       case KEY_TAB:
       ehmode = EditHdr::NONE;
-      key = 0;
-      rawkey = 0;
+      input.clearkeys();
       return;
 
       case KEY_BACKSPACE:
@@ -1509,7 +1502,7 @@ void editadsr(int col)
     }
     eacolumn &= 3;
 
-    if ((mouseb) && (!prevmouseb))
+    if ((input.mouseb) && (!input.prevmouseb))
     {
       ehmode = EditHdr::NONE;
       return;
@@ -1529,22 +1522,21 @@ void editbpm(int col)
         if (win_quitted)
         {
             exitprogram = true;
-            key = 0;
-            rawkey = 0;
+            input.clearkeys();
             return;
         }
 
-        if ((mousey == dpos.statusTopY) && (!prevmouseb) && (mouseb == MOUSEB_LEFT) &&
-            (mousex >= dpos.statusTopFvX+31) &&
-            (mousex <= dpos.statusTopFvX+33))
+        if ((input.mousey == dpos.statusTopY) && (!input.prevmouseb) && (input.mouseb == MOUSEB_LEFT) &&
+            (input.mousex >= dpos.statusTopFvX+31) &&
+            (input.mousex <= dpos.statusTopFvX+33))
         {
-            eacolumn = mousex - (dpos.statusTopFvX+31);
+            eacolumn = input.mousex - (dpos.statusTopFvX+31);
             continue;
         }
 
-        if (key >= 48 && key <= 58)
+        if (input.key >= 48 && input.key <= 58)
         {
-            int number = key - 48;
+            int number = input.key - 48;
 
             switch(eacolumn)
             {
@@ -1563,17 +1555,16 @@ void editbpm(int col)
             eacolumn++;
         }
 
-        switch(rawkey)
+        switch(input.rawkey)
         {
         case KEY_F7:
-            if (!shiftpressed) break;
+            if (!input.shiftpressed) break;
             // fall through
         case KEY_ESC:
         case KEY_ENTER:
         case KEY_TAB:
             ehmode = EditHdr::NONE;
-            key = 0;
-            rawkey = 0;
+            input.clearkeys();
             return;
 
         case KEY_BACKSPACE:
@@ -1589,7 +1580,7 @@ void editbpm(int col)
         eacolumn &= 3;
         if (eacolumn == 3) eacolumn = 0;
 
-        if ((mouseb) && (!prevmouseb))
+        if ((input.mouseb) && (!input.prevmouseb))
         {
             ehmode = EditHdr::NONE;
             return;
@@ -1664,7 +1655,7 @@ void switchMode()
     printblank(dpos.statusBottomX, dpos.statusBottomY, 58);
     printblank(dpos.statusBottomX, dpos.statusBottomY+1, 58);
 
-    if ((key == 'y') || (key == 'Y'))
+    if (input.iskeyyes())
     {
         std::memset(songfilename, 0, sizeof songfilename);
 
@@ -1683,8 +1674,7 @@ void switchMode()
         initDisplayPositions();
         printmainscreen();
     }
-    key = 0;
-    rawkey = 0;
+    input.clearkeys();
 }
 
 void optimizeeverything()

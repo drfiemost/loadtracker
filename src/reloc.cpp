@@ -639,7 +639,7 @@ TABLETYPE:
       goto PRCLEANUP;
     }
 
-    switch(rawkey)
+    switch(input.rawkey)
     {
       case KEY_LEFT:
       case KEY_RIGHT:
@@ -1051,7 +1051,7 @@ TABLETYPE:
       goto PRCLEANUP;
     }
 
-    switch(rawkey)
+    switch(input.rawkey)
     {
       case KEY_LEFT:
       playeradr -= 0x0400;
@@ -1129,7 +1129,7 @@ TABLETYPE:
       goto PRCLEANUP;
     }
 
-    switch(rawkey)
+    switch(input.rawkey)
     {
       case KEY_LEFT:
       zeropageadr -= 0x10;
@@ -1600,7 +1600,7 @@ TABLETYPE:
       goto PRCLEANUP;
     }
 
-    switch(rawkey)
+    switch(input.rawkey)
     {
       case KEY_LEFT:
       case KEY_DOWN:
@@ -1806,8 +1806,7 @@ PRCLEANUP:
   if (songwork) delete [] songwork;
   if (instrwork) delete [] instrwork;
   printmainscreen();
-  key = 0;
-  rawkey = 0;
+  input.clearkeys();
 }
 
 int packpattern(unsigned char *dest, unsigned char *src, int rows)
@@ -2161,15 +2160,13 @@ void insertaddrhi(const char *name)
 
 void findtableduplicates(int num)
 {
-  int c,d,e;
-
   if (num == STBL)
   {
-    for (c = 1; c <= MAX_TABLELEN; c++)
+    for (int c = 1; c <= MAX_TABLELEN; c++)
     {
       if (tableused[num][c])
       {
-        for (d = c+1; d <= MAX_TABLELEN; d++)
+        for (int d = c+1; d <= MAX_TABLELEN; d++)
         {
           if (tableused[num][d])
           {
@@ -2177,7 +2174,7 @@ void findtableduplicates(int num)
             {
               // Duplicate found, remove and map to the original
               tableused[num][d] = 0;
-              for (e = d; e <= MAX_TABLELEN; e++)
+              for (int e = d; e <= MAX_TABLELEN; e++)
                 if (tableused[num][e]) tablemap[num][e]--;
               tablemap[num][d] = tablemap[num][c];
             }
@@ -2188,17 +2185,18 @@ void findtableduplicates(int num)
   }
   else
   {
-    for (c = 1; c <= MAX_TABLELEN; c++)
+    for (int c = 1; c <= MAX_TABLELEN; c++)
     {
       if (isusedandselfcontained(num, c))
       {
-        for (d = c + song.gettablepartlen(num, c - 1); d <= MAX_TABLELEN; )
+        for (int d = c + song.gettablepartlen(num, c - 1); d <= MAX_TABLELEN; )
         {
           int len = song.gettablepartlen(num, d - 1);
 
           if (isusedandselfcontained(num, d))
           {
-            for (e = 0; e < len; e++)
+            int e = 0;
+            for (; e < len; e++)
             {
               if (e < len-1)
               {
@@ -2732,7 +2730,7 @@ TABLETYPE_S:
             goto PRCLEANUP_S;
         }
 
-        switch(rawkey)
+        switch(input.rawkey)
         {
         case KEY_LEFT:
         case KEY_RIGHT:
@@ -3138,7 +3136,7 @@ TABLETYPE_S:
             goto PRCLEANUP_S;
         }
 
-        switch(rawkey)
+        switch(input.rawkey)
         {
         case KEY_LEFT:
             playeradr -= 0x0400;
@@ -3216,7 +3214,7 @@ TABLETYPE_S:
             goto PRCLEANUP_S;
         }
 
-        switch(rawkey)
+        switch(input.rawkey)
         {
         case KEY_LEFT:
             zeropageadr -= 0x10;
@@ -3654,7 +3652,7 @@ SKIPTABLE_S:
             goto PRCLEANUP_S;
         }
 
-        switch(rawkey)
+        switch(input.rawkey)
         {
         case KEY_LEFT:
         case KEY_DOWN:
@@ -3860,8 +3858,7 @@ PRCLEANUP_S:
     if (songwork) delete [] songwork;
     if (instrwork) delete [] instrwork;
     printmainscreen();
-    key = 0;
-    rawkey = 0;
+    input.clearkeys();
 }
 
 void exectable(int num, int ptr)

@@ -258,33 +258,36 @@ NEWPATH:
       return 0;
     }
 
-    if (mouseb)
+    if (input.mouseb)
     {
       // Cancel (click outside)
-      if ((mousey < 3) || (mousey > 3+VISIBLEFILES+6) || (mousex <= 4+10) || (mousex >= 75+10))
+      if ((input.mousey < 3) || (input.mousey > 3+VISIBLEFILES+6) ||
+          (input.mousex <= 4+10) || (input.mousex >= 75+10))
       {
-        if ((!prevmouseb) && (lastclick)) exitfilesel = 0;
+        if ((!input.prevmouseb) && (lastclick)) exitfilesel = 0;
       }
 
       // Select dir,name,filter
-      if ((mousey >= 3+VISIBLEFILES+3) && (mousey <= 3+VISIBLEFILES+5) && (mousex >= 14+10) && (mousex <= 73+10))
+      if ((input.mousey >= 3+VISIBLEFILES+3) && (input.mousey <= 3+VISIBLEFILES+5)
+          && (input.mousex >= 14+10) && (input.mousex <= 73+10))
       {
-        filemode = mousey - (3+VISIBLEFILES+3) + 1;
-        if ((filemode == 3) && (!prevmouseb) && (lastclick)) goto ENTERFILE;
+        filemode = input.mousey - (3+VISIBLEFILES+3) + 1;
+        if ((filemode == 3) && (!input.prevmouseb) && (lastclick)) goto ENTERFILE;
       }
 
       // Select file from list
-      if ((mousey >= 3) && (mousey <= 3+VISIBLEFILES+2) && (mousex >= 6+10) && (mousex <= 73+10))
+      if ((input.mousey >= 3) && (input.mousey <= 3+VISIBLEFILES+2) &&
+          (input.mousex >= 6+10) && (input.mousex <= 73+10))
       {
         filemode = 0;
-        filepos = mousey - 4 - 1 + fileview;
+        filepos = input.mousey - 4 - 1 + fileview;
         if (filepos < 0) filepos = 0;
         if (filepos > files-1) filepos = files - 1;
 
         if (!direntry[filepos].attribute)
           std::strcpy(name, direntry[filepos].name);
 
-        if ((!prevmouseb) && (lastclick) && (lastfile == filepos)) goto ENTERFILE;
+        if ((!input.prevmouseb) && (lastclick) && (lastfile == filepos)) goto ENTERFILE;
       }
     }
 
@@ -302,9 +305,11 @@ NEWPATH:
 
     if (!filemode)
     {
-      if (((key >= '0') && (key <= '0')) || ((key >= 'a') && (key <= 'z')) || ((key >= 'A') && (key <= 'Z')))
+      if (((input.key >= '0') && (input.key <= '0')) ||
+          ((input.key >= 'a') && (input.key <= 'z')) ||
+          ((input.key >= 'A') && (input.key <= 'Z')))
       {
-        char k = std::tolower(key);
+        char k = std::tolower(input.key);
         int oldfilepos = filepos;
 
         for (filepos = oldfilepos + 1; filepos < files; filepos++)
@@ -319,7 +324,7 @@ NEWPATH:
       }
     }
 
-    switch(rawkey)
+    switch(input.rawkey)
     {
       case KEY_ESC:
       exitfilesel = 0;
@@ -392,7 +397,7 @@ NEWPATH:
       break;
 
       case KEY_TAB:
-      if (!shiftpressed)
+      if (!input.shiftpressed)
       {
         filemode++;
         if (filemode > 3) filemode = 0;
@@ -529,7 +534,7 @@ ENTERFILE:
 
     if (win_quitted) exitfilesel = 0;
 
-    if ((mouseb) && (!prevmouseb))
+    if ((input.mouseb) && (!input.prevmouseb))
     {
       lastclick = DOUBLECLICKDELAY;
       lastfile = filepos;

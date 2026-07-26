@@ -52,10 +52,10 @@ Tables tables;
 
 void tablecommands()
 {
-  switch(rawkey)
+  switch(input.rawkey)
   {
     case KEY_Q:
-    if ((shiftpressed) && (tables.num() == STBL))
+    if ((input.shiftpressed) && (tables.num() == STBL))
     {
       int speed = (song.ltable[tables.num()][tables.pos()] << 8) | song.rtable[tables.num()][tables.pos()];
       speed *= 34716;
@@ -68,7 +68,7 @@ void tablecommands()
     break;
 
     case KEY_A:
-    if ((shiftpressed) && (tables.num() == STBL))
+    if ((input.shiftpressed) && (tables.num() == STBL))
     {
       int speed = (song.ltable[tables.num()][tables.pos()] << 8) | song.rtable[tables.num()][tables.pos()];
       speed *= 30929;
@@ -80,7 +80,7 @@ void tablecommands()
     break;
 
     case KEY_W:
-    if ((shiftpressed) && (tables.num() == STBL))
+    if ((input.shiftpressed) && (tables.num() == STBL))
     {
       int speed = (song.ltable[tables.num()][tables.pos()] << 8) | song.rtable[tables.num()][tables.pos()];
       speed *= 2;
@@ -89,7 +89,7 @@ void tablecommands()
       song.ltable[tables.num()][tables.pos()] = speed >> 8;
       song.rtable[tables.num()][tables.pos()] = speed & 0xff;
     }
-    if ((shiftpressed) && ((tables.num() == PTBL) || (tables.num() == FTBL)) && (song.ltable[tables.num()][tables.pos()] < 0x80))
+    if ((input.shiftpressed) && ((tables.num() == PTBL) || (tables.num() == FTBL)) && (song.ltable[tables.num()][tables.pos()] < 0x80))
     {
       int speed = (signed char)(song.rtable[tables.num()][tables.pos()]);
       speed *= 2;
@@ -101,7 +101,7 @@ void tablecommands()
     break;
 
     case KEY_S:
-    if ((shiftpressed) && (tables.num() == STBL))
+    if ((input.shiftpressed) && (tables.num() == STBL))
     {
       int speed = (song.ltable[tables.num()][tables.pos()] << 8) | song.rtable[tables.num()][tables.pos()];
       speed /= 2;
@@ -109,7 +109,7 @@ void tablecommands()
       song.ltable[tables.num()][tables.pos()] = speed >> 8;
       song.rtable[tables.num()][tables.pos()] = speed & 0xff;
     }
-    if ((shiftpressed) && ((tables.num() == PTBL) || (tables.num() == FTBL)) && (song.ltable[tables.num()][tables.pos()] < 0x80))
+    if ((input.shiftpressed) && ((tables.num() == PTBL) || (tables.num() == FTBL)) && (song.ltable[tables.num()][tables.pos()] < 0x80))
     {
       int speed = (signed char)(song.rtable[tables.num()][tables.pos()]);
       speed /= 2;
@@ -119,7 +119,7 @@ void tablecommands()
     break;
 
     case KEY_SPACE:
-    if (!shiftpressed)
+    if (!input.shiftpressed)
       playtestnote(FIRSTNOTE + epoctave * 12, einum, epchn);
     else
       releasenote(epchn);
@@ -135,7 +135,7 @@ void tablecommands()
       if (tables.num() >= MAX_TABLES) tables.m_num = 0;
       tables.m_pos += tables.curview();
     }
-    if (shiftpressed) tables.resetmarknum();
+    if (input.shiftpressed) tables.resetmarknum();
     break;
 
     case KEY_LEFT:
@@ -148,36 +148,36 @@ void tablecommands()
       if (tables.num() < 0) tables.m_num = MAX_TABLES - 1;
       tables.m_pos += tables.curview();
     }
-    if (shiftpressed) tables.resetmarknum();
+    if (input.shiftpressed) tables.resetmarknum();
     break;
 
     case KEY_HOME:
-    tables.tableup(shiftpressed, tables.pos());
+    tables.tableup(input.shiftpressed, tables.pos());
     break;
 
     case KEY_END:
-    tables.tabledown(shiftpressed, MAX_TABLELEN-1-tables.pos());
+    tables.tabledown(input.shiftpressed, MAX_TABLELEN-1-tables.pos());
     break;
 
     case KEY_PGUP:
-    tables.tableup(shiftpressed, PGUPDNREPEAT);
+    tables.tableup(input.shiftpressed, PGUPDNREPEAT);
     break;
 
     case KEY_PGDN:
-    tables.tabledown(shiftpressed, PGUPDNREPEAT);
+    tables.tabledown(input.shiftpressed, PGUPDNREPEAT);
     break;
 
     case KEY_UP:
-    tables.tableup(shiftpressed);
+    tables.tableup(input.shiftpressed);
     break;
 
     case KEY_DOWN:
-    tables.tabledown(shiftpressed);
+    tables.tabledown(input.shiftpressed);
     break;
 
     case KEY_X:
     case KEY_C:
-    if (shiftpressed)
+    if (input.shiftpressed)
     {
       if (tables.marknum() != -1)
       {
@@ -192,7 +192,7 @@ void tablecommands()
         {
           ltablecopybuffer[d] = song.ltable[tables.marknum()][c];
           rtablecopybuffer[d] = song.rtable[tables.marknum()][c];
-          if (rawkey == KEY_X)
+          if (input.rawkey == KEY_X)
           {
             song.ltable[tables.marknum()][c] = 0;
             song.rtable[tables.marknum()][c] = 0;
@@ -206,7 +206,7 @@ void tablecommands()
     break;
 
     case KEY_V:
-    if (shiftpressed)
+    if (input.shiftpressed)
     {
       if (tablecopyrows)
       {
@@ -222,11 +222,11 @@ void tablecommands()
     break;
 
     case KEY_O:
-    if (shiftpressed) optimizetable(tables.num());
+    if (input.shiftpressed) optimizetable(tables.num());
     break;
 
     case KEY_U:
-    if (shiftpressed)
+    if (input.shiftpressed)
     {
       tables.fliplock();
       tables.validatetableview();
@@ -371,7 +371,7 @@ void tablecommands()
     break;
 
     case KEY_N:
-    if (shiftpressed)
+    if (input.shiftpressed)
     {
       switch (tables.num())
       {
@@ -398,7 +398,7 @@ void tablecommands()
     break;
 
     case KEY_INS:
-    song.inserttable(tables.num(), tables.pos(), shiftpressed);
+    song.inserttable(tables.num(), tables.pos(), input.shiftpressed);
     break;
 
     case KEY_ENTER:
@@ -443,7 +443,7 @@ void tablecommands()
         case STBL:
         if (song.rtable[tables.num()][tables.pos()])
         {
-          if (!shiftpressed)
+          if (!input.shiftpressed)
           {
             gototable(STBL, song.rtable[tables.num()][tables.pos()] - 1);
             return;
@@ -481,7 +481,7 @@ void tablecommands()
         }
         else
         {
-          if (shiftpressed)
+          if (input.shiftpressed)
           {
             int pos = song.gettablelen(table);
             if (pos >= MAX_TABLELEN-1) pos = MAX_TABLELEN - 1;
@@ -501,7 +501,7 @@ void tablecommands()
     break;
 
     case KEY_APOST2:
-    if (shiftpressed)
+    if (input.shiftpressed)
     {
       tables.m_pos -= tables.curview();
       tables.m_num--;

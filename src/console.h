@@ -41,6 +41,22 @@ struct Positions
     int statusTopY;
 };
 
+struct Input
+{
+    int key             = 0;
+    int rawkey          = 0;
+    int mouseb          = 0;
+    int prevmouseb      = 0;
+    int mouseheld       = 0;
+    int mousex          = 0;
+    int mousey          = 0;
+    bool shiftpressed   = false;
+    bool altpressed     = false;
+
+    bool iskeyyes();
+    void clearkeys();
+};
+
 
 bool initscreen();
 void closescreen();
@@ -60,11 +76,7 @@ void flashCursor();
 int getCursorColor();
 
 #ifndef CONSOLE_C
-extern bool shiftpressed, altpressed;
-extern int key, rawkey;
-extern int mouseb, prevmouseb;
-extern int mouseheld;
-extern int mousex, mousey;
+extern Input input;
 extern Positions dpos;
 #endif
 

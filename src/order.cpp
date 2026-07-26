@@ -123,7 +123,7 @@ void orderlistcommands()
     }
   }
 
-  switch(key)
+  switch(input.key)
   {
     case 'R':
     if (eseditpos < song.len[esnum][eschn])
@@ -161,20 +161,23 @@ void orderlistcommands()
     prevsong();
     break;
   }
-  switch(rawkey)
+  switch(input.rawkey)
   {
     case KEY_1:
     case KEY_2:
     case KEY_3:
-    if (shiftpressed)
+    if (input.shiftpressed)
     {
       int schn = eschn;
       int tchn = 0;
 
       esmark.chn = -1;
-      if (rawkey == KEY_1) tchn = 0;
-      if (rawkey == KEY_2) tchn = 1;
-      if (rawkey == KEY_3) tchn = 2;
+      switch (input.rawkey)
+      {
+      case KEY_1: tchn = 0; break;
+      case KEY_2: tchn = 1; break;
+      case KEY_3: tchn = 2; break;
+      }
       if (schn != tchn)
       {
         int lentemp = song.len[esnum][schn];
@@ -190,7 +193,7 @@ void orderlistcommands()
     break;
 
     case KEY_X:
-    if (shiftpressed)
+    if (input.shiftpressed)
     {
       if (esmark.chn != -1)
       {
@@ -224,7 +227,7 @@ void orderlistcommands()
     break;
 
     case KEY_C:
-    if (shiftpressed)
+    if (input.shiftpressed)
     {
       if (esmark.chn != -1)
       {
@@ -253,7 +256,7 @@ void orderlistcommands()
     break;
 
     case KEY_V:
-    if (shiftpressed)
+    if (input.shiftpressed)
     {
       int oldlen = song.len[esnum][eschn];
 
@@ -273,7 +276,7 @@ void orderlistcommands()
     break;
 
     case KEY_L:
-    if (shiftpressed)
+    if (input.shiftpressed)
     {
       if (esmark.chn == -1)
       {
@@ -287,7 +290,7 @@ void orderlistcommands()
 
 
     case KEY_SPACE:
-    if (!shiftpressed)
+    if (!input.shiftpressed)
     {
       if (eseditpos < song.len[esnum][eschn]) espos[eschn] = eseditpos;
       if (esend[eschn] < espos[eschn]) esend[eschn] = 0;
@@ -303,7 +306,7 @@ void orderlistcommands()
     break;
 
     case KEY_BACKSPACE:
-    if (!shiftpressed)
+    if (!input.shiftpressed)
     {
       if ((esend[eschn] != eseditpos) && (eseditpos > espos[eschn]))
       {
@@ -330,7 +333,7 @@ void orderlistcommands()
     case KEY_ENTER:
     if (eseditpos < song.len[esnum][eschn])
     {
-      if (!shiftpressed)
+      if (!input.shiftpressed)
       {
         if (song.order[esnum][eschn][eseditpos] < MAX_PATT)
           epnum[eschn] = song.order[esnum][eschn][eseditpos];
@@ -412,7 +415,7 @@ void orderlistcommands()
       eseditpos = song.len[esnum][eschn]+1;
       escolumn = 0;
     }
-    if (shiftpressed) esmark.chn = -1;
+    if (input.shiftpressed) esmark.chn = -1;
     break;
 
     case KEY_DOWN:
@@ -423,7 +426,7 @@ void orderlistcommands()
       eseditpos = song.len[esnum][eschn]+1;
       escolumn = 0;
     }
-    if (shiftpressed) esmark.chn = -1;
+    if (input.shiftpressed) esmark.chn = -1;
     break;
   }
   if (eseditpos - esview[eschn] < 0)
@@ -439,7 +442,7 @@ void orderlistcommands()
 
 void namecommands()
 {
-  switch(rawkey)
+  switch(input.rawkey)
   {
     case KEY_DOWN:
     case KEY_ENTER:
@@ -544,7 +547,7 @@ void deleteorder()
 
 void orderleft()
 {
-  if ((shiftpressed) && (eseditpos < song.len[esnum][eschn]))
+  if ((input.shiftpressed) && (eseditpos < song.len[esnum][eschn]))
   {
     if ((esmark.chn != eschn) || (eseditpos != esmark.end))
     {
@@ -568,12 +571,12 @@ void orderleft()
     }
     else escolumn = 0;
   }
-  if ((shiftpressed) && (eseditpos < song.len[esnum][eschn])) esmark.end = eseditpos;
+  if ((input.shiftpressed) && (eseditpos < song.len[esnum][eschn])) esmark.end = eseditpos;
 }
 
 void orderright()
 {
-  if ((shiftpressed) && (eseditpos < song.len[esnum][eschn]))
+  if ((input.shiftpressed) && (eseditpos < song.len[esnum][eschn]))
   {
     if ((esmark.chn != eschn) || (eseditpos != esmark.end))
     {
@@ -592,7 +595,7 @@ void orderright()
     }
     else escolumn = 1;
   }
-  if ((shiftpressed) && (eseditpos < song.len[esnum][eschn])) esmark.end = eseditpos;
+  if ((input.shiftpressed) && (eseditpos < song.len[esnum][eschn])) esmark.end = eseditpos;
 }
 
 void nextsong()

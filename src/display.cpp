@@ -97,7 +97,7 @@ void printstatus()
 {
   int cc = getCursorColor();
 
-  menu = (mouseb > MOUSEB_LEFT) && (mousey <= 1) && (ehmode == EditHdr::NONE);
+  menu = (input.mouseb > MOUSEB_LEFT) && (input.mousey <= 1) && (ehmode == EditHdr::NONE);
 
   printblankc(0, 0, colors.CHEADER, MAX_COLUMNS);
 

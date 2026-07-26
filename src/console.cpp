@@ -41,20 +41,12 @@ bool gfxinitted = false;
 unsigned *scrbuffer = nullptr;
 unsigned *prevscrbuffer = nullptr;
 unsigned char *chardata = nullptr;
-int key = 0;
-int rawkey = 0;
-bool shiftpressed = false;
-bool altpressed = false;
 int cursorflashdelay = 0;
-int mouseb = 0;
-int prevmouseb = 0;
-unsigned mousex = 0;
-unsigned mousey = 0;
 unsigned mousepixelx = 0;
 unsigned mousepixely = 0;
 unsigned oldmousepixelx = 0xffffffff;
 unsigned oldmousepixely = 0xffffffff;
-int mouseheld = 0;
+Input input;
 int region[MAX_ROWS];
 
 int cursorflash = 0;
@@ -85,6 +77,17 @@ Positions dpos =
     0,                          // statusTopX
     0                           // statusTopY
 };
+
+bool Input::iskeyyes()
+{
+    return (key == 'y') || (key == 'Y');
+}
+
+void Input::clearkeys()
+{
+    key = 0;
+    rawkey = 0;
+}
 
 void closescreen();
 void loadexternalpalette();
@@ -441,16 +444,16 @@ void editstring(char *buffer, int maxlength)
 {
   int len = std::strlen(buffer);
 
-  if ((key >= 32) && (key < 256))
+  if ((input.key >= 32) && (input.key < 256))
   {
     if (len < maxlength-1)
     {
-      buffer[len] = key;
+      buffer[len] = input.key;
       buffer[len+1] = 0;
     }
   }
 
-  if ((rawkey == KEY_BACKSPACE) && (len > 0))
+  if ((input.rawkey == KEY_BACKSPACE) && (len > 0))
   {
     buffer[len-1] = 0;
   }
@@ -461,18 +464,18 @@ void getkey()
   win_asciikey = 0;
   cursorflashdelay += win_getspeed(50); // Updates win_asciikey
 
-  prevmouseb = mouseb;
+  input.prevmouseb = input.mouseb;
 
   mou_getpos(&mousepixelx, &mousepixely);
-  mouseb = mou_getbuttons();
-  mousex = mousepixelx / fontwidth;
-  mousey = mousepixely / fontheight;
+  input.mouseb = mou_getbuttons();
+  input.mousex = mousepixelx / fontwidth;
+  input.mousey = mousepixely / fontheight;
 
-  if (mouseb) mouseheld++;
-  else mouseheld = 0;
+  if (input.mouseb) input.mouseheld++;
+  else input.mouseheld = 0;
 
-  key = win_asciikey;
-  rawkey = 0;
+  input.key = win_asciikey;
+  input.rawkey = 0;
   for (int c = 0; c < SDL_SCANCODE_COUNT; c++)
   {
     if (win_keytable[c])
@@ -480,37 +483,37 @@ void getkey()
       if ((c != SDL_SCANCODE_LSHIFT) && (c != SDL_SCANCODE_RSHIFT) &&
           (c != SDL_SCANCODE_LCTRL) && (c != SDL_SCANCODE_RCTRL))
       {
-        rawkey = c;
+        input.rawkey = c;
         win_keytable[c] = false;
         break;
       }
     }
   }
 
-  shiftpressed = (win_keystate[SDL_SCANCODE_LSHIFT])||(win_keystate[SDL_SCANCODE_RSHIFT])
+  input.shiftpressed = (win_keystate[SDL_SCANCODE_LSHIFT])||(win_keystate[SDL_SCANCODE_RSHIFT])
                   || (win_keystate[SDL_SCANCODE_LCTRL])||(win_keystate[SDL_SCANCODE_RCTRL]);
 
-  altpressed = (win_keystate[SDL_SCANCODE_LALT])
+  input.altpressed = (win_keystate[SDL_SCANCODE_LALT])
                 || (win_keystate[SDL_SCANCODE_RALT]);
 
-  if (rawkey == SDL_SCANCODE_KP_ENTER)
+  if (input.rawkey == SDL_SCANCODE_KP_ENTER)
   {
-    key = KEY_ENTER;
-    rawkey = SDL_SCANCODE_RETURN;
+    input.key = KEY_ENTER;
+    input.rawkey = SDL_SCANCODE_RETURN;
   }
 
-  switch (rawkey)
+  switch (input.rawkey)
   {
-    case SDL_SCANCODE_KP_0: key = '0'; break;
-    case SDL_SCANCODE_KP_1: key = '1'; break;
-    case SDL_SCANCODE_KP_2: key = '2'; break;
-    case SDL_SCANCODE_KP_3: key = '3'; break;
-    case SDL_SCANCODE_KP_4: key = '4'; break;
-    case SDL_SCANCODE_KP_5: key = '5'; break;
-    case SDL_SCANCODE_KP_6: key = '6'; break;
-    case SDL_SCANCODE_KP_7: key = '7'; break;
-    case SDL_SCANCODE_KP_8: key = '8'; break;
-    case SDL_SCANCODE_KP_9: key = '9'; break;
+    case SDL_SCANCODE_KP_0: input.key = '0'; break;
+    case SDL_SCANCODE_KP_1: input.key = '1'; break;
+    case SDL_SCANCODE_KP_2: input.key = '2'; break;
+    case SDL_SCANCODE_KP_3: input.key = '3'; break;
+    case SDL_SCANCODE_KP_4: input.key = '4'; break;
+    case SDL_SCANCODE_KP_5: input.key = '5'; break;
+    case SDL_SCANCODE_KP_6: input.key = '6'; break;
+    case SDL_SCANCODE_KP_7: input.key = '7'; break;
+    case SDL_SCANCODE_KP_8: input.key = '8'; break;
+    case SDL_SCANCODE_KP_9: input.key = '9'; break;
   }
 }
 

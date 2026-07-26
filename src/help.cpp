@@ -386,7 +386,7 @@ void onlinehelp(int standalone,int context)
       break;
     }
 
-    switch(rawkey)
+    switch(input.rawkey)
     {
       case KEY_LEFT:
       case KEY_UP:
@@ -426,23 +426,22 @@ void onlinehelp(int standalone,int context)
       break;
 
       default:
-      if (rawkey && !standalone) goto EXITHELP;
+      if (input.rawkey && !standalone) goto EXITHELP;
 
       break;
     }
 
-    if ((mouseb) && (mousey >= 1) && (mousey < ((MAX_ROWS-1) / 2))) hview++;
-    if ((mouseb) && (mousey > ((MAX_ROWS-1) / 2) && (mousey <= MAX_ROWS-1))) hview--;
+    if ((input.mouseb) && (input.mousey >= 1) && (input.mousey < ((MAX_ROWS-1) / 2))) hview++;
+    if ((input.mouseb) && (input.mousey > ((MAX_ROWS-1) / 2) && (input.mousey <= MAX_ROWS-1))) hview--;
 
     if (hview > -1) hview = -1;
     if (hview < -(lastrow-MAX_ROWS+1)) hview = -(lastrow-MAX_ROWS+1);
-    if ((mouseb) && (!prevmouseb) && (!mousey)) break;
+    if ((input.mouseb) && (!input.prevmouseb) && (!input.mousey)) break;
   }
 EXITHELP:
   if(!standalone) {
     printmainscreen();
-    key = 0;
-    rawkey = 0;
+    input.clearkeys();
   }
 }
 

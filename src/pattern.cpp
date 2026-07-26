@@ -105,7 +105,7 @@ void insertnote(int newnote)
             {
                 song.pattern[epnum[epchn]][eppos*4+1] = 0;
             }
-            if ((shiftpressed) && (newnote == REST))
+            if ((input.shiftpressed) && (newnote == REST))
             {
                 song.pattern[epnum[epchn]][eppos*4+2] = 0;
                 song.pattern[epnum[epchn]][eppos*4+3] = 0;
@@ -128,7 +128,7 @@ void patterncommands()
 {
   int maxChns = getMaxChannels();
 
-  switch(key)
+  switch(input.key)
   {
     case '<':
     case '(':
@@ -144,21 +144,21 @@ void patterncommands()
   }
   {
     int newnote = -1;
-    if (key)
+    if (input.key)
     {
       switch (keypreset)
       {
         case KEY_TRACKER:
         for (int i = 0; i < (int)sizeof(notekeytbl1); i++)
         {
-          if ((rawkey == notekeytbl1[i]) && (!epcolumn) && (!shiftpressed) && (!altpressed))
+          if ((input.rawkey == notekeytbl1[i]) && (!epcolumn) && (!input.shiftpressed) && (!input.altpressed))
           {
             newnote = FIRSTNOTE+i+epoctave*12;
           }
         }
         for (int i = 0; i < (int)sizeof(notekeytbl2); i++)
         {
-          if ((rawkey == notekeytbl2[i]) && (!epcolumn) && (!shiftpressed) && (!altpressed))
+          if ((input.rawkey == notekeytbl2[i]) && (!epcolumn) && (!input.shiftpressed) && (!input.altpressed))
           {
             newnote = FIRSTNOTE+i+(epoctave+1)*12;
           }
@@ -168,7 +168,7 @@ void patterncommands()
         case KEY_DMC:
         for (int i = 0; i < (int)sizeof(dmckeytbl); i++)
         {
-          if ((rawkey == dmckeytbl[i]) && (!epcolumn) && (!shiftpressed) && (!altpressed))
+          if ((input.rawkey == dmckeytbl[i]) && (!epcolumn) && (!input.shiftpressed) && (!input.altpressed))
           {
             newnote = FIRSTNOTE+i+epoctave*12;
           }
@@ -178,14 +178,14 @@ void patterncommands()
         case KEY_JANKO:
         for (int i = 0; i < (int)sizeof(jankokeytbl1); i++)
         {
-          if ((rawkey == jankokeytbl1[i]) && (!epcolumn) && (!shiftpressed) && (!altpressed))
+          if ((input.rawkey == jankokeytbl1[i]) && (!epcolumn) && (!input.shiftpressed) && (!input.altpressed))
           {
             newnote = FIRSTNOTE+i+epoctave*12;
           }
         }
         for (int i = 0; i < (int)sizeof(jankokeytbl2); i++)
         {
-          if ((rawkey == jankokeytbl2[i]) && (!epcolumn) && (!shiftpressed) && (!altpressed))
+          if ((input.rawkey == jankokeytbl2[i]) && (!epcolumn) && (!input.shiftpressed) && (!input.altpressed))
           {
             newnote = FIRSTNOTE+i+(epoctave+1)*12;
           }
@@ -195,14 +195,14 @@ void patterncommands()
     }
 
     if (newnote > LASTNOTE) newnote = -1;
-    if ((rawkey == KEY_BACKSPACE) && (!epcolumn)) newnote = REST;
-    if ((rawkey == KEY_CAPSLOCK) && (!epcolumn)) newnote = KEYOFF;
-    if (rawkey == KEY_ENTER)
+    if ((input.rawkey == KEY_BACKSPACE) && (!epcolumn)) newnote = REST;
+    if ((input.rawkey == KEY_CAPSLOCK) && (!epcolumn)) newnote = KEYOFF;
+    if (input.rawkey == KEY_ENTER)
     {
       switch(epcolumn)
       {
         case 0:
-        if (shiftpressed)
+        if (input.shiftpressed)
           newnote = KEYON;
         else
           newnote = KEYOFF;
@@ -228,7 +228,7 @@ void patterncommands()
           }
           else
           {
-            if (shiftpressed)
+            if (input.shiftpressed)
             {
               int pos = song.gettablelen(WTBL);
               if (pos >= MAX_TABLELEN-1) pos = MAX_TABLELEN - 1;
@@ -247,7 +247,7 @@ void patterncommands()
           }
           else
           {
-            if (shiftpressed)
+            if (input.shiftpressed)
             {
               int pos = song.gettablelen(PTBL);
               if (pos >= MAX_TABLELEN-1) pos = MAX_TABLELEN - 1;
@@ -266,7 +266,7 @@ void patterncommands()
           }
           else
           {
-            if (shiftpressed)
+            if (input.shiftpressed)
             {
               int pos = song.gettablelen(FTBL);
               if (pos >= MAX_TABLELEN-1) pos = MAX_TABLELEN - 1;
@@ -280,7 +280,7 @@ void patterncommands()
           case CMD_FUNKTEMPO:
           if (song.pattern[epnum[epchn]][eppos*4+3])
           {
-            if (!shiftpressed)
+            if (!input.shiftpressed)
             {
               gototable(STBL, song.pattern[epnum[epchn]][eppos*4+3] - 1);
               return;
@@ -293,7 +293,7 @@ void patterncommands()
           }
           else
           {
-            if (shiftpressed)
+            if (input.shiftpressed)
             {
               int pos = song.findfreespeedtable();
               if (pos >= 0)
@@ -311,7 +311,7 @@ void patterncommands()
           case CMD_TONEPORTA:
           if (song.pattern[epnum[epchn]][eppos*4+3])
           {
-            if (!shiftpressed)
+            if (!input.shiftpressed)
             {
               gototable(STBL, song.pattern[epnum[epchn]][eppos*4+3] - 1);
               return;
@@ -324,7 +324,7 @@ void patterncommands()
           }
           else
           {
-            if (shiftpressed)
+            if (input.shiftpressed)
             {
               int pos = song.findfreespeedtable();
               if (pos >= 0)
@@ -340,7 +340,7 @@ void patterncommands()
           case CMD_VIBRATO:
           if (song.pattern[epnum[epchn]][eppos*4+3])
           {
-            if (!shiftpressed)
+            if (!input.shiftpressed)
             {
               gototable(STBL, song.pattern[epnum[epchn]][eppos*4+3] - 1);
               return;
@@ -353,7 +353,7 @@ void patterncommands()
           }
           else
           {
-            if (shiftpressed)
+            if (input.shiftpressed)
             {
               int pos = song.findfreespeedtable();
               if (pos >= 0)
@@ -382,26 +382,26 @@ void patterncommands()
         insertnote(newnote);
     }
   }
-  switch(rawkey)
+  switch(input.rawkey)
   {
     case KEY_O:
-    if (shiftpressed) shrinkpattern();
+    if (input.shiftpressed) shrinkpattern();
     break;
 
     case KEY_P:
-    if (shiftpressed) expandpattern();
+    if (input.shiftpressed) expandpattern();
     break;
 
     case KEY_J:
-    if (shiftpressed) joinpattern();
+    if (input.shiftpressed) joinpattern();
     break;
 
     case KEY_K:
-    if (shiftpressed) splitpattern();
+    if (input.shiftpressed) splitpattern();
     break;
 
     case KEY_Z:
-    if (shiftpressed)
+    if (input.shiftpressed)
     {
       autoadvance++;
       if (autoadvance > 2) autoadvance = 0;
@@ -413,7 +413,7 @@ void patterncommands()
     break;
 
     case KEY_E:
-    if (shiftpressed)
+    if (input.shiftpressed)
     {
       if (epmark.chn != -1)
       {
@@ -447,7 +447,7 @@ void patterncommands()
     break;
 
     case KEY_R:
-    if (shiftpressed)
+    if (input.shiftpressed)
     {
       for (int c = 0; c < cmdcopyrows; c++)
       {
@@ -460,7 +460,7 @@ void patterncommands()
     break;
 
     case KEY_I:
-    if (shiftpressed)
+    if (input.shiftpressed)
     {
       if (epmark.chn != -1)
       {
@@ -499,7 +499,7 @@ void patterncommands()
     break;
 
     case KEY_Q:
-    if (shiftpressed)
+    if (input.shiftpressed)
     {
       if (epmark.chn != -1)
       {
@@ -530,7 +530,7 @@ void patterncommands()
     break;
 
     case KEY_A:
-    if (shiftpressed)
+    if (input.shiftpressed)
     {
       if (epmark.chn != -1)
       {
@@ -561,7 +561,7 @@ void patterncommands()
     break;
 
     case KEY_W:
-    if (shiftpressed)
+    if (input.shiftpressed)
     {
       if (epmark.chn != -1)
       {
@@ -600,7 +600,7 @@ void patterncommands()
     break;
 
     case KEY_S:
-    if (shiftpressed)
+    if (input.shiftpressed)
     {
       if (epmark.chn != -1)
       {
@@ -639,7 +639,7 @@ void patterncommands()
     break;
 
     case KEY_M:
-    if (shiftpressed)
+    if (input.shiftpressed)
     {
       stepsize++;
       if (stepsize > MAX_PATTROWS) stepsize = MAX_PATTROWS;
@@ -647,7 +647,7 @@ void patterncommands()
     break;
 
     case KEY_N:
-    if (shiftpressed)
+    if (input.shiftpressed)
     {
       stepsize--;
       if (stepsize < 2) stepsize = 2;
@@ -655,7 +655,7 @@ void patterncommands()
     break;
 
     case KEY_H:
-    if (shiftpressed)
+    if (input.shiftpressed)
     {
       int c;
       switch (song.pattern[epnum[epchn]][eppos*4+2])
@@ -700,7 +700,7 @@ void patterncommands()
     break;
 
     case KEY_L:
-    if (shiftpressed)
+    if (input.shiftpressed)
     {
       if (epmark.chn == -1)
       {
@@ -714,7 +714,7 @@ void patterncommands()
 
     case KEY_C:
     case KEY_X:
-    if (shiftpressed)
+    if (input.shiftpressed)
     {
       if (epmark.chn != -1)
       {
@@ -732,7 +732,7 @@ void patterncommands()
           patterncopybuffer[d*4+1] = song.pattern[epnum[epmark.chn]][c*4+1];
           patterncopybuffer[d*4+2] = song.pattern[epnum[epmark.chn]][c*4+2];
           patterncopybuffer[d*4+3] = song.pattern[epnum[epmark.chn]][c*4+3];
-          if (rawkey == KEY_X)
+          if (input.rawkey == KEY_X)
           {
             song.pattern[epnum[epmark.chn]][c*4] = REST;
             song.pattern[epnum[epmark.chn]][c*4+1] = 0;
@@ -753,7 +753,7 @@ void patterncommands()
           patterncopybuffer[d*4+1] = song.pattern[epnum[epchn]][c*4+1];
           patterncopybuffer[d*4+2] = song.pattern[epnum[epchn]][c*4+2];
           patterncopybuffer[d*4+3] = song.pattern[epnum[epchn]][c*4+3];
-          if (rawkey == KEY_X)
+          if (input.rawkey == KEY_X)
           {
             song.pattern[epnum[epchn]][c*4] = REST;
             song.pattern[epnum[epchn]][c*4+1] = 0;
@@ -768,7 +768,7 @@ void patterncommands()
     break;
 
     case KEY_V:
-    if ((shiftpressed) && (patterncopyrows))
+    if ((input.shiftpressed) && (patterncopyrows))
     {
       for (int c = 0; c < patterncopyrows; c++)
       {
@@ -839,7 +839,7 @@ void patterncommands()
     break;
 
     case KEY_SPACE:
-    if (!shiftpressed)
+    if (!input.shiftpressed)
       recordmode = !recordmode;
     else
     {
@@ -861,7 +861,7 @@ void patterncommands()
     break;
 
     case KEY_RIGHT:
-    if (!shiftpressed)
+    if (!input.shiftpressed)
     {
       epcolumn++;
       if (epcolumn >= 6)
@@ -884,7 +884,7 @@ void patterncommands()
     break;
 
     case KEY_LEFT:
-    if (!shiftpressed)
+    if (!input.shiftpressed)
     {
       epcolumn--;
       if (epcolumn < 0)
@@ -931,7 +931,7 @@ void patterncommands()
     break;
 
     case KEY_APOST2:
-    if (!shiftpressed)
+    if (!input.shiftpressed)
     {
       epchn++;
       if (epchn >= maxChns) epchn = 0;
@@ -948,15 +948,15 @@ void patterncommands()
     case KEY_1:
     case KEY_2:
     case KEY_3:
-    if (shiftpressed)
-      mutechannel(rawkey - KEY_1);
+    if (input.shiftpressed)
+      mutechannel(input.rawkey - KEY_1);
     break;
     case KEY_4:
     case KEY_5:
     case KEY_6:
-    if (shiftpressed && (numsids == 2))
+    if (input.shiftpressed && (numsids == 2))
     {
-        mutechannel(rawkey - KEY_1);
+        mutechannel(input.rawkey - KEY_1);
     }
     break;
   }
@@ -1040,7 +1040,7 @@ void patterncommands()
 
 void patterndown(int n)
 {
-  if (shiftpressed)
+  if (input.shiftpressed)
   {
     if ((epmark.chn != epchn) || (eppos != epmark.end))
     {
@@ -1053,13 +1053,13 @@ void patterndown(int n)
   {
     eppos = 0;
   }
-  if (shiftpressed) epmark.end = eppos;
+  if (input.shiftpressed) epmark.end = eppos;
   updateview();
 }
 
 void patternup(int n)
 {
-  if (shiftpressed)
+  if (input.shiftpressed)
   {
     if ((epmark.chn != epchn) || (eppos != epmark.end))
     {
@@ -1072,7 +1072,7 @@ void patternup(int n)
   {
     eppos = getPattlen(epnum[epchn]);
   }
-  if (shiftpressed) epmark.end = eppos;
+  if (input.shiftpressed) epmark.end = eppos;
   updateview();
 }
 

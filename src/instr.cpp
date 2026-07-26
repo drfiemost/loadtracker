@@ -46,11 +46,11 @@ int eicolumn;
 
 void instrumentcommands()
 {
-  switch(rawkey)
+  switch(input.rawkey)
   {
     case KEY_CANC:
     case KEY_DEL:
-    if ((einum) && (shiftpressed) && (eipos < 9))
+    if ((einum) && (input.shiftpressed) && (eipos < 9))
     {
       song.deleteinstrtable(einum);
       clearinstr(einum);
@@ -58,7 +58,7 @@ void instrumentcommands()
     break;
 
     case KEY_X:
-    if ((einum) && (shiftpressed) && (eipos < 9))
+    if ((einum) && (input.shiftpressed) && (eipos < 9))
     {
       cutinstr = einum;
       std::memcpy(&instrcopybuffer, &song.instr[einum], sizeof(Instr));
@@ -67,7 +67,7 @@ void instrumentcommands()
     break;
 
     case KEY_C:
-    if ((einum) && (shiftpressed) && (eipos < 9))
+    if ((einum) && (input.shiftpressed) && (eipos < 9))
     {
       cutinstr = -1;
       std::memcpy(&instrcopybuffer, &song.instr[einum], sizeof(Instr));
@@ -75,7 +75,7 @@ void instrumentcommands()
     break;
 
     case KEY_S:
-    if ((einum) && (shiftpressed) && (eipos < 9))
+    if ((einum) && (input.shiftpressed) && (eipos < 9))
     {
       std::memcpy(&song.instr[einum], &instrcopybuffer, sizeof(Instr));
       if (cutinstr != -1)
@@ -90,7 +90,7 @@ void instrumentcommands()
     break;
 
     case KEY_V:
-    if ((einum) && (shiftpressed) && (eipos < 9))
+    if ((einum) && (input.shiftpressed) && (eipos < 9))
     {
       std::memcpy(&song.instr[einum], &instrcopybuffer, sizeof(Instr));
     }
@@ -139,7 +139,7 @@ void instrumentcommands()
     break;
 
     case KEY_N:
-    if ((eipos != 9) && (shiftpressed))
+    if ((eipos != 9) && (input.shiftpressed))
     {
       eipos = 9;
       return;
@@ -147,7 +147,7 @@ void instrumentcommands()
     break;
 
     case KEY_U:
-    if (shiftpressed)
+    if (input.shiftpressed)
     {
       tables.fliplock();
       tables.validatetableview();
@@ -157,7 +157,7 @@ void instrumentcommands()
     case KEY_SPACE:
     if (eipos != 9)
     {
-      if (!shiftpressed)
+      if (!input.shiftpressed)
         playtestnote(FIRSTNOTE + epoctave * 12, einum, epchn);
       else
         releasenote(epchn);
@@ -177,7 +177,7 @@ void instrumentcommands()
 
         if (song.instr[einum].ptr[eipos-2])
         {
-          if ((eipos == 5) && (shiftpressed))
+          if ((eipos == 5) && (input.shiftpressed))
           {
             song.instr[einum].ptr[STBL] = makespeedtable(song.instr[einum].ptr[STBL], finevibrato, true) + 1;
             break;
@@ -188,7 +188,7 @@ void instrumentcommands()
         {
           pos = song.gettablelen(eipos-2);
           if (pos >= MAX_TABLELEN-1) pos = MAX_TABLELEN - 1;
-          if (shiftpressed) song.instr[einum].ptr[eipos-2] = pos + 1;
+          if (input.shiftpressed) song.instr[einum].ptr[eipos-2] = pos + 1;
         }
         gototable(eipos-2, pos);
       }
