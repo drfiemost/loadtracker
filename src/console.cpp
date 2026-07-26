@@ -198,10 +198,7 @@ void initicon()
     {
       io_read(handle, iconbuffer, size);
       io_close(handle);
-      SDL_IOStream *rw = SDL_IOFromMem(iconbuffer, size);
-      SDL_Surface *icon = SDL_LoadPNG_IO(rw, true);
-      SDL_SetWindowIcon(win_window, icon);
-      SDL_DestroySurface(icon);
+      win_seticon(iconbuffer, size);
       delete [] iconbuffer;
     }
   }
@@ -461,8 +458,7 @@ void editstring(char *buffer, int maxlength)
 
 void getkey()
 {
-  win_asciikey = 0;
-  cursorflashdelay += win_getspeed(50); // Updates win_asciikey
+  cursorflashdelay += win_getspeed(50);
 
   input.prevmouseb = input.mouseb;
 
@@ -474,27 +470,12 @@ void getkey()
   if (input.mouseb) input.mouseheld++;
   else input.mouseheld = 0;
 
-  input.key = win_asciikey;
-  input.rawkey = 0;
-  for (int c = 0; c < SDL_SCANCODE_COUNT; c++)
-  {
-    if (win_keytable[c])
-    {
-      if ((c != SDL_SCANCODE_LSHIFT) && (c != SDL_SCANCODE_RSHIFT) &&
-          (c != SDL_SCANCODE_LCTRL) && (c != SDL_SCANCODE_RCTRL))
-      {
-        input.rawkey = c;
-        win_keytable[c] = false;
-        break;
-      }
-    }
-  }
+  input.key = key_get();
+  input.rawkey = key_getraw();
 
-  input.shiftpressed = (win_keystate[SDL_SCANCODE_LSHIFT])||(win_keystate[SDL_SCANCODE_RSHIFT])
-                  || (win_keystate[SDL_SCANCODE_LCTRL])||(win_keystate[SDL_SCANCODE_RCTRL]);
+  input.shiftpressed = key_shift();
 
-  input.altpressed = (win_keystate[SDL_SCANCODE_LALT])
-                || (win_keystate[SDL_SCANCODE_RALT]);
+  input.altpressed = key_alt();
 
   if (input.rawkey == SDL_SCANCODE_KP_ENTER)
   {

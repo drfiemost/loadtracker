@@ -140,6 +140,14 @@ void win_closewindow()
     SDL_DestroyWindow(win_window);
 }
 
+void win_seticon(char *iconbuffer, int size)
+{
+    SDL_IOStream *rw = SDL_IOFromMem(iconbuffer, size);
+    SDL_Surface *icon = SDL_LoadPNG_IO(rw, true);
+    SDL_SetWindowIcon(win_window, icon);
+    SDL_DestroySurface(icon);
+}
+
 void win_savepos()
 {
     int x, y;
@@ -195,6 +203,7 @@ void win_checkmessages()
     unsigned keynum;
 
     win_mouseywheel = 0.f;
+    win_asciikey = 0;
 
     SDL_PumpEvents();
 
@@ -606,4 +615,38 @@ void mou_getpos(unsigned *x, unsigned *y)
 unsigned mou_getbuttons()
 {
     return win_mousebuttons;
+}
+
+int key_get()
+{
+    return win_asciikey;
+}
+
+int key_getraw()
+{
+  for (int c = 0; c < SDL_SCANCODE_COUNT; c++)
+  {
+    if (win_keytable[c])
+    {
+      if ((c != SDL_SCANCODE_LSHIFT) && (c != SDL_SCANCODE_RSHIFT) &&
+          (c != SDL_SCANCODE_LCTRL) && (c != SDL_SCANCODE_RCTRL))
+      {
+        win_keytable[c] = false;
+        return c;
+      }
+    }
+  }
+  return 0;
+}
+
+bool key_shift()
+{
+    return (win_keystate[SDL_SCANCODE_LSHIFT]) || (win_keystate[SDL_SCANCODE_RSHIFT])
+                  || (win_keystate[SDL_SCANCODE_LCTRL]) || (win_keystate[SDL_SCANCODE_RCTRL]);
+}
+
+bool key_alt()
+{
+    return (win_keystate[SDL_SCANCODE_LALT])
+                || (win_keystate[SDL_SCANCODE_RALT]);
 }

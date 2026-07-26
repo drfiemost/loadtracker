@@ -19,6 +19,7 @@ enum
 
 bool win_openwindow(const char *appname);
 void win_closewindow();
+void win_seticon(char *iconbuffer, int size);
 int win_getspeed(int framerate);
 
 bool gfx_init(unsigned xsize, unsigned ysize);
@@ -38,13 +39,14 @@ bool gfx_loadcharset(const char *name, unsigned char *chardata);
 void mou_getpos(unsigned *x, unsigned *y);
 unsigned mou_getbuttons();
 
+int key_get();
+int key_getraw();
+bool key_shift();
+bool key_alt();
+
 extern bool win_quitted;
 extern int win_fullscreen;
-extern bool win_keytable[SDL_SCANCODE_COUNT];
-extern bool win_keystate[SDL_SCANCODE_COUNT];
-extern unsigned char win_asciikey;
 extern float win_mouseywheel;
-extern SDL_Window *win_window;
 
 extern bool gfx_redraw;
 extern unsigned char gfx_palette[];
