@@ -28,6 +28,7 @@ bool gfx_lock();
 void gfx_unlock();
 void gfx_flip();
 
+bool gfx_setcolor(int p, int r, int g, int b);
 void gfx_setpalette();
 
 bool gfx_loadcursor(const char *name);
@@ -38,6 +39,7 @@ bool gfx_loadcharset(const char *name, unsigned char *chardata);
 
 void mou_getpos(unsigned *x, unsigned *y);
 unsigned mou_getbuttons();
+float mou_getwheel();
 
 int key_get();
 int key_getraw();
@@ -46,10 +48,8 @@ bool key_alt();
 
 extern bool win_quitted;
 extern int win_fullscreen;
-extern float win_mouseywheel;
 
 extern bool gfx_redraw;
-extern unsigned char gfx_palette[];
 extern SDL_Surface *gfx_screen;
 
 extern unsigned xpos;

@@ -291,13 +291,13 @@ NEWPATH:
       }
     }
 
-    if (win_mouseywheel != 0.f)
+    if (input.wheel != 0.f)
     {
-      if (win_mouseywheel > 0.f)
+      if (input.wheel > 0.f)
       {
         if (filepos > 0) filepos--;
       }
-      else if (win_mouseywheel < 0.f)
+      else if (input.wheel < 0.f)
       {
         if (filepos < files-1) filepos++;
       }

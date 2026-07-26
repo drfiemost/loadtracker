@@ -384,7 +384,7 @@ void waitkeymouse()
     getkey();
     if ((input.rawkey) || (input.key)) break;
     if (win_quitted) break;
-    if (input.mouseb || (win_mouseywheel != 0.f)) break;
+    if (input.mouseb || (input.wheel)) break;
   }
 
   converthex();
@@ -607,7 +607,7 @@ void mousecommands()
 
   int currentSonglen = song.len[esnum][eschn];
 
-  if (win_mouseywheel != 0.f)
+  if (input.wheel)
   {
     // Scroll patterns
     if ((input.mousey >= dpos.patternsY) &&
@@ -615,9 +615,9 @@ void mousecommands()
         (input.mousex >= dpos.patternsX) &&
         (input.mousex <= dpos.patternsX + 11 + (maxChns-1)*13))
     {
-        if (win_mouseywheel > 0.f)
+        if (input.wheel > 0)
           patternup();
-        else if (win_mouseywheel < 0.f)
+        else if (input.wheel < 0)
           patterndown();
     }
     // Scroll instruments
@@ -626,9 +626,9 @@ void mousecommands()
         (input.mousex >= dpos.instrumentsX) &&
         (input.mousex <= dpos.instrumentsX+46))
     {
-        if (win_mouseywheel > 0.f)
+        if (input.wheel > 0)
           previnstr();
-        else if (win_mouseywheel < 0.f)
+        else if (input.wheel < 0)
           nextinstr();
     }
     // Scroll orderlist
@@ -638,7 +638,7 @@ void mousecommands()
         (input.mousex <= dpos.orderlistX+34+((numsids == 2)?13:34)))
     {
       int newchn = input.mousey - (dpos.orderlistY+1);
-      if (win_mouseywheel > 0.f)
+      if (input.wheel > 0)
       {
         if (esview[newchn] > 0)
         {
@@ -646,7 +646,7 @@ void mousecommands()
           if (newchn == eschn) eseditpos--;
         }
       }
-      else if (win_mouseywheel < 0.f)
+      else if (input.wheel < 0)
       {
         if ((song.len[esnum][newchn]-esview[newchn]) > getVisibleOrderlist()-1)
         {
@@ -661,9 +661,9 @@ void mousecommands()
         (input.mousex >= dpos.instrumentsX) &&
         (input.mousex <= dpos.instrumentsX+7+(MAX_TABLES-1)*12))
     {
-        if (win_mouseywheel > 0.f)
+        if (input.wheel > 0)
           tables.tableup(input.shiftpressed);
-        else if (win_mouseywheel < 0.f)
+        else if (input.wheel < 0)
           tables.tabledown(input.shiftpressed);
     }
     // Scroll tempo
@@ -672,9 +672,9 @@ void mousecommands()
         if ((input.mousex >= dpos.statusTopFvX+27) &&
             (input.mousex <= dpos.statusTopFvX+31))
         {
-            if (win_mouseywheel > 0.f)
+            if (input.wheel > 0)
                 nextmultiplier();
-            else if (win_mouseywheel < 0.f)
+            else if (input.wheel < 0)
                 prevmultiplier();
         }
         else
@@ -682,9 +682,9 @@ void mousecommands()
             (input.mousex >= dpos.statusTopFvX+31) &&
             (input.mousex <= dpos.statusTopFvX+37))
         {
-            if (win_mouseywheel > 0.f)
+            if (input.wheel > 0)
                 snd_bpmtempo++;
-            else if (win_mouseywheel < 0.f)
+            else if (input.wheel < 0)
                 snd_bpmtempo--;
         }
     }

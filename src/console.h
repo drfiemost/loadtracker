@@ -50,6 +50,7 @@ struct Input
     int mouseheld       = 0;
     int mousex          = 0;
     int mousey          = 0;
+    int wheel           = 0;
     bool shiftpressed   = false;
     bool altpressed     = false;
 

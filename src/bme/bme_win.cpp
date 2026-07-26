@@ -429,6 +429,18 @@ void gfx_flip()
     gfx_redraw = false;
 }
 
+bool gfx_setcolor(int p, int r, int g, int b)
+{
+    if (p >= MAX_COLORS)
+        return false;
+
+    int i = p*3;
+    gfx_palette[i++] = r;
+    gfx_palette[i++] = g;
+    gfx_palette[i++] = b;
+    return true;
+}
+
 void gfx_calcpalette()
 {
     unsigned char *sptr = gfx_palette;
@@ -615,6 +627,11 @@ void mou_getpos(unsigned *x, unsigned *y)
 unsigned mou_getbuttons()
 {
     return win_mousebuttons;
+}
+
+float mou_getwheel()
+{
+    return win_mouseywheel;
 }
 
 int key_get()

@@ -172,12 +172,10 @@ void loadexternalpalette()
           int r, g, b;
           if (std::sscanf(ln, "%d %d %d", &r, &g, &b) == 3)
           {
-            gfx_palette[p++] = r;
-            gfx_palette[p++] = g;
-            gfx_palette[p++] = b;
+            if (!gfx_setcolor(p, r, g, b)) break;
           }
 
-          if (p >= MAX_COLORS*3) break;
+          p++;
         }
       }
     }
@@ -203,6 +201,7 @@ void initicon()
     }
   }
 }
+
 void closescreen()
 {
   if (scrbuffer)
@@ -467,6 +466,8 @@ void getkey()
   input.mousex = mousepixelx / fontwidth;
   input.mousey = mousepixely / fontheight;
 
+  input.wheel = static_cast<int>(mou_getwheel());
+
   if (input.mouseb) input.mouseheld++;
   else input.mouseheld = 0;
 
@@ -477,12 +478,7 @@ void getkey()
 
   input.altpressed = key_alt();
 
-  if (input.rawkey == SDL_SCANCODE_KP_ENTER)
-  {
-    input.key = KEY_ENTER;
-    input.rawkey = SDL_SCANCODE_RETURN;
-  }
-
+  // numpad
   switch (input.rawkey)
   {
     case SDL_SCANCODE_KP_0: input.key = '0'; break;
@@ -495,6 +491,10 @@ void getkey()
     case SDL_SCANCODE_KP_7: input.key = '7'; break;
     case SDL_SCANCODE_KP_8: input.key = '8'; break;
     case SDL_SCANCODE_KP_9: input.key = '9'; break;
+    case SDL_SCANCODE_KP_ENTER:
+        input.key = KEY_ENTER;
+        input.rawkey = SDL_SCANCODE_RETURN;
+        break;
   }
 }
 
