@@ -24,9 +24,9 @@
 
 #include "sound.h"
 
-#include "configfile.h"
 #include "ltmidi.h"
 #include "play.h"
+#include "settings.h"
 #include "sid.h"
 
 #include "bme_snd.h"
@@ -74,28 +74,26 @@ void sound_playrout();
 void sound_mixer(Sint32 *dest, unsigned samples);
 Uint32 sound_timer(void *userdata, SDL_TimerID timerID, Uint32 interval);
 
-bool sound_init(unsigned mr, bool writer, unsigned m, unsigned ntsc,
-               unsigned multiplier, unsigned interpolate, unsigned customclockrate,
-               unsigned exsid, float filterbias, unsigned combwaves)
+bool sound_init(bool writer, const Settings &cfg)
 {
   sound_uninit();
 
-  if (multiplier)
+  if (cfg.multiplier)
   {
-    if (ntsc)
+    if (cfg.ntsc)
     {
-      framerate = NTSCFRAMERATE * multiplier;
-      snd_bpmtempo = 150 * multiplier;
+      framerate = NTSCFRAMERATE * cfg.multiplier;
+      snd_bpmtempo = 150 * cfg.multiplier;
     }
     else
     {
-      framerate = PALFRAMERATE * multiplier;
-      snd_bpmtempo = 125 * multiplier;
+      framerate = PALFRAMERATE * cfg.multiplier;
+      snd_bpmtempo = 125 * cfg.multiplier;
     }
   }
   else
   {
-    if (ntsc)
+    if (cfg.ntsc)
     {
       framerate = NTSCFRAMERATE / 2;
       snd_bpmtempo = 150 / 2;
@@ -107,7 +105,7 @@ bool sound_init(unsigned mr, bool writer, unsigned m, unsigned ntsc,
     }
   }
 
-  if (exsid)
+  if (cfg.exsid)
   {
 #ifdef USE_EXSID
     exsidfd = exSID_new();
@@ -122,9 +120,9 @@ bool sound_init(unsigned mr, bool writer, unsigned m, unsigned ntsc,
     {
       case XS_MD_PLUS:
       exSID_audio_op(exsidfd, m == 1 ? XS_AU_8580_8580 : XS_AU_6581_6581);
-      exSID_clockselect(exsidfd, ntsc ? XS_CL_NTSC : XS_CL_PAL);
+      exSID_clockselect(exsidfd, cfg.ntsc ? XS_CL_NTSC : XS_CL_PAL);
       exSID_audio_op(exsidfd, XS_AU_UNMUTE);
-      exsidDelay = ntsc ? NTSCCLOCKRATE : PALCLOCKRATE;
+      exsidDelay = cfg.ntsc ? NTSCCLOCKRATE : PALCLOCKRATE;
       break;
 
       case XS_MD_STD:
@@ -147,11 +145,11 @@ bool sound_init(unsigned mr, bool writer, unsigned m, unsigned ntsc,
   }
   else
   {
-    int playspeed = mr;
+    int playspeed = cfg.mixrate;
     if (playspeed < MINMIXRATE) playspeed = MINMIXRATE;
     if (playspeed > MAXMIXRATE) playspeed = MAXMIXRATE;
 
-    if (!snd_init(playspeed, numsids))
+    if (!snd_init(playspeed, config.numsids))
     {
       return false;
     }
@@ -165,7 +163,7 @@ bool sound_init(unsigned mr, bool writer, unsigned m, unsigned ntsc,
       writehandle = std::fopen("sidaudio.raw", "wb");
 
     playspeed = getmixrate();
-    sid_init(playspeed, m, ntsc, interpolate, customclockrate, numsids, filterbias, combwaves);
+    sid_init(playspeed, cfg);
 
     snd_setplayer(&sound_playrout);
     snd_setcustommixer(sound_mixer);
@@ -246,11 +244,11 @@ Uint32 sound_timer(void*, SDL_TimerID, Uint32 interval)
 
 void sound_playrout()
 {
-  if (numsids == 1)
+  if (config.numsids == 1)
   {
     playroutine();
   }
-  else if (numsids == 2)
+  else if (config.numsids == 2)
   {
     playroutine_stereo();
   }
@@ -273,7 +271,7 @@ void sound_mixer(Sint32 *dest, unsigned samples)
   if (!initted) return;
   if (samples > MIXBUFFERSIZE) return;
 
-  if (numsids == 1)
+  if (config.numsids == 1)
   {
     if (!lbuffer) return;
     sid_fillbuffer(lbuffer, samples);
@@ -287,7 +285,7 @@ void sound_mixer(Sint32 *dest, unsigned samples)
       dest[c] = lbuffer[c];
     }
   }
-  else if (numsids == 2)
+  else if (config.numsids == 2)
   {
     sid_fillbuffer_stereo(lbuffer, rbuffer, samples);
     if (writehandle)
@@ -315,8 +313,8 @@ void sound_mixer(Sint32 *dest, unsigned samples)
       {
         Sint32 ls = lbuffer[c];
         Sint32 rs = rbuffer[c];
-        dest[c*2] = (ls-rs) * panning + rs;
-        dest[c*2+1] = (rs-ls) * panning + ls;
+        dest[c*2] = (ls-rs) * config.panning + rs;
+        dest[c*2+1] = (rs-ls) * config.panning + ls;
       }
     }
   }

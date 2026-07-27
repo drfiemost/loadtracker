@@ -22,9 +22,7 @@
 
 #include "common.h"
 #include "file.h"
-#include "sound.h"
-#include "pattern.h"
-#include "reloc.h"
+#include "settings.h"
 
 #include "bme_win.h"
 
@@ -39,57 +37,9 @@
 
 #include <sys/stat.h>
 
-// Increase if configuration has incompatible changes
-#define CFG_VERSION 2
-
-// config
-unsigned mr = DEFAULTMIXRATE;
-unsigned sidmodel = 1;
-unsigned numsids = 1;
-unsigned ntsc = 0;
-int fileformat = FORMAT_PRG;
-int playeradr = 0x1000;
-int zeropageadr = 0xfc;
-unsigned playerversion = 0;
-unsigned keypreset = KEY_TRACKER;
-unsigned defaultpatternlength = 64;
-int stepsize = 4;
-unsigned multiplier = 1;
-unsigned adparam = 0x0f00;
-unsigned interpolate = 1;
-unsigned patterndispmode = 2;
-unsigned sidaddress = 0xd400;
-unsigned sid2address = 0xd500;
-float panning = 1.0f;
-unsigned finevibrato = 1;
-unsigned optimizepulse = 1;
-unsigned optimizerealtime = 1;
-unsigned residdelay = 0;
-unsigned customclockrate = 0;
-float basepitch = 0.0f;
-float filterbias = 0.5f;
-unsigned combwaves = 1;
-float equaldivisionsperoctave = 12.0f;
-char specialnotenames[186];
-char scalatuningfilepath[MAX_PATHNAME];
-unsigned exsid = 0;
-unsigned darkmode = 0;
-
-bool usefinevib = false;
-
 void getparam(FILE *handle, unsigned *value);
 void getfloatparam(FILE *handle, float *value);
 void getstringparam(FILE *handle, char *value);
-
-int getMaxChannels()
-{
-    return (numsids == 1) ? MAX_CHN_MONO : MAX_CHN;
-}
-
-int getVisibleOrderlist()
-{
-    return (numsids == 1) ? 23 : 14;
-}
 
 void getFilename(char filename[MAX_PATHNAME], bool createdir)
 {
@@ -133,38 +83,38 @@ void loadconfig()
     getparam(configfile, &cfg_version);
     if (cfg_version == CFG_VERSION)
     {
-        getparam(configfile, &mr);
-        getparam(configfile, &sidmodel);
-        getparam(configfile, &numsids);
-        getparam(configfile, &ntsc);
-        getparam(configfile, (unsigned *)&fileformat);
-        getparam(configfile, (unsigned *)&playeradr);
-        getparam(configfile, (unsigned *)&zeropageadr);
-        getparam(configfile, &playerversion);
-        getparam(configfile, &keypreset);
-        getparam(configfile, &defaultpatternlength);
-        getparam(configfile, (unsigned *)&stepsize);
-        getparam(configfile, &multiplier);
-        getparam(configfile, &adparam);
-        getparam(configfile, &interpolate);
-        getparam(configfile, &patterndispmode);
-        getparam(configfile, &sidaddress);
-        getparam(configfile, &sid2address);
-        getfloatparam(configfile, &panning);
-        getparam(configfile, &finevibrato);
-        getparam(configfile, &optimizepulse);
-        getparam(configfile, &optimizerealtime);
-        getparam(configfile, &residdelay);
-        getparam(configfile, &customclockrate);
+        getparam(configfile, &config.mixrate);
+        getparam(configfile, &config.sidmodel);
+        getparam(configfile, &config.numsids);
+        getparam(configfile, &config.ntsc);
+        getparam(configfile, (unsigned *)&config.fileformat);
+        getparam(configfile, (unsigned *)&config.playeradr);
+        getparam(configfile, (unsigned *)&config.zeropageadr);
+        getparam(configfile, &config.playerversion);
+        getparam(configfile, &config.keypreset);
+        getparam(configfile, (unsigned *)&config.defaultpatternlength);
+        getparam(configfile, (unsigned *)&config.stepsize);
+        getparam(configfile, &config.multiplier);
+        getparam(configfile, &config.adparam);
+        getparam(configfile, &config.interpolate);
+        getparam(configfile, &config.patterndispmode);
+        getparam(configfile, &config.sidaddress);
+        getparam(configfile, &config.sid2address);
+        getfloatparam(configfile, &config.panning);
+        getparam(configfile, &config.finevibrato);
+        getparam(configfile, &config.optimizepulse);
+        getparam(configfile, &config.optimizerealtime);
+        getparam(configfile, &config.residdelay);
+        getparam(configfile, &config.customclockrate);
         getparam(configfile, (unsigned*)&win_fullscreen);
-        getfloatparam(configfile, &basepitch);
-        getfloatparam(configfile, &filterbias);
-        getparam(configfile, &combwaves);
-        getfloatparam(configfile, &equaldivisionsperoctave);
+        getfloatparam(configfile, &config.basepitch);
+        getfloatparam(configfile, &config.filterbias);
+        getparam(configfile, &config.combwaves);
+        getfloatparam(configfile, &config.equaldivisionsperoctave);
         getstringparam(configfile, specialnotenames);
         getstringparam(configfile, scalatuningfilepath);
-        getparam(configfile, &exsid);
-        getparam(configfile, &darkmode);
+        getparam(configfile, &config.exsid);
+        getparam(configfile, &config.darkmode);
         getparam(configfile, &xpos);
         getparam(configfile, &ypos);
         getparam(configfile, &xsize);
@@ -228,38 +178,38 @@ void saveconfig()
                  ";Window X size\n%d\n\n"
                  ";Window Y size\n%d\n\n",
         CFG_VERSION,
-        mr,
-        sidmodel,
-        numsids,
-        ntsc,
-        fileformat,
-        playeradr,
-        zeropageadr,
-        playerversion,
-        keypreset,
-        defaultpatternlength,
-        stepsize,
-        multiplier,
-        adparam,
-        interpolate,
-        patterndispmode,
-        sidaddress,
-        sid2address,
-        panning,
-        finevibrato,
-        optimizepulse,
-        optimizerealtime,
-        residdelay,
-        customclockrate,
+        config.mixrate,
+        config.sidmodel,
+        config.numsids,
+        config.ntsc,
+        config.fileformat,
+        config.playeradr,
+        config.zeropageadr,
+        config.playerversion,
+        config.keypreset,
+        config.defaultpatternlength,
+        config.stepsize,
+        config.multiplier,
+        config.adparam,
+        config.interpolate,
+        config.patterndispmode,
+        config.sidaddress,
+        config.sid2address,
+        config.panning,
+        config.finevibrato,
+        config.optimizepulse,
+        config.optimizerealtime,
+        config.residdelay,
+        config.customclockrate,
         win_fullscreen,
-        basepitch,
-        filterbias,
-        combwaves,
-        equaldivisionsperoctave,
+        config.basepitch,
+        config.filterbias,
+        config.combwaves,
+        config.equaldivisionsperoctave,
         specialnotenames,
         scalatuningfilepath,
-        exsid,
-        darkmode,
+        config.exsid,
+        config.darkmode,
         xpos,
         ypos,
         xsize,
@@ -358,31 +308,3 @@ void getstringparam(FILE *handle, char *value)
 }
 
 // TODO getboolparam
-
-void validateconfig()
-{
-  sidmodel &= 1;
-  adparam &= 0xffff;
-  zeropageadr &= 0xff;
-  playeradr &= 0xff00;
-  sidaddress &= 0xffff;
-  sid2address &= 0xffff;
-  if (!stepsize) stepsize = 4;
-  if (multiplier > 16) multiplier = 16;
-  if (keypreset > 2) keypreset = 0;
-  if ((finevibrato == 1) && (multiplier < 2)) usefinevib = true;
-  if (finevibrato > 1) usefinevib = true;
-  if (optimizepulse > 1) optimizepulse = 1;
-  if (optimizerealtime > 1) optimizerealtime = 1;
-  if (residdelay > 63) residdelay = 63;
-  if (customclockrate < 100) customclockrate = 0;
-  if (defaultpatternlength < 1) defaultpatternlength = 1;
-  if (defaultpatternlength > MAX_PATTROWS) defaultpatternlength = MAX_PATTROWS;
-  if (panning < 0.f) panning = 0.f;
-  if (panning > 1.f) panning = 1.f;
-  if (combwaves > 2) combwaves = 2;
-  if (filterbias < 0.0) filterbias = 0.0;
-  if (filterbias > 1.0) filterbias = 1.0;
-  if (numsids < 1) numsids = 1;
-  if (numsids > 2) numsids = 2;
-}

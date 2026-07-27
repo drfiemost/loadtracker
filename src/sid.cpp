@@ -24,6 +24,7 @@
 
 #include "sid.h"
 
+#include "settings.h"
 #include "sound.h"
 
 #include <residfp/residfp.h>
@@ -36,40 +37,39 @@ int clockrate;
 int samplerate;
 unsigned char sidreg[NUMSIDREGS];
 unsigned char sidreg2[NUMSIDREGS];
+
 unsigned char sidorder[] =
-  {0x15,0x16,0x18,0x17,
-   0x05,0x06,0x02,0x03,0x00,0x01,0x04,
-   0x0c,0x0d,0x09,0x0a,0x07,0x08,0x0b,
-   0x13,0x14,0x10,0x11,0x0e,0x0f,0x12};
+{
+    0x15,0x16,0x18,0x17,
+    0x05,0x06,0x02,0x03,0x00,0x01,0x04,
+    0x0c,0x0d,0x09,0x0a,0x07,0x08,0x0b,
+    0x13,0x14,0x10,0x11,0x0e,0x0f,0x12
+};
 
 unsigned char altsidorder[] =
-  {0x15,0x16,0x18,0x17,
-   0x04,0x00,0x01,0x02,0x03,0x05,0x06,
-   0x0b,0x07,0x08,0x09,0x0a,0x0c,0x0d,
-   0x12,0x0e,0x0f,0x10,0x11,0x13,0x14};
+{
+    0x15,0x16,0x18,0x17,
+    0x04,0x00,0x01,0x02,0x03,0x05,0x06,
+    0x0b,0x07,0x08,0x09,0x0a,0x0c,0x0d,
+    0x12,0x0e,0x0f,0x10,0x11,0x13,0x14
+};
 
 reSIDfp::residfp *sid = nullptr;
 reSIDfp::residfp *sid2 = nullptr;
 
-extern unsigned residdelay;
-extern unsigned adparam;
-
-void sid_init(int speed, unsigned m,
-              unsigned ntsc, unsigned interpolate,
-              unsigned customclockrate, unsigned numsids,
-              float filterbias, unsigned combwaves)
+void sid_init(int speed, const Settings &cfg)
 {
-  if (customclockrate)
-    clockrate = customclockrate;
+  if (cfg.customclockrate)
+    clockrate = cfg.customclockrate;
   else
-    clockrate = ntsc ? NTSCCLOCKRATE : PALCLOCKRATE;
+    clockrate = cfg.ntsc ? NTSCCLOCKRATE : PALCLOCKRATE;
 
   samplerate = speed;
 
   if (!sid) sid = new reSIDfp::residfp;
-  if (numsids == 2 && !sid2) sid2 = new reSIDfp::residfp;
+  if (cfg.numsids == 2 && !sid2) sid2 = new reSIDfp::residfp;
 
-  switch(interpolate)
+  switch(cfg.interpolate)
   {
     case 0:
         sid->setSamplingParameters(clockrate, reSIDfp::DECIMATE, speed);
@@ -84,15 +84,15 @@ void sid_init(int speed, unsigned m,
   }
 
   sid->reset();
-  sid->setFilter6581Curve(filterbias);
-  sid->setFilter8580Curve(filterbias);
+  sid->setFilter6581Curve(cfg.filterbias);
+  sid->setFilter8580Curve(cfg.filterbias);
   if (sid2)
   {
     sid2->reset();
-    sid2->setFilter6581Curve(filterbias);
-    sid2->setFilter8580Curve(filterbias);
+    sid2->setFilter6581Curve(cfg.filterbias);
+    sid2->setFilter8580Curve(cfg.filterbias);
   }
-  switch(combwaves)
+  switch(cfg.combwaves)
   {
     case 0:
         sid->setCombinedWaveforms(reSIDfp::WEAK);
@@ -117,7 +117,7 @@ void sid_init(int speed, unsigned m,
     sidreg[c] = 0x00;
     sidreg2[c] = 0x00;
   }
-  if (m == 1)
+  if (cfg.sidmodel == 1)
   {
     sid->setChipModel(reSIDfp::CSG8580);
     if (sid2) sid2->setChipModel(reSIDfp::CSG8580);
@@ -131,7 +131,7 @@ void sid_init(int speed, unsigned m,
 
 unsigned char sid_getorder(unsigned char index)
 {
-  if (adparam >= 0xf000)
+  if (config.adparam >= 0xf000)
     return altsidorder[index];
   else
     return sidorder[index];
@@ -156,14 +156,14 @@ int sid_fillbuffer(short *ptr, int samples)
     unsigned char o = sid_getorder(c);
 
     // Possible random badline delay once per writing
-    if ((badline == c) && (residdelay))
+    if ((badline == c) && (config.residdelay))
     {
-      tdelta2 = residdelay;
+      tdelta2 = config.residdelay;
       result = sid->clock(tdelta2, ptr);
       total += result;
       ptr += result;
       samples -= result;
-      tdelta -= residdelay;
+      tdelta -= config.residdelay;
     }
 
     sid->write(o, sidreg[o]);
@@ -232,17 +232,17 @@ int sid_fillbuffer_stereo(short *lptr, short *rptr, int samples)
     }
 
     // Possible random badline delay once per writing
-    if ((badline == c) && (residdelay))
+    if ((badline == c) && (config.residdelay))
     {
-      tdelta2 = residdelay;
+      tdelta2 = config.residdelay;
       result = sid->clock(tdelta2, lptr);
-      tdelta2 = residdelay;
+      tdelta2 = config.residdelay;
       result = sid2->clock(tdelta2, rptr);
       total += result;
       lptr += result;
       rptr += result;
       samples -= result;
-      tdelta -= residdelay;
+      tdelta -= config.residdelay;
     }
 
     sid->write(o, sidreg[o]);
