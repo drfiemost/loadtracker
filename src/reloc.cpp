@@ -148,14 +148,15 @@ int nocalculatedspeed;
 int nonormalspeed;
 int nozerospeed;
 
-struct buf src = STATIC_BUF_INIT;
-struct buf dest = STATIC_BUF_INIT;
+buf src = STATIC_BUF_INIT;
+buf dest = STATIC_BUF_INIT;
 
 //int testoverlap(int area1start, int area1size, int area2start, int area2size);
 int packpattern(unsigned char *dest, unsigned char *src, int rows);
 void findtableduplicates(int num);
 int isusedandselfcontained(int num, int start);
 void calcspeedtest(unsigned char pos);
+unsigned char swapnybbles(unsigned char n);
 
 int insertfile(const char *name);
 void inserttext(const char *text);
@@ -166,6 +167,13 @@ void insertbytes(const unsigned char *bytes, int size);
 void insertaddrlo(const char *name);
 void insertaddrhi(const char *name);
 
+void error(const char *msg)
+{
+    clearscreen();
+    printtextc(MAX_ROWS/2, colors.CTITLE, msg);
+    fliptoscreen();
+    waitkeynoupdate();
+}
 
 void relocator(const char* filename)
 {
@@ -313,10 +321,7 @@ void relocator(const char* filename)
         if (song.order[c][d][song.len[c][d]+1] >= song.len[c][d])
         {
           std::snprintf(textbuffer, MAX_PATHNAME, "ILLEGAL SONG RESTART POSITION! (SUBTUNE %02X, CHANNEL %d)", c, d+1);
-          clearscreen();
-          printtextc(MAX_ROWS/2, colors.CTITLE, textbuffer);
-          fliptoscreen();
-          waitkeynoupdate();
+          error(textbuffer);
           goto PRCLEANUP;
         }
       }
@@ -332,10 +337,7 @@ void relocator(const char* filename)
 
   if (!songs)
   {
-    clearscreen();
-    printtextc(MAX_ROWS/2, colors.CTITLE, "NO SONGS, NO DATA TO SAVE!");
-    fliptoscreen();
-    waitkeynoupdate();
+    error("NO SONGS, NO DATA TO SAVE!");
     goto PRCLEANUP;
   }
 
@@ -489,10 +491,7 @@ void relocator(const char* filename)
           case CMD_SETWAVEPTR:
           case CMD_FUNKTEMPO:
           std::snprintf(textbuffer, MAX_PATHNAME, "ILLEGAL WAVETABLE COMMAND (ROW %02X, COMMAND %X)", c+1, song.ltable[WTBL][c] - WAVECMD);
-          clearscreen();
-          printtextc(MAX_ROWS/2, colors.CTITLE, textbuffer);
-          fliptoscreen();
-          waitkeynoupdate();
+          error(textbuffer);
           goto PRCLEANUP;
         }
 
@@ -725,10 +724,7 @@ TABLETYPE:
   songwork = new (std::nothrow) unsigned char[songdatasize];
   if (!songwork)
   {
-    clearscreen();
-    printtextc(MAX_ROWS/2, colors.CTITLE, "OUT OF MEMORY IN PACKER/RELOCATOR!");
-    fliptoscreen();
-    waitkeynoupdate();
+    error("OUT OF MEMORY IN PACKER/RELOCATOR!");
     goto PRCLEANUP;
   }
 
@@ -801,11 +797,8 @@ TABLETYPE:
 
       if (result < 0)
       {
-        clearscreen();
         std::snprintf(textbuffer, MAX_PATHNAME, "PATTERN %02X IS TOO COMPLEX (OVER 256 BYTES PACKED)!", c);
-        printtextc(MAX_ROWS/2, colors.CTITLE, textbuffer);
-        fliptoscreen();
-        waitkeynoupdate();
+        error(textbuffer);
         goto PRCLEANUP;
       }
       pattdatasize += result;
@@ -816,10 +809,7 @@ TABLETYPE:
   pattwork = new (std::nothrow) unsigned char[pattdatasize];
   if (!pattwork)
   {
-    clearscreen();
-    printtextc(MAX_ROWS/2, colors.CTITLE, "OUT OF MEMORY IN PACKER/RELOCATOR!");
-    fliptoscreen();
-    waitkeynoupdate();
+    error("OUT OF MEMORY IN PACKER/RELOCATOR!");
     goto PRCLEANUP;
   }
 
@@ -841,10 +831,7 @@ TABLETYPE:
   instrwork = new (std::nothrow) unsigned char[instrsize];
   if (!instrwork)
   {
-    clearscreen();
-    printtextc(MAX_ROWS/2, colors.CTITLE, "OUT OF MEMORY IN PACKER/RELOCATOR!");
-    fliptoscreen();
-    waitkeynoupdate();
+    error("OUT OF MEMORY IN PACKER/RELOCATOR!");
     goto PRCLEANUP;
   }
 
@@ -1240,10 +1227,7 @@ TABLETYPE:
 
   if (!insertfile(playername))
   {
-    clearscreen();
-    printtextc(MAX_ROWS/2, colors.CTITLE, "COULD NOT OPEN PLAYROUTINE!");
-    fliptoscreen();
-    waitkeynoupdate();
+    error("COULD NOT OPEN PLAYROUTINE!");
     goto PRCLEANUP;
   }
 
@@ -1801,16 +1785,10 @@ PRCLEANUP:
 int packpattern(unsigned char *dest, unsigned char *src, int rows)
 {
   unsigned char temp1[MAX_PATTROWS*4];
-  unsigned char temp2[512];
   unsigned char instr = 0;
-  int command = -1;
-  int databyte = -1;
-  int destsizeim = 0;
-  int destsize = 0;
-  int c, d;
 
   // First optimize instrument changes
-  for (c = 0; c < rows; c++)
+  for (int c = 0; c < rows; c++)
   {
     if ((c) && (src[c*4+1]) && (src[c*4+1] == instr))
     {
@@ -1918,14 +1896,18 @@ int packpattern(unsigned char *dest, unsigned char *src, int rows)
     }
   }
 
+  int command = -1;
+  int databyte = -1;
   if (noeffects)
   {
     command = 0;
     databyte = 0;
   }
 
+  unsigned char temp2[512];
+  int destsizeim = 0;
   // Write in playroutine format
-  for (c = 0; c < rows; c++)
+  for (int c = 0; c < rows; c++)
   {
     // Instrument change with mapping
     if (temp1[c*4+1])
@@ -1961,14 +1943,15 @@ int packpattern(unsigned char *dest, unsigned char *src, int rows)
     }
   }
 
+  int destsize = 0;
   // Final step: optimize long singlebyte rests with "packed rest"
-  for (c = 0; c < destsizeim;)
+  for (int c = 0; c < destsizeim;)
   {
     int packok = 1;
 
     // Never pack first row or sequencer goes crazy
     if (!c) packok = 0;
-    
+
     // There must be no instrument or command changes on the row to be packed
     if (temp2[c] < FX)
     {
@@ -1997,6 +1980,7 @@ int packpattern(unsigned char *dest, unsigned char *src, int rows)
       dest[destsize++] = temp2[c++];
     else
     {
+      int d;
       for (d = c; d < destsizeim; )
       {
         if (temp2[d] == REST)
@@ -2015,7 +1999,8 @@ int packpattern(unsigned char *dest, unsigned char *src, int rows)
       else
         dest[destsize++] = temp2[c++];
     }
-    NEXTROW: {}
+NEXTROW:
+    {}
   }
   // See if pattern too big
   if (destsize > 256) return -1;
@@ -2411,10 +2396,7 @@ void relocator_stereo(const char* filename)
                 if (song.order[c][d][song.len[c][d]+1] >= song.len[c][d])
                 {
                     std::snprintf(textbuffer, MAX_PATHNAME, "ILLEGAL SONG RESTART POSITION! (SUBTUNE %02X, CHANNEL %d)", c, d+1);
-                    clearscreen();
-                    printtextc(MAX_ROWS/2, colors.CTITLE, textbuffer);
-                    fliptoscreen();
-                    waitkeynoupdate();
+                    error(textbuffer);
                     goto PRCLEANUP_S;
                 }
             }
@@ -2430,10 +2412,7 @@ void relocator_stereo(const char* filename)
 #endif
     if (!songs)
     {
-        clearscreen();
-        printtextc(MAX_ROWS/2, colors.CTITLE, "NO SONGS, NO DATA TO SAVE!");
-        fliptoscreen();
-        waitkeynoupdate();
+        error("NO SONGS, NO DATA TO SAVE!");
         goto PRCLEANUP_S;
     }
 
@@ -2587,10 +2566,7 @@ void relocator_stereo(const char* filename)
                 case CMD_SETWAVEPTR:
                 case CMD_FUNKTEMPO:
                     std::snprintf(textbuffer, MAX_PATHNAME, "ILLEGAL WAVETABLE COMMAND (ROW %02X, COMMAND %X)", c+1, song.ltable[WTBL][c] - WAVECMD);
-                    clearscreen();
-                    printtextc(MAX_ROWS/2, colors.CTITLE, textbuffer);
-                    fliptoscreen();
-                    waitkeynoupdate();
+                    error(textbuffer);
                     goto PRCLEANUP_S;
                 }
 
@@ -2692,7 +2668,7 @@ TABLETYPE_S:
     else
         std::snprintf(textbuffer, MAX_PATHNAME, "%s Packer/Relocator - %s", programname, filename);
     textbuffer[MAX_COLUMNS] = 0;
-    printtext(0, 0, colors.CHEADER, textbuffer);
+    printtext(1, 0, colors.CHEADER, textbuffer);
     printtext(1, 2, colors.CTITLE, "SELECT PLAYROUTINE OPTIONS: (CURSORS=MOVE/CHANGE, ENTER=ACCEPT, ESC=CANCEL)");
 
     config.playerversion |= PLAYER_BUFFERED;
@@ -2815,10 +2791,7 @@ TABLETYPE_S:
     songwork = new (std::nothrow) unsigned char[songdatasize];
     if (!songwork)
     {
-        clearscreen();
-        printtextc(MAX_ROWS/2, colors.CTITLE, "OUT OF MEMORY IN PACKER/RELOCATOR!");
-        fliptoscreen();
-        waitkeynoupdate();
+        error("OUT OF MEMORY IN PACKER/RELOCATOR!");
         goto PRCLEANUP_S;
     }
 
@@ -2891,11 +2864,8 @@ TABLETYPE_S:
 
             if (result < 0)
             {
-                clearscreen();
                 std::snprintf(textbuffer, MAX_PATHNAME, "PATTERN %02X IS TOO COMPLEX (OVER 256 BYTES PACKED)!", c);
-                printtextc(MAX_ROWS/2, colors.CTITLE, textbuffer);
-                fliptoscreen();
-                waitkeynoupdate();
+                error(textbuffer);
                 goto PRCLEANUP_S;
             }
             pattdatasize += result;
@@ -2906,10 +2876,7 @@ TABLETYPE_S:
     pattwork = new (std::nothrow) unsigned char[pattdatasize];
     if (!pattwork)
     {
-        clearscreen();
-        printtextc(MAX_ROWS/2, colors.CTITLE, "OUT OF MEMORY IN PACKER/RELOCATOR!");
-        fliptoscreen();
-        waitkeynoupdate();
+        error("OUT OF MEMORY IN PACKER/RELOCATOR!");
         goto PRCLEANUP_S;
     }
 
@@ -2931,10 +2898,7 @@ TABLETYPE_S:
     instrwork = new (std::nothrow) unsigned char[instrsize];
     if (!instrwork)
     {
-        clearscreen();
-        printtextc(MAX_ROWS/2, colors.CTITLE, "OUT OF MEMORY IN PACKER/RELOCATOR!");
-        fliptoscreen();
-        waitkeynoupdate();
+        error("OUT OF MEMORY IN PACKER/RELOCATOR!");
         goto PRCLEANUP_S;
     }
 
@@ -3326,10 +3290,7 @@ TABLETYPE_S:
 
     if (!insertfile(playername))
     {
-        clearscreen();
-        printtextc(MAX_ROWS/2, colors.CTITLE, "COULD NOT OPEN PLAYROUTINE!");
-        fliptoscreen();
-        waitkeynoupdate();
+        error("COULD NOT OPEN PLAYROUTINE!");
         goto PRCLEANUP_S;
     }
 
@@ -3670,10 +3631,10 @@ SKIPTABLE_S:
     // By default, copy loaded song name up to the extension
     char packedsongname[MAX_FILENAME];
     std::memset(packedsongname, 0, sizeof packedsongname);
-    for (size_t c = 0; c < std::strlen(filename); c++)
+    for (size_t i = 0; i < std::strlen(filename); i++)
     {
-        if (filename[c] == '.') break;
-        packedsongname[c] = filename[c];
+        if (filename[i] == '.') break;
+        packedsongname[i] = filename[i];
     }
     switch (config.fileformat)
     {

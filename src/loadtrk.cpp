@@ -1682,6 +1682,7 @@ void optimizeeverything()
 
   findduplicatepatterns();
 
+  unsigned char instrused[MAX_INSTR];
   std::memset(instrused, 0, sizeof instrused);
 
   for (int c = MAX_PATT-1; c >= 0; c--)

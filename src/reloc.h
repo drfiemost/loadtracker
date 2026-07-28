@@ -41,12 +41,10 @@ enum
 
 #ifndef RELOC_C
 extern unsigned char pattused[MAX_PATT];
-extern unsigned char instrused[MAX_INSTR];
 #endif
 
 void relocator(const char* filename);
 void relocator_stereo(const char* filename);
-unsigned char swapnybbles(unsigned char n);
 void exectable(int num, int ptr);
 void optimizetable(int num);
 
