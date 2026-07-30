@@ -47,12 +47,6 @@
 #include <cstring>
 #include <cstdlib>
 
-#if 1
-#define NUMSIDREGS 0x19
-unsigned char sidreg[NUMSIDREGS];
-unsigned char sidreg2[NUMSIDREGS];
-#endif
-
 bool monomode = true;
 int snd_bpmtempo = 125;
 
@@ -336,5 +330,13 @@ void waitkeymousenoupdate()
 }
 
 void waitkeynoupdate()
+{
+}
+
+void writereg(int, unsigned char)
+{
+}
+
+void writereg2(int, unsigned char)
 {
 }

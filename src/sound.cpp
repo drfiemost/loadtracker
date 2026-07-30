@@ -70,6 +70,9 @@ bool useexsid = false;
 SDL_TimerID timer = 0;
 void* exsidfd = nullptr;
 unsigned exsidDelay = 0;
+
+extern unsigned char sidreg[NUMSIDREGS];
+extern unsigned char sidreg2[NUMSIDREGS];
 #endif
 
 void sound_playrout();

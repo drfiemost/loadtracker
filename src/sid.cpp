@@ -287,3 +287,13 @@ int sid_fillbuffer_stereo(short *lptr, short *rptr, int samples)
 
   return total;
 }
+
+void writereg(int reg, unsigned char val)
+{
+    sidreg[reg] = val;
+}
+
+void writereg2(int reg, unsigned char val)
+{
+    sidreg2[reg] = val;
+}

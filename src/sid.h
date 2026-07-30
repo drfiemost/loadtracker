@@ -29,9 +29,7 @@ int sid_fillbuffer(short *ptr, int samples);
 int sid_fillbuffer_stereo(short *lptr, short *rptr, int samples);
 unsigned char sid_getorder(unsigned char index);
 
-#ifndef SID_C
-extern unsigned char sidreg[NUMSIDREGS];
-extern unsigned char sidreg2[NUMSIDREGS];
-#endif
+void writereg(int reg, unsigned char val);
+void writereg2(int reg, unsigned char val);
 
 #endif

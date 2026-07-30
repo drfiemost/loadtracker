@@ -108,13 +108,13 @@ void playtestnote(int note, int ins, int chnnum)
     {
       if (chnnum < 3)
       {
-        sidreg[0x5+chnnum*7] = config.adparam>>8; // Hardrestart
-        sidreg[0x6+chnnum*7] = config.adparam&0xff;
+        writereg(0x5+chnnum*7, config.adparam>>8); // Hardrestart
+        writereg(0x6+chnnum*7, config.adparam&0xff);
       }
       else
       {
-        sidreg2[0x5+(chnnum-3)*7] = config.adparam>>8; // Hardrestart
-        sidreg2[0x6+(chnnum-3)*7] = config.adparam&0xff;
+        writereg2(0x5+(chnnum-3)*7, config.adparam>>8); // Hardrestart
+        writereg2(0x6+(chnnum-3)*7, config.adparam&0xff);
       }
     }
   }
@@ -276,10 +276,10 @@ void playroutine()
       }
     }
 FILTERSTOP:
-    sidreg[0x15] = 0x00;
-    sidreg[0x16] = filtercutoff;
-    sidreg[0x17] = filterctrl;
-    sidreg[0x18] = filtertype | masterfader;
+    writereg(0x15, 0x00);
+    writereg(0x16, filtercutoff);
+    writereg(0x17, filterctrl);
+    writereg(0x18, filtertype | masterfader);
 
     for (int c = 0; c < MAX_CHN_MONO; c++)
     {
@@ -374,8 +374,8 @@ TICK0:
                 stopsong();
             }
           }
-          sidreg[0x5+7*c] = iptr->ad;
-          sidreg[0x6+7*c] = iptr->sr;
+          writereg(0x5+7*c, iptr->ad);
+          writereg(0x6+7*c, iptr->sr);
         }
       }
 
@@ -402,11 +402,11 @@ TICK0:
         break;
 
         case CMD_SETAD:
-        sidreg[0x5+7*c] = cptr->newcmddata;
+        writereg(0x5+7*c, cptr->newcmddata);
         break;
 
         case CMD_SETSR:
-        sidreg[0x6+7*c] = cptr->newcmddata;
+        writereg(0x6+7*c, cptr->newcmddata);
         break;
 
         case CMD_SETWAVE:
@@ -624,11 +624,11 @@ TICK0:
               break;
 
               case CMD_SETAD:
-              sidreg[0x5+7*c] = param;
+              writereg(0x5+7*c, param);
               break;
 
               case CMD_SETSR:
-              sidreg[0x6+7*c] = param;;
+              writereg(0x6+7*c, param);
               break;
 
               case CMD_SETWAVE:
@@ -913,8 +913,8 @@ GETNEWNOTES:
               cptr->gate = 0xfe;
               if (!(song.instr[cptr->instr].gatetimer & 0x80))
               {
-                sidreg[0x5+7*c] = config.adparam>>8;
-                sidreg[0x6+7*c] = config.adparam&0xff;
+                writereg(0x5+7*c, config.adparam>>8);
+                writereg(0x6+7*c, config.adparam&0xff);
               }
             }
           }
@@ -922,14 +922,14 @@ GETNEWNOTES:
       }
 NEXTCHN:
       if (cptr->mute)
-        sidreg[0x4+7*c] = cptr->wave = 0x08;
+        writereg(0x4+7*c, cptr->wave = 0x08);
       else
       {
-        sidreg[0x0+7*c] = cptr->freq & 0xff;
-        sidreg[0x1+7*c] = cptr->freq >> 8;
-        sidreg[0x2+7*c] = cptr->pulse & 0xfe;
-        sidreg[0x3+7*c] = cptr->pulse >> 8;
-        sidreg[0x4+7*c] = cptr->wave & cptr->gate;
+        writereg(0x0+7*c, cptr->freq & 0xff);
+        writereg(0x1+7*c, cptr->freq >> 8);
+        writereg(0x2+7*c, cptr->pulse & 0xfe);
+        writereg(0x3+7*c, cptr->pulse >> 8);
+        writereg(0x4+7*c, cptr->wave & cptr->gate);
       }
       cptr++;
     }
@@ -1078,10 +1078,10 @@ void playroutine_stereo()
             }
         }
 FILTERSTOP_S:
-        sidreg[0x15] = 0x00;
-        sidreg[0x16] = filtercutoff;
-        sidreg[0x17] = filterctrl;
-        sidreg[0x18] = filtertype | masterfader;
+        writereg(0x15, 0x00);
+        writereg(0x16, filtercutoff);
+        writereg(0x17, filterctrl);
+        writereg(0x18, filtertype | masterfader);
 
         if (filter2ptr)
         {
@@ -1130,10 +1130,10 @@ FILTERSTOP_S:
         }
 
 FILTER2STOP_S:
-        sidreg2[0x15] = 0x00;
-        sidreg2[0x16] = filter2cutoff;
-        sidreg2[0x17] = filter2ctrl;
-        sidreg2[0x18] = filter2type | masterfader;
+        writereg2(0x15, 0x00);
+        writereg2(0x16, filter2cutoff);
+        writereg2(0x17, filter2ctrl);
+        writereg2(0x18, filter2type | masterfader);
 
         for (int c = 0; c < MAX_CHN; c++)
         {
@@ -1244,13 +1244,13 @@ TICK0_S:
                     }
                     if (c < 3)
                     {
-                        sidreg[0x5+7*c] = iptr->ad;
-                        sidreg[0x6+7*c] = iptr->sr;
+                        writereg(0x5+7*c, iptr->ad);
+                        writereg(0x6+7*c, iptr->sr);
                     }
                     else
                     {
-                        sidreg2[0x5+7*(c-3)] = iptr->ad;
-                        sidreg2[0x6+7*(c-3)] = iptr->sr;
+                        writereg2(0x5+7*(c-3), iptr->ad);
+                        writereg2(0x6+7*(c-3), iptr->sr);
                     }
                 }
             }
@@ -1279,16 +1279,16 @@ TICK0_S:
 
             case CMD_SETAD:
                 if (c < 3)
-                    sidreg[0x5+7*c] = cptr->newcmddata;
+                    writereg(0x5+7*c, cptr->newcmddata);
                 else
-                    sidreg2[0x5+7*(c-3)] = cptr->newcmddata;
+                    writereg2(0x5+7*(c-3), cptr->newcmddata);
                 break;
 
             case CMD_SETSR:
                 if (c < 3)
-                    sidreg[0x6+7*c] = cptr->newcmddata;
+                    writereg(0x6+7*c, cptr->newcmddata);
                 else
-                    sidreg2[0x6+7*(c-3)] = cptr->newcmddata;
+                    writereg2(0x6+7*(c-3), cptr->newcmddata);
                 break;
 
             case CMD_SETWAVE:
@@ -1531,16 +1531,16 @@ WAVEEXEC_S:
 
                         case CMD_SETAD:
                             if (c < 3)
-                                sidreg[0x5+7*c] = param;
+                                writereg(0x5+7*c, param);
                             else
-                                sidreg2[0x5+7*(c-3)] = param;
+                                writereg2(0x5+7*(c-3), param);
                             break;
 
                         case CMD_SETSR:
                             if (c < 3)
-                                sidreg[0x6+7*c] = param;
+                                writereg(0x6+7*c, param);
                             else
-                                sidreg2[0x6+7*(c-3)] = param;
+                                writereg2(0x6+7*(c-3), param);
                             break;
 
                         case CMD_SETWAVE:
@@ -1849,13 +1849,13 @@ GETNEWNOTES_S:
                             {
                                 if (c < 3)
                                 {
-                                    sidreg[0x5+7*c] = config.adparam>>8;
-                                    sidreg[0x6+7*c] = config.adparam&0xff;
+                                    writereg(0x5+7*c, config.adparam>>8);
+                                    writereg(0x6+7*c, config.adparam&0xff);
                                 }
                                 else
                                 {
-                                    sidreg2[0x5+7*(c-3)] = config.adparam>>8;
-                                    sidreg2[0x6+7*(c-3)] = config.adparam&0xff;
+                                    writereg2(0x5+7*(c-3), config.adparam>>8);
+                                    writereg2(0x6+7*(c-3), config.adparam&0xff);
                                 }
                             }
                         }
@@ -1866,27 +1866,27 @@ NEXTCHN_S:
             if (cptr->mute)
             {
                 if (c < 3)
-                    sidreg[0x4+7*c] = cptr->wave = 0x08;
+                    writereg(0x4+7*c, cptr->wave = 0x08);
                 else
-                    sidreg2[0x4+7*(c-3)] = cptr->wave = 0x08;
+                    writereg2(0x4+7*(c-3), cptr->wave = 0x08);
             }
             else
             {
                 if (c < 3)
                 {
-                    sidreg[0x0+7*c] = cptr->freq & 0xff;
-                    sidreg[0x1+7*c] = cptr->freq >> 8;
-                    sidreg[0x2+7*c] = cptr->pulse & 0xfe;
-                    sidreg[0x3+7*c] = cptr->pulse >> 8;
-                    sidreg[0x4+7*c] = cptr->wave & cptr->gate;
+                    writereg(0x0+7*c, cptr->freq & 0xff);
+                    writereg(0x1+7*c, cptr->freq >> 8);
+                    writereg(0x2+7*c, cptr->pulse & 0xfe);
+                    writereg(0x3+7*c, cptr->pulse >> 8);
+                    writereg(0x4+7*c, cptr->wave & cptr->gate);
                 }
                 else
                 {
-                    sidreg2[0x0+7*(c-3)] = cptr->freq & 0xff;
-                    sidreg2[0x1+7*(c-3)] = cptr->freq >> 8;
-                    sidreg2[0x2+7*(c-3)] = cptr->pulse & 0xfe;
-                    sidreg2[0x3+7*(c-3)] = cptr->pulse >> 8;
-                    sidreg2[0x4+7*(c-3)] = cptr->wave & cptr->gate;
+                    writereg2(0x0+7*(c-3), cptr->freq & 0xff);
+                    writereg2(0x1+7*(c-3), cptr->freq >> 8);
+                    writereg2(0x2+7*(c-3), cptr->pulse & 0xfe);
+                    writereg2(0x3+7*(c-3), cptr->pulse >> 8);
+                    writereg2(0x4+7*(c-3), cptr->wave & cptr->gate);
                 }
             }
             cptr++;
