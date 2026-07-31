@@ -39,13 +39,8 @@ enum
   PLAYER_FULLBUFFERED   = 512
 };
 
-#ifndef RELOC_C
-extern unsigned char pattused[MAX_PATT];
-#endif
-
 void relocator(const char* filename);
 void relocator_stereo(const char* filename);
-void exectable(int num, int ptr);
 void optimizetable(int num);
 
 #endif

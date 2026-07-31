@@ -46,6 +46,7 @@ public:
 
 #ifndef SONG_C
 extern Song song;
+extern unsigned char pattused[MAX_PATT];
 #endif
 
 void loadsong();

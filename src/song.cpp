@@ -47,6 +47,7 @@
 
 Song song;
 
+unsigned char pattused[MAX_PATT];
 int pattlen[MAX_PATT];
 int highestusedpattern;
 int highestusedinstr;

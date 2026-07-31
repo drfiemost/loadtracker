@@ -50,11 +50,19 @@ extern "C" {
 #include "parse.h"
 }
 
+#include <algorithm>
+#include <array>
+#include <iterator>
 #include <new>
 
 #include <cstring>
 #include <cstdio>
 #include <cstdlib>
+
+#ifdef OVERFLOW
+// might be defined in math.h
+#  undef OVERFLOW
+#endif
 
 #define MAX_OPTIONS 7
 
@@ -79,6 +87,18 @@ struct TabError
   Cause cause = Cause::NONE;
   int source1 = 0;
   int source2 = 0;
+};
+
+struct DataInf
+{
+    int offset;
+    int size;
+};
+
+struct MapInf
+{
+    unsigned char map;
+    bool used;
 };
 
 #define MAX_BYTES_PER_ROW 16
@@ -110,18 +130,9 @@ const char *tablerightname[MAX_TABLES] =
   "mt_speedrighttbl"
 };
 
-unsigned char chnused[MAX_CHN];
-unsigned char pattused[MAX_PATT];
-unsigned char pattmap[MAX_PATT];
-unsigned char instrused[MAX_INSTR];
-unsigned char instrmap[MAX_INSTR];
-unsigned char tableused[MAX_TABLES][MAX_TABLELEN+1];
-unsigned char tablemap[MAX_TABLES][MAX_TABLELEN+1];
-int pattoffset[MAX_PATT];
-int pattsize[MAX_PATT];
-
-int songoffset[MAX_SONGS][MAX_CHN];
-int songsize[MAX_SONGS][MAX_CHN];
+bool chnused[MAX_CHN];
+std::array<MapInf,MAX_INSTR> instr;
+std::array<std::array<MapInf,MAX_TABLELEN+1>,MAX_TABLES> table;
 
 ErrorType tableerror;
 
@@ -160,6 +171,7 @@ buf src = STATIC_BUF_INIT;
 buf dest = STATIC_BUF_INIT;
 
 //int testoverlap(int area1start, int area1size, int area2start, int area2size);
+void exectable(int num, int ptr);
 int packpattern(unsigned char *dest, unsigned char *src, int rows);
 void findtableduplicates(int num);
 int isusedandselfcontained(int num, int start);
@@ -274,10 +286,9 @@ void initreloc()
   nozerospeed = 1;
 
   std::memset(pattused, 0, sizeof pattused);
-  std::memset(instrused, 0, sizeof instrused);
-  std::memset(chnused, 0, sizeof chnused);
-  std::memset(tableused, 0, sizeof tableused);
-  std::memset(tablemap, 0, sizeof tablemap);
+  instr.fill({0,false});
+  table.fill({0,false});
+  std::fill(std::begin(chnused), std::end(chnused), false);
 
   tableerror = ErrorType::NONE;
 }
@@ -286,6 +297,10 @@ void relocator(const char* filename)
 {
   unsigned char *packeddata = nullptr;
   const char *playername = (config.adparam < 0xf000) ? "player.s" : "altplayer.s";
+
+  unsigned char pattmap[MAX_PATT];
+  DataInf patt[MAX_PATT];
+  DataInf sng[MAX_SONGS][MAX_CHN];
 
   TabError taberr;
   int patterns = 0;
@@ -365,7 +380,7 @@ void relocator(const char* filename)
             for (int f = 0; f < getPattlen(num); f++)
             {
               if ((song.pattern[num][f*4] != REST) || (song.pattern[num][f*4+1]) || (song.pattern[num][f*4+2]))
-                chnused[d] = 1;
+                chnused[d] = true;
             }
           }
           else
@@ -414,7 +429,7 @@ void relocator(const char* filename)
 
   // Build the pattern-mapping
   // Instrument 1 is always used
-  instrused[1] = 1;
+  instr[1].used = true;
   for (int c = 0; c < MAX_PATT; c++)
   {
     if (pattused[c])
@@ -430,7 +445,7 @@ void relocator(const char* filename)
         if ((song.pattern[c][d*4] == KEYOFF) || (song.pattern[c][d*4] == KEYON))
           nogate = 0;
         if (song.pattern[c][d*4+1])
-          instrused[song.pattern[c][d*4+1]] = 1;
+          instr[song.pattern[c][d*4+1]].used = true;
         if (song.pattern[c][d*4+2])
           noeffects = 0;
         if ((song.pattern[c][d*4+2] >= CMD_SETWAVEPTR) && (song.pattern[c][d*4+2] <= CMD_SETFILTERPTR))
@@ -484,7 +499,7 @@ void relocator(const char* filename)
   // Also see if special first wave parameters are used
   for (int c = 0; c < MAX_INSTR; c++)
   {
-    if (instrused[c])
+    if (instr[c].used)
     {
       if (song.instr[c].gatetimer & 0x40) numlegato++;
       else
@@ -503,13 +518,13 @@ void relocator(const char* filename)
   // Build the instrument-mapping
   for (int c = 0; c < MAX_INSTR; c++)
   {
-    if (instrused[c])
+    if (instr[c].used)
     {
-      if (song.instr[c].gatetimer & 0x40) instrmap[c] = freelegato++;
+      if (song.instr[c].gatetimer & 0x40) instr[c].map = freelegato++;
       else
       {
-        if (song.instr[c].gatetimer & 0x80) instrmap[c] = freenohr++;
-        else instrmap[c] = freenormal++;
+        if (song.instr[c].gatetimer & 0x80) instr[c].map = freenohr++;
+        else instr[c].map = freenormal++;
       }
       instruments++;
       for (int d = 0; d < MAX_TABLES; d++)
@@ -531,7 +546,7 @@ void relocator(const char* filename)
   // Execute tableprograms invoked from wavetable commands
   for (int c = 0; c < MAX_TABLELEN; c++)
   {
-    if (tableused[WTBL][c+1])
+    if (table[WTBL][c+1].used)
     {
       if ((song.ltable[WTBL][c] >= WAVECMD) && (song.ltable[WTBL][c] <= WAVELASTCMD))
       {
@@ -582,12 +597,12 @@ void relocator(const char* filename)
   // Build the table-mapping
   for (int c = 0; c < MAX_TABLES; c++)
   {
-    int e = 1;
+    unsigned char e = 1;
     for (int d = 0; d < MAX_TABLELEN; d++)
     {
-      if (tableused[c][d+1])
+      if (table[c][d+1].used)
       {
-        tablemap[c][d+1] = e;
+        table[c][d+1].map = e;
         e++;
       }
     }
@@ -757,8 +772,8 @@ void relocator(const char* filename)
     {
       for (int d = 0; d < maxChns; d++)
       {
-        songoffset[c][d] = songdatasize;
-        songsize[c][d] = song.len[c][d] + 2;
+        sng[c][d].offset = songdatasize;
+        sng[c][d].size = song.len[c][d] + 2;
 
         int e;
         for (e = 0; e < song.len[c][d]; e++)
@@ -801,8 +816,8 @@ void relocator(const char* filename)
     {
       for (int d = 0; d < maxChns; d++)
       {
-        songoffset[c][d] = songdatasize;
-        songsize[c][d] = 0;
+        sng[c][d].offset = songdatasize;
+        sng[c][d].size = 0;
       }
     }
   }
@@ -838,9 +853,9 @@ void relocator(const char* filename)
   {
     if (pattused[c])
     {
-      pattoffset[d] = pattdatasize;
-      pattsize[d] = packpattern(&pattwork[pattdatasize], song.pattern[c], getPattlen(c));
-      pattdatasize += pattsize[d];
+      patt[d].offset = pattdatasize;
+      patt[d].size = packpattern(&pattwork[pattdatasize], song.pattern[c], getPattlen(c));
+      pattdatasize += patt[d].size;
       d++;
     }
   }
@@ -856,17 +871,17 @@ void relocator(const char* filename)
 
   for (int c = 1; c < MAX_INSTR; c++)
   {
-    if (instrused[c])
+    if (instr[c].used)
     {
-      int d = instrmap[c] - 1;
+      int d = instr[c].map - 1;
       instrwork[d] = song.instr[c].ad;
       instrwork[d+instruments] = song.instr[c].sr;
-      instrwork[d+instruments*2] = tablemap[WTBL][song.instr[c].ptr[WTBL]];
-      instrwork[d+instruments*3] = tablemap[PTBL][song.instr[c].ptr[PTBL]];
-      instrwork[d+instruments*4] = tablemap[FTBL][song.instr[c].ptr[FTBL]];
+      instrwork[d+instruments*2] = table[WTBL][song.instr[c].ptr[WTBL]].map;
+      instrwork[d+instruments*3] = table[PTBL][song.instr[c].ptr[PTBL]].map;
+      instrwork[d+instruments*4] = table[FTBL][song.instr[c].ptr[FTBL]].map;
       if (song.instr[c].vibdelay)
       {
-        instrwork[d+instruments*5] = tablemap[STBL][song.instr[c].ptr[STBL]];
+        instrwork[d+instruments*5] = table[STBL][song.instr[c].ptr[STBL]].map;
         instrwork[d+instruments*6] = song.instr[c].vibdelay - 1;
       }
       else
@@ -913,7 +928,7 @@ void relocator(const char* filename)
   // Process tables
   for (int c = 0; c < MAX_TABLELEN; c++)
   {
-    if (tableused[WTBL][c+1])
+    if (table[WTBL][c+1].used)
     {
       wavetblsize += 2;
       if ((song.ltable[WTBL][c] >= WAVEDELAY) && (song.ltable[WTBL][c] <= WAVELASTDELAY)) nowavedelay = 0;
@@ -991,7 +1006,7 @@ void relocator(const char* filename)
   }
   for (int c = 0; c < MAX_TABLELEN; c++)
   {
-    if (tableused[PTBL][c+1])
+    if (table[PTBL][c+1].used)
     {
       pulsetblsize += 2;
       if ((song.ltable[PTBL][c] >= 0x80) && (song.ltable[PTBL][c] != 0xff))
@@ -1007,7 +1022,7 @@ void relocator(const char* filename)
   }
   for (int c = 0; c < MAX_TABLELEN; c++)
   {
-    if (tableused[FTBL][c+1])
+    if (table[FTBL][c+1].used)
     {
       filttblsize += 2;
       if (song.ltable[FTBL][c] < 0x80) nofiltermod = 0;
@@ -1015,7 +1030,7 @@ void relocator(const char* filename)
   }
   for (int c = 0; c < MAX_TABLELEN; c++)
   {
-    if (tableused[STBL][c+1]) speedtblsize += 2;
+    if (table[STBL][c+1].used) speedtblsize += 2;
   }
   // Zero entry of speedtable
   if ((!novib) || (!nofunktempo) || (!noportamento) || (!notoneporta))
@@ -1343,7 +1358,7 @@ void relocator(const char* filename)
     // Table data
     for (int d = 0; d < MAX_TABLELEN; d++)
     {
-      if (tableused[c][d+1])
+      if (table[c][d+1].used)
       {
         switch (c)
         {
@@ -1387,7 +1402,7 @@ void relocator(const char* filename)
 
     for (int d = 0; d < MAX_TABLELEN; d++)
     {
-      if (tableused[c][d+1])
+      if (table[c][d+1].used)
       {
         if ((song.ltable[c][d] != 0xff) || (c == STBL))
         {
@@ -1403,15 +1418,15 @@ void relocator(const char* filename)
                 case CMD_PORTADOWN:
                 case CMD_TONEPORTA:
                 case CMD_VIBRATO:
-                insertbyte(tablemap[STBL][song.rtable[c][d]]);
+                insertbyte(table[STBL][song.rtable[c][d]].map);
                 break;
 
                 case CMD_SETPULSEPTR:
-                insertbyte(tablemap[PTBL][song.rtable[c][d]]);
+                insertbyte(table[PTBL][song.rtable[c][d]].map);
                 break;
 
                 case CMD_SETFILTERPTR:
-                insertbyte(tablemap[FTBL][song.rtable[c][d]]);
+                insertbyte(table[FTBL][song.rtable[c][d]].map);
                 break;
 
                 default:
@@ -1453,7 +1468,7 @@ void relocator(const char* filename)
           }
         }
         else
-          insertbyte(tablemap[c][song.rtable[c][d]]);
+          insertbyte(table[c][song.rtable[c][d]].map);
       }
     }
 
@@ -1468,7 +1483,7 @@ SKIPTABLE:
     {
       std::snprintf(textbuffer, MAX_PATHNAME, "mt_song%d", c*maxChns+d);
       insertlabel(textbuffer);
-      insertbytes(&songwork[songoffset[c][d]], songsize[c][d]);
+      insertbytes(&songwork[sng[c][d].offset], sng[c][d].size);
     }
   }
 
@@ -1477,7 +1492,7 @@ SKIPTABLE:
   {
     std::snprintf(textbuffer, MAX_PATHNAME, "mt_patt%d", c);
     insertlabel(textbuffer);
-    insertbytes(&pattwork[pattoffset[c]], pattsize[c]);
+    insertbytes(&pattwork[patt[c].offset], patt[c].size);
   }
 #ifndef NDEBUG
   {
@@ -1802,12 +1817,12 @@ PRCLEANUP:
 int packpattern(unsigned char *dest, unsigned char *src, int rows)
 {
   unsigned char temp1[MAX_PATTROWS*4];
-  unsigned char instr = 0;
+  unsigned char ninstr = 0;
 
   // First optimize instrument changes
   for (int c = 0; c < rows; c++)
   {
-    if ((c) && (src[c*4+1]) && (src[c*4+1] == instr))
+    if ((c) && (src[c*4+1]) && (src[c*4+1] == ninstr))
     {
       temp1[c*4] = src[c*4];
       temp1[c*4+1] = 0;
@@ -1821,7 +1836,7 @@ int packpattern(unsigned char *dest, unsigned char *src, int rows)
       temp1[c*4+2] = src[c*4+2];
       temp1[c*4+3] = src[c*4+3];
       if (src[c*4+1])
-        instr = src[c*4+1];
+        ninstr = src[c*4+1];
     }
 
     switch(temp1[c*4+2])
@@ -1830,17 +1845,17 @@ int packpattern(unsigned char *dest, unsigned char *src, int rows)
       case CMD_PORTAUP:
       case CMD_PORTADOWN:
       noportamento = 0;
-      temp1[c*4+3] = tablemap[STBL][temp1[c*4+3]];
+      temp1[c*4+3] = table[STBL][temp1[c*4+3]].map;
       break;
 
       case CMD_TONEPORTA:
       notoneporta = 0;
-      temp1[c*4+3] = tablemap[STBL][temp1[c*4+3]];
+      temp1[c*4+3] = table[STBL][temp1[c*4+3]].map;
       break;
 
       case CMD_VIBRATO:
       novib = 0;
-      temp1[c*4+3] = tablemap[STBL][temp1[c*4+3]];
+      temp1[c*4+3] = table[STBL][temp1[c*4+3]].map;
       break;
 
       case CMD_SETAD:
@@ -1858,19 +1873,19 @@ int packpattern(unsigned char *dest, unsigned char *src, int rows)
       // Remap table commands
       case CMD_SETWAVEPTR:
       nosetwaveptr = 0;
-      temp1[c*4+3] = tablemap[WTBL][temp1[c*4+3]];
+      temp1[c*4+3] = table[WTBL][temp1[c*4+3]].map;
       break;
 
       case CMD_SETPULSEPTR:
       nosetpulseptr = 0;
       nopulse = 0;
-      temp1[c*4+3] = tablemap[PTBL][temp1[c*4+3]];
+      temp1[c*4+3] = table[PTBL][temp1[c*4+3]].map;
       break;
 
       case CMD_SETFILTERPTR:
       nosetfiltptr = 0;
       nofilter = 0;
-      temp1[c*4+3] = tablemap[FTBL][temp1[c*4+3]];
+      temp1[c*4+3] = table[FTBL][temp1[c*4+3]].map;
       break;
 
       case CMD_SETFILTERCTRL:
@@ -1898,7 +1913,7 @@ int packpattern(unsigned char *dest, unsigned char *src, int rows)
 
       case CMD_FUNKTEMPO:
       nofunktempo = 0;
-      temp1[c*4+3] = tablemap[STBL][temp1[c*4+3]];
+      temp1[c*4+3] = table[STBL][temp1[c*4+3]].map;
       break;
 
       case CMD_SETTEMPO:
@@ -1929,7 +1944,7 @@ int packpattern(unsigned char *dest, unsigned char *src, int rows)
     // Instrument change with mapping
     if (temp1[c*4+1])
     {
-      temp2[destsizeim++] = instrmap[INSTRCHG+temp1[c*4+1]];
+      temp2[destsizeim++] = instr[INSTRCHG+temp1[c*4+1]].map;
     }
     // Rest+FX
     if (temp1[c*4] == REST)
@@ -2154,19 +2169,19 @@ void findtableduplicates(int num)
   {
     for (int c = 1; c <= MAX_TABLELEN; c++)
     {
-      if (tableused[num][c])
+      if (table[num][c].used)
       {
         for (int d = c+1; d <= MAX_TABLELEN; d++)
         {
-          if (tableused[num][d])
+          if (table[num][d].used)
           {
             if ((song.ltable[num][d-1] == song.ltable[num][c-1]) && (song.rtable[num][d-1] == song.rtable[num][c-1]))
             {
               // Duplicate found, remove and map to the original
-              tableused[num][d] = 0;
+              table[num][d].used = false;
               for (int e = d; e <= MAX_TABLELEN; e++)
-                if (tableused[num][e]) tablemap[num][e]--;
-              tablemap[num][d] = tablemap[num][c];
+                if (table[num][e].used) table[num][e].map--;
+              table[num][d].map = table[num][c].map;
             }
           }
         }
@@ -2217,11 +2232,11 @@ void findtableduplicates(int num)
             {
               // Duplicate found, remove and map to the original
               for (e = 0; e < len; e++)
-                tableused[num][d+e] = 0;
+                table[num][d+e].used = 0;
               for (e = d; e < MAX_TABLELEN; e++)
-                if (tableused[num][e]) tablemap[num][e] -= len;
+                if (table[num][e].used) table[num][e].map -= len;
               for (e = 0; e < len; e++)
-                tablemap[num][d+e] = tablemap[num][c+e];
+                table[num][d+e].map = table[num][c+e].map;
             }
           }
           d += len;
@@ -2242,7 +2257,7 @@ int isusedandselfcontained(int num, int start)
   // Check that whole table is used
   for (int c = start; c <= end; c++)
   {
-    if (tableused[num][c] == 0) return 0;
+    if (!table[num][c].used) return 0;
   }
   // Check for jump to outside
   if (song.rtable[num][end-1] != 0)
@@ -2251,9 +2266,9 @@ int isusedandselfcontained(int num, int start)
   }
   // Check for jump from outside
   for (int c = 1; c < start; c++)
-    if ((tableused[num][c]) && (song.ltable[num][c-1] == 0xff) && (song.rtable[num][c-1] >= start) && (song.rtable[num][c-1] <= end)) return 0;
+    if ((table[num][c].used) && (song.ltable[num][c-1] == 0xff) && (song.rtable[num][c-1] >= start) && (song.rtable[num][c-1] <= end)) return 0;
   for (int c = end+1; c <= MAX_TABLELEN; c++)
-    if ((tableused[num][c]) && (song.ltable[num][c-1] == 0xff) && (song.rtable[num][c-1] >= start) && (song.rtable[num][c-1] <= end)) return 0;
+    if ((table[num][c].used) && (song.ltable[num][c-1] == 0xff) && (song.rtable[num][c-1] >= start) && (song.rtable[num][c-1] <= end)) return 0;
 
   // OK!
   return 1;
@@ -2275,6 +2290,10 @@ void relocator_stereo(const char* filename)
 {
     unsigned char *packeddata = nullptr;
     const char *playername = (config.adparam < 0xf000) ? "player_s.s" : "altplayer_s.s";
+
+    unsigned char pattmap[MAX_PATT];
+    DataInf patt[MAX_PATT];
+    DataInf sng[MAX_SONGS][MAX_CHN];
 
     TabError taberr;
     int patterns = 0;
@@ -2350,7 +2369,7 @@ void relocator_stereo(const char* filename)
                         for (int f = 0; f < getPattlen(num); f++)
                         {
                             if ((song.pattern[num][f*4] != REST) || (song.pattern[num][f*4+1]) || (song.pattern[num][f*4+2]))
-                                chnused[d] = 1;
+                                chnused[d] = true;
                         }
                     }
                     else
@@ -2399,7 +2418,7 @@ void relocator_stereo(const char* filename)
 #endif
     // Build the pattern-mapping
     // Instrument 1 is always used
-    instrused[1] = 1;
+    instr[1].used = true;
     for (int c = 0; c < MAX_PATT; c++)
     {
         if (pattused[c])
@@ -2415,7 +2434,7 @@ void relocator_stereo(const char* filename)
                 if ((song.pattern[c][d*4] == KEYOFF) || (song.pattern[c][d*4] == KEYON))
                     nogate = 0;
                 if (song.pattern[c][d*4+1])
-                    instrused[song.pattern[c][d*4+1]] = 1;
+                    instr[song.pattern[c][d*4+1]].used = true;
                 if (song.pattern[c][d*4+2])
                     noeffects = 0;
                 if ((song.pattern[c][d*4+2] >= CMD_SETWAVEPTR) && (song.pattern[c][d*4+2] <= CMD_SETFILTERPTR))
@@ -2469,7 +2488,7 @@ void relocator_stereo(const char* filename)
     // Also see if special first wave parameters are used
     for (int c = 0; c < MAX_INSTR; c++)
     {
-        if (instrused[c])
+        if (instr[c].used)
         {
             if (song.instr[c].gatetimer & 0x40) numlegato++;
             else
@@ -2488,13 +2507,13 @@ void relocator_stereo(const char* filename)
     // Build the instrument-mapping
     for (int c = 0; c < MAX_INSTR; c++)
     {
-        if (instrused[c])
+        if (instr[c].used)
         {
-            if (song.instr[c].gatetimer & 0x40) instrmap[c] = freelegato++;
+            if (song.instr[c].gatetimer & 0x40) instr[c].map = freelegato++;
             else
             {
-                if (song.instr[c].gatetimer & 0x80) instrmap[c] = freenohr++;
-                else instrmap[c] = freenormal++;
+                if (song.instr[c].gatetimer & 0x80) instr[c].map = freenohr++;
+                else instr[c].map = freenormal++;
             }
             instruments++;
             for (int d = 0; d < MAX_TABLES; d++)
@@ -2516,7 +2535,7 @@ void relocator_stereo(const char* filename)
     // Execute tableprograms invoked from wavetable commands
     for (int c = 0; c < MAX_TABLELEN; c++)
     {
-        if (tableused[WTBL][c+1])
+        if (table[WTBL][c+1].used)
         {
             if ((song.ltable[WTBL][c] >= WAVECMD) && (song.ltable[WTBL][c] <= WAVELASTCMD))
             {
@@ -2567,12 +2586,12 @@ void relocator_stereo(const char* filename)
     // Build the table-mapping
     for (int c = 0; c < MAX_TABLES; c++)
     {
-        int e = 1;
+        unsigned char e = 1;
         for (int d = 0; d < MAX_TABLELEN; d++)
         {
-            if (tableused[c][d+1])
+            if (table[c][d+1].used)
             {
-                tablemap[c][d+1] = e;
+                table[c][d+1].map = e;
                 e++;
             }
         }
@@ -2734,8 +2753,8 @@ void relocator_stereo(const char* filename)
         {
             for (int d = 0; d < maxChns; d++)
             {
-                songoffset[c][d] = songdatasize;
-                songsize[c][d] = song.len[c][d] + 2;
+                sng[c][d].offset = songdatasize;
+                sng[c][d].size = song.len[c][d] + 2;
 
                 int e;
                 for (e = 0; e < song.len[c][d]; e++)
@@ -2778,8 +2797,8 @@ void relocator_stereo(const char* filename)
         {
             for (int d = 0; d < maxChns; d++)
             {
-                songoffset[c][d] = songdatasize;
-                songsize[c][d] = 0;
+                sng[c][d].offset = songdatasize;
+                sng[c][d].size = 0;
             }
         }
     }
@@ -2815,9 +2834,9 @@ void relocator_stereo(const char* filename)
     {
         if (pattused[c])
         {
-            pattoffset[d] = pattdatasize;
-            pattsize[d] = packpattern(&pattwork[pattdatasize], song.pattern[c], getPattlen(c));
-            pattdatasize += pattsize[d];
+            patt[d].offset = pattdatasize;
+            patt[d].size = packpattern(&pattwork[pattdatasize], song.pattern[c], getPattlen(c));
+            pattdatasize += patt[d].size;
             d++;
         }
     }
@@ -2833,17 +2852,17 @@ void relocator_stereo(const char* filename)
 
     for (int c = 1; c < MAX_INSTR; c++)
     {
-        if (instrused[c])
+        if (instr[c].used)
         {
-            int d = instrmap[c] - 1;
+            int d = instr[c].map - 1;
             instrwork[d] = song.instr[c].ad;
             instrwork[d+instruments] = song.instr[c].sr;
-            instrwork[d+instruments*2] = tablemap[WTBL][song.instr[c].ptr[WTBL]];
-            instrwork[d+instruments*3] = tablemap[PTBL][song.instr[c].ptr[PTBL]];
-            instrwork[d+instruments*4] = tablemap[FTBL][song.instr[c].ptr[FTBL]];
+            instrwork[d+instruments*2] = table[WTBL][song.instr[c].ptr[WTBL]].map;
+            instrwork[d+instruments*3] = table[PTBL][song.instr[c].ptr[PTBL]].map;
+            instrwork[d+instruments*4] = table[FTBL][song.instr[c].ptr[FTBL]].map;
             if (song.instr[c].vibdelay)
             {
-                instrwork[d+instruments*5] = tablemap[STBL][song.instr[c].ptr[STBL]];
+                instrwork[d+instruments*5] = table[STBL][song.instr[c].ptr[STBL]].map;
                 instrwork[d+instruments*6] = song.instr[c].vibdelay - 1;
             }
             else
@@ -2890,7 +2909,7 @@ void relocator_stereo(const char* filename)
     // Process tables
     for (int c = 0; c < MAX_TABLELEN; c++)
     {
-        if (tableused[WTBL][c+1])
+        if (table[WTBL][c+1].used)
         {
             wavetblsize += 2;
             if ((song.ltable[WTBL][c] >= WAVEDELAY) && (song.ltable[WTBL][c] <= WAVELASTDELAY)) nowavedelay = 0;
@@ -2968,7 +2987,7 @@ void relocator_stereo(const char* filename)
     }
     for (int c = 0; c < MAX_TABLELEN; c++)
     {
-        if (tableused[PTBL][c+1])
+        if (table[PTBL][c+1].used)
         {
             pulsetblsize += 2;
             if ((song.ltable[PTBL][c] >= 0x80) && (song.ltable[PTBL][c] != 0xff))
@@ -2984,7 +3003,7 @@ void relocator_stereo(const char* filename)
     }
     for (int c = 0; c < MAX_TABLELEN; c++)
     {
-        if (tableused[FTBL][c+1])
+        if (table[FTBL][c+1].used)
         {
             filttblsize += 2;
             if (song.ltable[FTBL][c] < 0x80) nofiltermod = 0;
@@ -2992,7 +3011,7 @@ void relocator_stereo(const char* filename)
     }
     for (int c = 0; c < MAX_TABLELEN; c++)
     {
-        if (tableused[STBL][c+1]) speedtblsize += 2;
+        if (table[STBL][c+1].used) speedtblsize += 2;
     }
     // Zero entry of speedtable
     if ((!novib) || (!nofunktempo) || (!noportamento) || (!notoneporta))
@@ -3301,7 +3320,7 @@ void relocator_stereo(const char* filename)
         // Table data
         for (int d = 0; d < MAX_TABLELEN; d++)
         {
-            if (tableused[c][d+1])
+            if (table[c][d+1].used)
             {
                 switch (c)
                 {
@@ -3345,7 +3364,7 @@ void relocator_stereo(const char* filename)
 
         for (int d = 0; d < MAX_TABLELEN; d++)
         {
-            if (tableused[c][d+1])
+            if (table[c][d+1].used)
             {
                 if ((song.ltable[c][d] != 0xff) || (c == STBL))
                 {
@@ -3361,15 +3380,15 @@ void relocator_stereo(const char* filename)
                             case CMD_PORTADOWN:
                             case CMD_TONEPORTA:
                             case CMD_VIBRATO:
-                                insertbyte(tablemap[STBL][song.rtable[c][d]]);
+                                insertbyte(table[STBL][song.rtable[c][d]].map);
                                 break;
 
                             case CMD_SETPULSEPTR:
-                                insertbyte(tablemap[PTBL][song.rtable[c][d]]);
+                                insertbyte(table[PTBL][song.rtable[c][d]].map);
                                 break;
 
                             case CMD_SETFILTERPTR:
-                                insertbyte(tablemap[FTBL][song.rtable[c][d]]);
+                                insertbyte(table[FTBL][song.rtable[c][d]].map);
                                 break;
 
                             default:
@@ -3411,7 +3430,7 @@ void relocator_stereo(const char* filename)
                     }
                 }
                 else
-                    insertbyte(tablemap[c][song.rtable[c][d]]);
+                    insertbyte(table[c][song.rtable[c][d]].map);
             }
         }
 
@@ -3426,7 +3445,7 @@ SKIPTABLE_S:
         {
             std::snprintf(textbuffer, MAX_PATHNAME, "mt_song%d", c*maxChns+d);
             insertlabel(textbuffer);
-            insertbytes(&songwork[songoffset[c][d]], songsize[c][d]);
+            insertbytes(&songwork[sng[c][d].offset], sng[c][d].size);
         }
     }
 
@@ -3435,7 +3454,7 @@ SKIPTABLE_S:
     {
         std::snprintf(textbuffer, MAX_PATHNAME, "mt_patt%d", c);
         insertlabel(textbuffer);
-        insertbytes(&pattwork[pattoffset[c]], pattsize[c]);
+        insertbytes(&pattwork[patt[c].offset], patt[c].size);
     }
 #ifndef NDEBUG
     {
@@ -3761,9 +3780,9 @@ void exectable(int num, int ptr)
       break;
     }
     // If were already here, exit
-    if (tableused[num][ptr]) break;
+    if (table[num][ptr].used) break;
     // Mark current position used
-    tableused[num][ptr] = 1;
+    table[num][ptr].used = true;
     // Go to next ptr.
     if (num != STBL)
     {
@@ -3779,7 +3798,7 @@ void exectable(int num, int ptr)
 
 void optimizetable(int num)
 {
-  std::memset(tableused, 0, sizeof tableused);
+  table.fill({0, false});
 
   for (int c = 0; c < MAX_PATT; c++)
   {
@@ -3804,7 +3823,7 @@ void optimizetable(int num)
 
   for (int c = 0; c < MAX_TABLELEN; c++)
   {
-    if (tableused[WTBL][c+1])
+    if (table[WTBL][c+1].used)
     {
       if ((song.ltable[WTBL][c] >= WAVECMD) && (song.ltable[WTBL][c] <= WAVELASTCMD))
       {
@@ -3840,6 +3859,6 @@ void optimizetable(int num)
   }
   for (; c >= 0; c--)
   {
-    if (!tableused[num][c+1]) song.deletetable(num, c);
+    if (!table[num][c+1].used) song.deletetable(num, c);
   }
 }
