@@ -1276,8 +1276,8 @@ void joinpattern()
 
     findusedpatterns();
     {
-      int del1 = pattused[c];
-      int del2 = pattused[d];
+      bool del1 = pattused.test(c);
+      bool del2 = pattused.test(d);
 
       if (!del1)
       {

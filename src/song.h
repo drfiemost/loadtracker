@@ -21,6 +21,8 @@
 
 #include "common.h"
 
+#include <bitset>
+
 struct Song
 {
     Instr instr[MAX_INSTR];
@@ -46,7 +48,7 @@ public:
 
 #ifndef SONG_C
 extern Song song;
-extern unsigned char pattused[MAX_PATT];
+extern std::bitset<MAX_PATT> pattused;
 #endif
 
 void loadsong();

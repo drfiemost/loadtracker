@@ -44,6 +44,8 @@
 #include "bme_snd.h"
 #include "bme_io.h"
 
+#include <bitset>
+
 #include <cctype>
 #include <cstring>
 #include <cstdio>
@@ -1682,18 +1684,17 @@ void optimizeeverything()
 
   findduplicatepatterns();
 
-  unsigned char instrused[MAX_INSTR];
-  std::memset(instrused, 0, sizeof instrused);
+  std::bitset<MAX_INSTR> instrused;
 
   for (int c = MAX_PATT-1; c >= 0; c--)
   {
-    if (pattused[c])
+    if (pattused.test(c))
     {
       for (int d = 0; d < MAX_PATTROWS; d++)
       {
         if (song.pattern[c][d*4] == ENDPATT) break;
         if (song.pattern[c][d*4+1])
-          instrused[song.pattern[c][d*4+1]] = 1;
+          instrused.set(song.pattern[c][d*4+1]);
       }
     }
     else deletepattern(c);
@@ -1703,7 +1704,7 @@ void optimizeeverything()
 
   for (int c = MAX_INSTR-2; c >= 1; c--)
   {
-    if (!instrused[c])
+    if (!instrused.test(c))
     {
       clearinstr(c);
 
@@ -1734,7 +1735,7 @@ void findduplicatepatterns()
 
   for (int c = 0; c < MAX_PATT; c++)
   {
-    if (pattused[c])
+    if (pattused.test(c))
     {
       for (int d = c+1; d < MAX_PATT; d++)
       {

@@ -52,6 +52,7 @@ extern "C" {
 
 #include <algorithm>
 #include <array>
+#include <bitset>
 #include <iterator>
 #include <new>
 
@@ -63,8 +64,6 @@ extern "C" {
 // might be defined in math.h
 #  undef OVERFLOW
 #endif
-
-#define MAX_OPTIONS 7
 
 enum class Cause
 {
@@ -101,7 +100,7 @@ struct MapInf
     bool used;
 };
 
-#define MAX_BYTES_PER_ROW 16
+constexpr int MAX_OPTIONS = 7;
 
 const char *playeroptname[MAX_OPTIONS] =
 {
@@ -130,9 +129,9 @@ const char *tablerightname[MAX_TABLES] =
   "mt_speedrighttbl"
 };
 
-bool chnused[MAX_CHN];
-std::array<MapInf,MAX_INSTR> instr;
-std::array<std::array<MapInf,MAX_TABLELEN+1>,MAX_TABLES> table;
+std::bitset<MAX_CHN> chnused;
+std::array<MapInf, MAX_INSTR> instr;
+std::array<std::array<MapInf, MAX_TABLELEN+1>, MAX_TABLES> table;
 
 ErrorType tableerror;
 
@@ -285,10 +284,10 @@ void initreloc()
   nonormalspeed = 1;
   nozerospeed = 1;
 
-  std::memset(pattused, 0, sizeof pattused);
   instr.fill({0,false});
   table.fill({0,false});
-  std::fill(std::begin(chnused), std::end(chnused), false);
+  chnused.reset();
+  pattused.reset();
 
   tableerror = ErrorType::NONE;
 }
@@ -376,11 +375,11 @@ void relocator(const char* filename)
           {
             int num = song.order[c][d][e];
 
-            pattused[num] = 1;
+            pattused.set(num);
             for (int f = 0; f < getPattlen(num); f++)
             {
               if ((song.pattern[num][f*4] != REST) || (song.pattern[num][f*4+1]) || (song.pattern[num][f*4+2]))
-                chnused[d] = true;
+                chnused.set(d);
             }
           }
           else
@@ -422,7 +421,7 @@ void relocator(const char* filename)
   // Optimize amount of used channels
   for (int c = maxChns; c; c--)
   {
-    if (chnused[c])
+    if (chnused.test(c))
       break;
     channels = c;
   }
@@ -432,7 +431,7 @@ void relocator(const char* filename)
   instr[1].used = true;
   for (int c = 0; c < MAX_PATT; c++)
   {
-    if (pattused[c])
+    if (pattused.test(c))
     {
       pattmap[c] = patterns;
       patterns++;
@@ -825,7 +824,7 @@ void relocator(const char* filename)
   // Calculate total size of patterns
   for (int c = 0; c < MAX_PATT; c++)
   {
-    if (pattused[c])
+    if (pattused.test(c))
     {
       int result = packpattern(patttemp, song.pattern[c], getPattlen(c));
 
@@ -851,7 +850,7 @@ void relocator(const char* filename)
   pattdatasize = 0;
   for (int c = 0, d = 0; c < MAX_PATT; c++)
   {
-    if (pattused[c])
+    if (pattused.test(c))
     {
       patt[d].offset = pattdatasize;
       patt[d].size = packpattern(&pattwork[pattdatasize], song.pattern[c], getPattlen(c));
@@ -2110,6 +2109,7 @@ void insertlabel(const char *name)
 
 void insertbytes(const unsigned char *bytes, int size)
 {
+  constexpr int MAX_BYTES_PER_ROW = 16;
   char insertbuffer[80];
   int row = 0;
 
@@ -2365,11 +2365,11 @@ void relocator_stereo(const char* filename)
                     {
                         int num = song.order[c][d][e];
 
-                        pattused[num] = 1;
+                        pattused.set(num);
                         for (int f = 0; f < getPattlen(num); f++)
                         {
                             if ((song.pattern[num][f*4] != REST) || (song.pattern[num][f*4+1]) || (song.pattern[num][f*4+2]))
-                                chnused[d] = true;
+                                chnused.set(d);
                         }
                     }
                     else
@@ -2411,7 +2411,7 @@ void relocator_stereo(const char* filename)
 #if 0
   for (int c = maxChns; c; c--)
   {
-    if (chnused[c])
+    if (chnused.test(c))
       break;
     channels = c;
   }
@@ -2421,7 +2421,7 @@ void relocator_stereo(const char* filename)
     instr[1].used = true;
     for (int c = 0; c < MAX_PATT; c++)
     {
-        if (pattused[c])
+        if (pattused.test(c))
         {
             pattmap[c] = patterns;
             patterns++;
@@ -2806,7 +2806,7 @@ void relocator_stereo(const char* filename)
     // Calculate total size of patterns
     for (int c = 0; c < MAX_PATT; c++)
     {
-        if (pattused[c])
+        if (pattused.test(c))
         {
             int result = packpattern(patttemp, song.pattern[c], getPattlen(c));
 
@@ -2832,7 +2832,7 @@ void relocator_stereo(const char* filename)
     pattdatasize = 0;
     for (int c = 0, d = 0; c < MAX_PATT; c++)
     {
-        if (pattused[c])
+        if (pattused.test(c))
         {
             patt[d].offset = pattdatasize;
             patt[d].size = packpattern(&pattwork[pattdatasize], song.pattern[c], getPattlen(c));

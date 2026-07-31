@@ -47,7 +47,7 @@
 
 Song song;
 
-unsigned char pattused[MAX_PATT];
+std::bitset<MAX_PATT> pattused;
 int pattlen[MAX_PATT];
 int highestusedpattern;
 int highestusedinstr;
@@ -1155,7 +1155,7 @@ void loadsong()
       findusedpatterns();
       for (int c = 0; c < MAX_PATT; c++)
       {
-        if (!pattused[c])
+        if (!pattused.test(c))
         {
           bool ok = true;
           for (int d = 0; d < pattlen[c]; d++)
@@ -1724,7 +1724,7 @@ int insertpattern(int p)
   if (p >= MAX_PATT-2) return 0;
 
   findusedpatterns();
-  if (pattused[MAX_PATT-1]) return 0;
+  if (pattused.test(MAX_PATT-1)) return 0;
 
   std::memmove(song.pattern[p+2], song.pattern[p+1], (MAX_PATT-p-2)*(MAX_PATTROWS*4+4));  
   countpatternlengths();
@@ -1806,7 +1806,7 @@ void findusedpatterns()
   int maxChns = config.getMaxChannels();
 
   countpatternlengths();
-  std::memset(pattused, 0, sizeof pattused);
+  pattused.reset();
   for (int c = 0; c < MAX_SONGS; c++)
   {
     if ((song.len[c][0]) && (song.len[c][1]) && (song.len[c][2]))
@@ -1818,7 +1818,7 @@ void findusedpatterns()
         {
           if (song.order[c][d][e] < REPEAT)
           {
-            pattused[song.order[c][d][e]] = 1;
+            pattused.set(song.order[c][d][e]);
           }
         }
       }
