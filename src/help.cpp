@@ -27,11 +27,7 @@
 #include "bme_main.h"
 #include "bme_win.h"
 
-#ifdef LTRELOC
-#  include "tools/ltreloc.h"
-#else
-#  include "loadtrk.h"
-#endif
+#include "loadtrk.h" // for waitkeymousenoupdate
 
 #include <cstdio>
 
@@ -376,9 +372,7 @@ void onlinehelp(int standalone, int context)
       printtext(61, 0, colors.CHEADER, "Arrows/PgUp/PgDn/Home/End scroll, F12 toggles context, others exit");
     }
 
-    fliptoscreen();
     waitkeymousenoupdate();
-
 
     if (win_quitted)
     {

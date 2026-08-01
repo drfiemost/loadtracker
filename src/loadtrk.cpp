@@ -117,6 +117,7 @@ void switchMode();
 void optimizeeverything();
 void findduplicatepatterns();
 void tooltips();
+void waitkeymouse();
 
 int main(int argc, char **argv)
 {
@@ -364,6 +365,7 @@ void waitkey()
   for (;;)
   {
     displayupdate();
+    tooltips();
     getkey();
     if ((input.rawkey) || (input.key)) break;
     if (win_quitted) break;
@@ -380,8 +382,8 @@ void waitkeymouse()
     tooltips();
     getkey();
     if ((input.rawkey) || (input.key)) break;
-    if (win_quitted) break;
     if (input.mouseb || (input.wheel)) break;
+    if (win_quitted) break;
   }
 
   converthex();
@@ -394,8 +396,8 @@ void waitkeymousenoupdate()
     fliptoscreen();
     getkey();
     if ((input.rawkey) || (input.key)) break;
-    if (win_quitted) break;
     if (input.mouseb) break;
+    if (win_quitted) break;
   }
 
   converthex();

@@ -31,7 +31,6 @@
 #  endif
 #endif
 
-void waitkeymousenoupdate();
 void waitkeynoupdate();
 
 #endif

@@ -28,7 +28,6 @@
 
 #include "channels.h"
 #include "colors.h"
-#include "console.h"
 #include "display.h"
 #include "file.h"
 #include "pattern.h"
@@ -320,10 +319,6 @@ int main(int argc, char **argv)
 
   // Exit
   return 0;
-}
-
-void waitkeymousenoupdate()
-{
 }
 
 void waitkeynoupdate()

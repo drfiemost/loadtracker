@@ -22,8 +22,6 @@
 #include "common.h"
 #include "file.h"
 
-void waitkey();
-void waitkeymouse();
 void waitkeynoupdate();
 void waitkeymousenoupdate();
 void onlinehelp(int standalone, int context);
