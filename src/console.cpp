@@ -47,7 +47,6 @@ unsigned mousepixely = 0;
 unsigned oldmousepixelx = 0xffffffff;
 unsigned oldmousepixely = 0xffffffff;
 Input input;
-int region[MAX_ROWS];
 
 int cursorflash = 0;
 
@@ -131,8 +130,6 @@ bool initscreen()
 
   scrbuffer = new unsigned[MAX_COLUMNS * MAX_ROWS];
   prevscrbuffer = new unsigned[MAX_COLUMNS * MAX_ROWS];
-
-  std::memset(region, 0, sizeof region);
 
   chardata = new unsigned char[4096];
   if (!gfx_loadcharset("font.png", chardata))
@@ -349,9 +346,12 @@ void fliptoscreen()
 {
   if (!gfxinitted) return;
 
+  bool redrawmouse = false;
+
   // Mark previous mousecursor area changed if mouse moved
   if ((mousepixelx != oldmousepixelx) || (mousepixely != oldmousepixely))
   {
+    redrawmouse = true;
     int sy = oldmousepixely / fontheight;
     int ey = (oldmousepixely + mousesizey - 1) / fontheight;
     int sx = oldmousepixelx / fontwidth;
@@ -380,11 +380,15 @@ void fliptoscreen()
   unsigned *sptr = scrbuffer;
   unsigned *cmpptr = prevscrbuffer;
 
-  bool regionschanged = false;
+  int sy = mousepixely / fontheight;
+  int ey = (mousepixely + mousesizey - 1) / fontheight;
+  int sx = mousepixelx / fontwidth;
+  int ex = (mousepixelx + mousesizex - 1) / fontwidth;
 
   // Now redraw text on changed areas
   for (int y = 0; y < MAX_ROWS; y++)
   {
+    bool mousecol = (y >= sy) && (y <= ey);
     unsigned char *rptr = (unsigned char*)gfx_screen->pixels + y*fontheight * gfx_screen->pitch;
     for (int x = 0; x < MAX_COLUMNS; x++)
     {
@@ -392,8 +396,9 @@ void fliptoscreen()
       if (*sptr != *cmpptr)
       {
         *cmpptr = *sptr;
-        region[y] = 1;
-        regionschanged = true;
+
+        if (mousecol && (x >= sx) && (x <= ex))
+            redrawmouse = true;
 
         unsigned char *chptr = &chardata[(*sptr & 0xffff)*16];
         unsigned char *dptr = rptr + x*fontwidth;
@@ -417,15 +422,9 @@ void fliptoscreen()
   gfx_unlock();
 
   // Redraw mouse if text was redrawn
-  if (regionschanged)
+  if (redrawmouse)
   {
-    int sy = mousepixely / fontheight;
-    int ey = (mousepixely + mousesizey - 1) / fontheight;
-    if (ey >= MAX_ROWS) ey = MAX_ROWS - 1;
-
     gfx_drawcursor(mousepixelx, mousepixely);
-    for (int y = sy; y <= ey; y++)
-      region[y] = 1;
   }
 
   // Store current mouse position as old
@@ -500,16 +499,20 @@ void getkey()
 
 void initDisplayPositions()
 {
-    if (config.numsids == 1)
+    switch (config.numsids)
     {
+    case 1:
         dpos.channelsX = MAX_COLUMNS-21;
         dpos.orderlistX = 54;
         dpos.patternsX = 14;
-    }
-    else if (config.numsids == 2)
-    {
+        break;
+    case 2:
         dpos.channelsX = MAX_COLUMNS-42;
         dpos.orderlistX = 80;
         dpos.patternsX = 1;
+        break;
+    default:
+        // unreachable
+        break;
     }
 }
