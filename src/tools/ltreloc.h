@@ -29,12 +29,6 @@
 #    define STDOUT stdout
 #    define STDERR stderr
 #  endif
-extern const char *programname;
-extern bool monomode;
-
-extern char loadedsongfilename[MAX_FILENAME];
-extern char songfilename[MAX_FILENAME];
-extern char instrfilename[MAX_FILENAME];
 #endif
 
 void waitkeymousenoupdate();

@@ -32,12 +32,6 @@
 #include "bme_main.h"
 #include "bme_win.h"
 
-#ifdef LTRELOC
-#  include "tools/ltreloc.h"
-#else
-#  include "loadtrk.h"
-#endif
-
 #include <cstring>
 #include <cctype>
 #include <cstdio>
@@ -64,6 +58,10 @@ struct Direntry
 };
 
 Direntry direntry[MAX_DIRFILES];
+
+char loadedsongfilename[MAX_FILENAME];
+char songfilename[MAX_FILENAME];
+char instrfilename[MAX_FILENAME];
 
 char songpath[MAX_PATHNAME];
 char instrpath[MAX_PATHNAME];

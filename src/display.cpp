@@ -41,17 +41,13 @@
 #include "bme_snd.h"
 #include "bme_win.h"
 
-#ifdef LTRELOC
-#  include "tools/ltreloc.h"
-#else
-#  include "loadtrk.h"
-#endif
-
 #include <utility>
 #include <string>
 
 #include <cstdio>
 #include <cstring>
+
+const char *programname;
 
 const char *notename[] =
 {
@@ -119,7 +115,7 @@ void printstatus()
 
     int color;
 
-    color = ((config.numsids == 2) && !monomode) ? colors.CHEADER : colors.CMUTE|(colors.CHDRBG<<4);
+    color = ((config.numsids == 2) && !config.monomode) ? colors.CHEADER : colors.CMUTE|(colors.CHDRBG<<4);
     printtext(dpos.statusTopFvX-3, dpos.statusTopY, color, "ST");
 
     color = config.usefinevib ? colors.CHEADER : colors.CMUTE|(colors.CHDRBG<<4);

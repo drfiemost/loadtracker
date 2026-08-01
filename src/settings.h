@@ -62,6 +62,7 @@ struct Settings
     float equaldivisionsperoctave;
 
     bool usefinevib;
+    bool monomode;
 
     Settings();
     void validate();

@@ -1978,23 +1978,23 @@ int packpattern(unsigned char *dest, unsigned char *src, int rows)
   // Final step: optimize long singlebyte rests with "packed rest"
   for (int c = 0; c < destsizeim;)
   {
-    int packok = 1;
+    bool packok = true;
 
     // Never pack first row or sequencer goes crazy
-    if (!c) packok = 0;
+    if (!c) packok = false;
 
     // There must be no instrument or command changes on the row to be packed
     if (temp2[c] < FX)
     {
       dest[destsize++] = temp2[c++];
-      packok = 0;
+      packok = false;
     }
     if ((temp2[c] >= FXONLY) && (temp2[c] < FIRSTNOTE))
     {
       int fxnum = temp2[c] - FXONLY;
       dest[destsize++] = temp2[c++];
       if (fxnum) dest[destsize++] = temp2[c++];
-      packok = 0;
+      packok = false;
       goto NEXTROW;
     }
     if (temp2[c] < FXONLY)
@@ -2002,10 +2002,10 @@ int packpattern(unsigned char *dest, unsigned char *src, int rows)
       int fxnum = temp2[c] - FX;
       dest[destsize++] = temp2[c++];
       if (fxnum) dest[destsize++] = temp2[c++];
-      packok = 0;
+      packok = false;
     }
 
-    if (temp2[c] != REST) packok = 0;
+    if (temp2[c] != REST) packok = false;
 
     if (!packok)
       dest[destsize++] = temp2[c++];

@@ -22,7 +22,10 @@
 #include "file.h"
 
 #ifndef DISPLAY_C
+extern const char *programname;
+
 extern char textbuffer[MAX_PATHNAME];
+extern const char *notename[];
 
 extern bool menu;
 extern int editmode;

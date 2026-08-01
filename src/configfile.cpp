@@ -45,9 +45,10 @@ void getFilename(char filename[MAX_PATHNAME], bool createdir)
 {
 #ifdef _WIN32
   GetModuleFileName(NULL, filename, MAX_PATHNAME);
-  filename[strlen(filename)-3] = 'c';
-  filename[strlen(filename)-2] = 'f';
-  filename[strlen(filename)-1] = 'g';
+  size_t len = std::strlen(filename);
+  filename[len-3] = 'c';
+  filename[len-2] = 'f';
+  filename[len-1] = 'g';
 #elif __amigaos__
   std::strcpy(filename, "PROGDIR:loadtrk.cfg");
 #else

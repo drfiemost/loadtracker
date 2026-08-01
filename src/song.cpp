@@ -26,6 +26,7 @@
 
 #include "common.h"
 #include "channels.h"
+#include "file.h"
 #include "instr.h"
 #include "order.h"
 #include "pattern.h"
@@ -33,12 +34,6 @@
 #include "reloc.h"
 #include "settings.h"
 #include "table.h"
-
-#ifdef LTRELOC
-#  include "tools/ltreloc.h"
-#else
-#  include "loadtrk.h"
-#endif
 
 #include "bme_end.h"
 

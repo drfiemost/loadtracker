@@ -22,16 +22,6 @@
 #include "common.h"
 #include "file.h"
 
-#ifndef LOADTRK_C
-
-extern bool monomode;
-extern char loadedsongfilename[MAX_FILENAME];
-extern char songfilename[MAX_FILENAME];
-extern char instrfilename[MAX_FILENAME];
-extern const char *programname;
-extern const char *notename[];
-#endif
-
 void waitkey();
 void waitkeymouse();
 void waitkeynoupdate();

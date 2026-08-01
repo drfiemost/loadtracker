@@ -99,5 +99,6 @@ Settings::Settings() :
     basepitch(0.0f),
     filterbias(0.5f),
     equaldivisionsperoctave(12.0f),
-    usefinevib(false)
+    usefinevib(false),
+    monomode(true)
 {}

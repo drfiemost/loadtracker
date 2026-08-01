@@ -32,12 +32,6 @@
 
 #include "bme_snd.h"
 
-#ifdef LTRELOC
-#  include "tools/ltreloc.h"
-#else
-#  include "loadtrk.h"
-#endif
-
 #include <SDL3/SDL.h>
 
 #ifdef _WIN32
@@ -301,7 +295,7 @@ void sound_mixer(Sint32 *dest, unsigned samples)
                 std::fwrite(&rbuffer[c], sizeof(Sint16), 1, writehandle);
             }
         }
-        if (monomode)
+        if (config.monomode)
         {
             for (unsigned c = 0; c < samples; c++)
             {

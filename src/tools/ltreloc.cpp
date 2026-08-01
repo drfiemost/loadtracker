@@ -29,6 +29,8 @@
 #include "channels.h"
 #include "colors.h"
 #include "console.h"
+#include "display.h"
+#include "file.h"
 #include "pattern.h"
 #include "reloc.h"
 #include "settings.h"
@@ -47,14 +49,7 @@
 #include <cstring>
 #include <cstdlib>
 
-bool monomode = true;
 int snd_bpmtempo = 125;
-
-char loadedsongfilename[MAX_FILENAME];
-char songfilename[MAX_FILENAME];
-char instrfilename[MAX_FILENAME];
-
-const char *programname = "LTReloc v" PACKAGE_VERSION;
 
 extern unsigned char datafile[];
 
@@ -93,6 +88,8 @@ void usage()
 
 int main(int argc, char **argv)
 {
+  programname = "LTReloc v" PACKAGE_VERSION;
+
 #ifdef _WIN32
   /*
     SDL_Init() reroutes stdout and stderr, either to stdout.txt and stderr.txt

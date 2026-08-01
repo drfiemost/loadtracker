@@ -56,15 +56,7 @@
 
 constexpr int HOLDDELAY = 24;
 
-bool monomode = true;
 bool writer = false;
-
-char loadedsongfilename[MAX_FILENAME];
-char songfilename[MAX_FILENAME];
-char instrfilename[MAX_FILENAME];
-
-extern char *notename[];
-const char *programname = "LoadTracker " PACKAGE_VERSION;
 
 unsigned char hexkeytbl[16] =
 {
@@ -128,6 +120,8 @@ void tooltips();
 
 int main(int argc, char **argv)
 {
+  programname = "LoadTracker " PACKAGE_VERSION;
+
   // Open datafile
   if (!io_openlinkeddatafile(datafile))
     return EXIT_FAILURE;
@@ -941,7 +935,7 @@ void mousecommands()
     {
       if ((input.mousex >= dpos.statusTopFvX-3) && (input.mousex <= dpos.statusTopFvX-2) && (config.numsids == 2))
       {
-        monomode = !monomode;
+        config.monomode = !config.monomode;
       }
       if ((input.mousex >= dpos.statusTopFvX) && (input.mousex <= dpos.statusTopFvX+1))
       {
@@ -1229,7 +1223,7 @@ void generalcommands()
     }
     else if (input.shiftpressed && (config.numsids == 2))
     {
-        monomode = !monomode;
+        config.monomode = !config.monomode;
     }
     break;
 

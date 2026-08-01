@@ -22,6 +22,10 @@
 #include "common.h"
 
 #ifndef FILE_C
+extern char loadedsongfilename[MAX_FILENAME];
+extern char songfilename[MAX_FILENAME];
+extern char instrfilename[MAX_FILENAME];
+
 extern char songpath[MAX_PATHNAME];
 extern char instrpath[MAX_PATHNAME];
 extern char packedpath[MAX_PATHNAME];
