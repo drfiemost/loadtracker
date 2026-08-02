@@ -74,6 +74,7 @@ void usage()
     std::fprintf(STDOUT, "-Ix  enable/disable optimizations. DEFAULT=enabled\n");
     std::fprintf(STDOUT, "-Jx  enable/disable full buffering. DEFAULT=disabled\n");
     std::fprintf(STDOUT, "-Lxx SID memory location in hex. DEFAULT=D400\n");
+    std::fprintf(STDOUT, "-Mxx 2nd SID memory location in hex. DEFAULT=D500\n");
     std::fprintf(STDOUT, "-N   Use NTSC timing\n");
     std::fprintf(STDOUT, "-Oxx Set pulseoptimization/skipping (0 = off, 1 = on) DEFAULT=on\n");
     std::fprintf(STDOUT, "-P   Use PAL timing (DEFAULT)\n");
@@ -108,7 +109,7 @@ int main(int argc, char **argv)
   clearsong(true, true, true, true, true);
 
   char packedsongname[MAX_PATHNAME];
-  // get input- and output file names
+  // get input and output file names
   if (argc >= 3)
   {
       std::strcpy(songfilename, argv[1]);
@@ -118,11 +119,13 @@ int main(int argc, char **argv)
       std::exit(EXIT_FAILURE);
   }
 
+  SngType type;
+
   // Load song
   if (std::strlen(songfilename))
   {
-      loadsong();
-      if (std::strlen(loadedsongfilename) == 0)
+      type = loadsong();
+      if (type == SngType::NONE)
       {
         std::fprintf(STDERR, "error: file not found.\n");
         std::exit(EXIT_FAILURE);
@@ -190,6 +193,10 @@ int main(int argc, char **argv)
 
         case 'L':
         std::sscanf(&argv[c][2], "%x", &config.sidaddress);
+        break;
+
+        case 'M':
+        std::sscanf(&argv[c][2], "%x", &config.sid2address);
         break;
 
         case 'O':
@@ -314,11 +321,15 @@ int main(int argc, char **argv)
     calculatefreqtable(config);
 
   // perform relocation
-  relocator(packedsongname);
-  // FIXME relocator_stereo
+  switch (type)
+  {
+    case SngType::STANDARD: relocator(packedsongname); break;
+    case SngType::DUAL: relocator_stereo(packedsongname); break;
+    default: break; // unreachable
+  }
 
   // Exit
-  return 0;
+  return EXIT_SUCCESS;
 }
 
 void waitkeynoupdate()

@@ -663,7 +663,7 @@ void mousecommands()
     {
         for (int c = 0; c < MAX_TABLES; c++)
         {
-            if ((input.mousex >= dpos.instrumentsX+3+c*12) &&
+            if ((input.mousex >= dpos.instrumentsX+c*12) &&
                     (input.mousex <= dpos.instrumentsX+7+c*12))
             tables.setnum(c);
         }

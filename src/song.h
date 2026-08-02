@@ -32,6 +32,13 @@ enum
   MST_RAW           = 4
 };
 
+enum class SngType
+{
+    NONE,
+    STANDARD,
+    DUAL
+};
+
 struct Song
 {
     Instr instr[MAX_INSTR];
@@ -60,7 +67,7 @@ extern Song song;
 extern std::bitset<MAX_PATT> pattused;
 #endif
 
-void loadsong();
+SngType loadsong();
 bool savesong();
 void mergesong();
 void clearsong(bool cs, bool cp, bool ci, bool cf, bool cn);

@@ -478,10 +478,9 @@ bool saveinstrument()
   return false;
 }
 
-void loadsong()
+SngType loadsong()
 {
-  int maxChns = config.getMaxChannels();
-  int channelstoload = maxChns;
+  int channelstoload = config.getMaxChannels();
 
   char ident[4];
   bool loaded = false;
@@ -1106,85 +1105,86 @@ void loadsong()
 #endif
     std::fclose(handle);
   }
-  if (loaded)
+  if (!loaded)
+      return SngType::NONE;
+
+  std::strcpy(loadedsongfilename, songfilename);
+
+  // Reset table views
+  for (int c = 0; c < MAX_TABLES; c++) tables.settableview(c, 0);
+
+  // Convert pulsemodulation speed of < v2.4 songs
+  if (ident[3] < '4')
   {
-    std::strcpy(loadedsongfilename, songfilename);
-
-    // Reset table views
-    for (int c = 0; c < MAX_TABLES; c++) tables.settableview(c, 0);
-
-    // Convert pulsemodulation speed of < v2.4 songs
-    if (ident[3] < '4')
+    for (int c = 0; c < MAX_TABLELEN; c++)
     {
-      for (int c = 0; c < MAX_TABLELEN; c++)
+      if ((song.ltable[PTBL][c] < 0x80) && (song.rtable[PTBL][c]))
       {
-        if ((song.ltable[PTBL][c] < 0x80) && (song.rtable[PTBL][c]))
-        {
-          int speed = ((signed char)song.rtable[PTBL][c]);
-          speed <<= 1;
-          if (speed > 127) speed = 127;
-          if (speed < -128) speed = -128;
-          song.rtable[PTBL][c] = speed;
-        }
+        int speed = ((signed char)song.rtable[PTBL][c]);
+        speed <<= 1;
+        if (speed > 127) speed = 127;
+        if (speed < -128) speed = -128;
+        song.rtable[PTBL][c] = speed;
       }
-    }
-
-    // Convert old legato/nohr parameters
-    if (ident[3] < '5')
-    {
-        for (int c = 1; c < MAX_INSTR; c++)
-        {
-            if (song.instr[c].firstwave >= 0x80)
-            {
-                song.instr[c].gatetimer |= 0x80;
-                song.instr[c].firstwave &= 0x7f;
-            }
-            if (!song.instr[c].firstwave) song.instr[c].gatetimer |= 0x40;
-        }
-    }
-
-    // If was a mono song, create empty orderlists for channels 4-6
-    if (channelstoload < MAX_CHN)
-    {
-      int emptypatt = MAX_PATT-1;
-
-      findusedpatterns();
-      for (int c = 0; c < MAX_PATT; c++)
-      {
-        if (!pattused.test(c))
-        {
-          bool ok = true;
-          for (int d = 0; d < pattlen[c]; d++)
-          {
-            if ((song.pattern[c][d*4] != REST) || (song.pattern[c][d*4+1] != 0x00) ||
-                (song.pattern[c][d*4+2] != 0x00) || (song.pattern[c][d*4+3] != 0x00))
-              ok = false;
-          }
-
-          if (ok)
-          {
-            emptypatt = c;
-            break;
-          }
-        }
-      }
-
-      for (int c = 0; c < MAX_SONGS; c++)
-      {
-        if (song.len[c][0])
-        {
-           for (int d = channelstoload; d < MAX_CHN; d++)
-           {
-             song.order[c][d][0] = emptypatt;
-             song.order[c][d][1] = 0xff;
-             song.order[c][d][2] = 0x00;
-             song.len[c][d] = 1;
-           }
-        }
-      }
-      songchange();
     }
   }
+
+  // Convert old legato/nohr parameters
+  if (ident[3] < '5')
+  {
+      for (int c = 1; c < MAX_INSTR; c++)
+      {
+          if (song.instr[c].firstwave >= 0x80)
+          {
+              song.instr[c].gatetimer |= 0x80;
+              song.instr[c].firstwave &= 0x7f;
+          }
+          if (!song.instr[c].firstwave) song.instr[c].gatetimer |= 0x40;
+      }
+  }
+
+  // If was a mono song, create empty orderlists for channels 4-6
+  if (channelstoload < MAX_CHN)
+  {
+    int emptypatt = MAX_PATT-1;
+
+    findusedpatterns();
+    for (int c = 0; c < MAX_PATT; c++)
+    {
+      if (!pattused.test(c))
+      {
+        bool ok = true;
+        for (int d = 0; d < pattlen[c]; d++)
+        {
+          if ((song.pattern[c][d*4] != REST) || (song.pattern[c][d*4+1] != 0x00) ||
+              (song.pattern[c][d*4+2] != 0x00) || (song.pattern[c][d*4+3] != 0x00))
+            ok = false;
+        }
+
+        if (ok)
+        {
+          emptypatt = c;
+          break;
+        }
+      }
+    }
+
+    for (int c = 0; c < MAX_SONGS; c++)
+    {
+      if (song.len[c][0])
+      {
+         for (int d = channelstoload; d < MAX_CHN; d++)
+         {
+           song.order[c][d][0] = emptypatt;
+           song.order[c][d][1] = 0xff;
+           song.order[c][d][2] = 0x00;
+           song.len[c][d] = 1;
+         }
+      }
+    }
+    songchange();
+  }
+  return (channelstoload == MAX_CHN) ? SngType::DUAL : SngType::STANDARD;
 }
 
 void loadinstrument()
