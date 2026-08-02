@@ -39,7 +39,12 @@ extern int autoadvance;
 extern Selection epmark;
 #endif
 
-void patterncommands();
+void shrinkpattern();
+void expandpattern();
+void splitpattern();
+void joinpattern();
+void updateview();
+
 void nextpattern();
 void prevpattern();
 void patternup(int n=1);

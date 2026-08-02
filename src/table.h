@@ -30,7 +30,6 @@ enum
   MST_RAW           = 4
 };
 
-void tablecommands();
 int makespeedtable(unsigned data, int mode, bool makenew);
 void gototable(int num, int pos);
 

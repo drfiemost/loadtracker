@@ -49,6 +49,7 @@ set(LOADTRK_SOURCES
     src/sound.cpp
     src/console.cpp
     src/colors.cpp
+    src/commands.cpp
     src/channels.cpp
     src/tuning.cpp
     src/timer.cpp

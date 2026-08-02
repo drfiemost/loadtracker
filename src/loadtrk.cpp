@@ -24,6 +24,7 @@
 
 #include "channels.h"
 #include "colors.h"
+#include "commands.h"
 #include "configfile.h"
 #include "console.h"
 #include "display.h"
@@ -324,7 +325,7 @@ int main(int argc, char **argv)
 
   // Reset channels/song
   initchannels();
-  clearsong(true, true, true, true, true);
+  clear(true, true, true, true, true);
 
   timer.setfreq(config.ntsc);
   timer.setmult(config.multiplier);
@@ -1427,7 +1428,7 @@ void clear()
 
   if (cs | cp | ci | ct | cn)
     std::memset(songfilename, 0, sizeof songfilename);
-  clearsong(cs, cp, ci, ct, cn);
+  clear(cs, cp, ci, ct, cn);
 
   input.clearkeys();
 }
@@ -1665,7 +1666,7 @@ void switchMode()
         std::memset(songfilename, 0, sizeof songfilename);
 
         config.numsids ^= 3;
-        clearsong(true, true, true, true, true);
+        clear(true, true, true, true, true);
 
         sound_init(writer, config);
         initDisplayPositions();

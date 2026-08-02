@@ -34,8 +34,6 @@ extern Selection esmark;
 #endif
 
 void updateviewtopos();
-void orderlistcommands();
-void namecommands();
 void nextsong();
 void prevsong();
 void songchange();

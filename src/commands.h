@@ -16,24 +16,16 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#ifndef INSTR_H
-#define INSTR_H
+#ifndef COMMANDS_H
+#define COMMANDS_H
 
-#include "common.h"
-
-#ifndef INSTR_C
-// Curent instrument number
-extern int einum;
-// Instrument on the first row
-extern int eirow;
-extern int eipos;
-extern int eicolumn;
-#endif
-
-void nextinstr(int n=1);
-void previnstr(int n=1);
-void clearinstr();
-void clearinstr(int num);
-void gotoinstr(int i);
+void clear(bool cs, bool cp, bool ci, bool cf, bool cn);
+void patterncommands();
+void orderlistcommands();
+void orderleft();
+void orderright();
+void instrumentcommands();
+void tablecommands();
+void namecommands();
 
 #endif
