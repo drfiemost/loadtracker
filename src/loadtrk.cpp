@@ -114,6 +114,7 @@ void nextmultiplier();
 void editadsr(int col);
 void editbpm(int col);
 void setspecialnotenames();
+void switchMode(unsigned sids);
 void switchMode();
 void optimizeeverything();
 void findduplicatepatterns();
@@ -338,7 +339,11 @@ int main(int argc, char **argv)
   }
 
   // Load song if applicable
-  if (std::strlen(songfilename)) loadsong();
+  if (std::strlen(songfilename))
+  {
+      SngType type = loadsong();
+      switchMode((type == SngType::DUAL) ? 2 : 1);
+  }
 
   // Start editor mainloop
   printmainscreen();
@@ -1254,7 +1259,10 @@ void load()
     if (!input.shiftpressed)
     {
       if (fileselector(songfilename, songpath, songfilter, "LOAD SONG", 0))
-        loadsong();
+      {
+        SngType type = loadsong();
+        switchMode((type == SngType::DUAL) ? 2 : 1);
+      }
     }
     else
     {
@@ -1640,6 +1648,18 @@ void setspecialnotenames()
   }
 }
 
+void switchMode(unsigned sids)
+{
+    if (config.numsids != sids)
+    {
+        config.numsids = sids;
+
+        sound_init(writer, config);
+        initDisplayPositions();
+        printmainscreen();
+    }
+}
+
 void switchMode()
 {
     char nextMode[7];
@@ -1665,12 +1685,9 @@ void switchMode()
     {
         std::memset(songfilename, 0, sizeof songfilename);
 
-        config.numsids ^= 3;
         clear(true, true, true, true, true);
 
-        sound_init(writer, config);
-        initDisplayPositions();
-        printmainscreen();
+        switchMode(config.numsids ^ 3);
     }
     input.clearkeys();
 }
