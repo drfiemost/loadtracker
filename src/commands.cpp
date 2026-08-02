@@ -89,6 +89,12 @@ void clear(bool cs, bool cp, bool ci, bool cf, bool cn)
     clearsong(cs, cp, ci, cf, cn);
 }
 
+void gototable(int num, int pos)
+{
+  editmode = EDIT_TABLES;
+  tables.settableview(num, pos);
+}
+
 void patterncommands()
 {
   int maxChns = config.getMaxChannels();
@@ -1648,26 +1654,20 @@ void tablecommands()
     break;
 
     case KEY_RIGHT:
-    tables.m_column++;
-    if (tables.m_column > 3)
+    if (tables.inccolumn())
     {
       tables.m_pos -= tables.curview();
-      tables.m_column = 0;
-      tables.m_num++;
-      if (tables.num() >= MAX_TABLES) tables.m_num = 0;
+      tables.incnum();
       tables.m_pos += tables.curview();
     }
     if (input.shiftpressed) tables.resetmarknum();
     break;
 
     case KEY_LEFT:
-    tables.m_column--;
-    if (tables.m_column < 0)
+    if (tables.deccolumn())
     {
       tables.m_pos -= tables.curview();
-      tables.m_column = 3;
-      tables.m_num--;
-      if (tables.num() < 0) tables.m_num = MAX_TABLES - 1;
+      tables.decnum();
       tables.m_pos += tables.curview();
     }
     if (input.shiftpressed) tables.resetmarknum();
@@ -1736,8 +1736,7 @@ void tablecommands()
         {
           song.ltable[tables.num()][tables.pos()] = ltablecopybuffer[c];
           song.rtable[tables.num()][tables.pos()] = rtablecopybuffer[c];
-          tables.m_pos++;
-          if (tables.pos() >= MAX_TABLELEN) tables.m_pos = MAX_TABLELEN-1;
+          tables.incpos();
         }
       }
     }
@@ -1830,7 +1829,6 @@ void tablecommands()
           song.ltable[tables.num()][tables.pos()] = (time < 127) ? time : 127;
           song.rtable[tables.num()][tables.pos()] = speed;
           time -= song.ltable[tables.num()][tables.pos()];
-          tables.m_pos++;
         }
         else
         {
@@ -1838,8 +1836,8 @@ void tablecommands()
           song.ltable[tables.num()][tables.pos()] = 0x80 | ((currentpulse >> 8) & 0xf);
           song.rtable[tables.num()][tables.pos()] = currentpulse & 0xff;
           time--;
-          tables.m_pos++;
         }
+        tables.m_pos++;
       }
     }
     if (tables.num() == FTBL)
@@ -1973,10 +1971,10 @@ void tablecommands()
           else
           {
             int oldeditpos = tables.pos();
-            int oldeditcolumn = tables.m_column;
+            int oldeditcolumn = tables.column();
             int pos = makespeedtable(song.rtable[tables.num()][tables.pos()], mstmode, true);
             gototable(WTBL, oldeditpos);
-            tables.m_column = oldeditcolumn;
+            tables.setcolumn(oldeditcolumn);
 
             song.rtable[tables.num()][tables.pos()] = pos + 1;
             return;
@@ -2026,22 +2024,20 @@ void tablecommands()
     if (input.shiftpressed)
     {
       tables.m_pos -= tables.curview();
-      tables.m_num--;
-      if (tables.num() < 0) tables.m_num = MAX_TABLES-1;
+      tables.decnum();
       tables.m_pos += tables.curview();
     }
     else
     {
       tables.m_pos -= tables.curview();
-      tables.m_num++;
-      if (tables.num() >= MAX_TABLES) tables.m_num = 0;
+      tables.incnum();
       tables.m_pos += tables.curview();
     }
   }
 
   if (hexnybble >= 0)
   {
-    switch(tables.m_column)
+    switch(tables.column())
     {
       case 0:
       song.ltable[tables.num()][tables.pos()] &= 0x0f;
@@ -2060,12 +2056,9 @@ void tablecommands()
       song.rtable[tables.num()][tables.pos()] |= hexnybble;
       break;
     }
-    tables.m_column++;
-    if (tables.m_column > 3)
+    if (tables.inccolumn())
     {
-      tables.m_column = 0;
-      tables.m_pos++;
-      if (tables.pos() >= MAX_TABLELEN) tables.m_pos = MAX_TABLELEN-1;
+      tables.incpos();
     }
   }
 

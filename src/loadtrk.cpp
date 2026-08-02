@@ -665,7 +665,7 @@ void mousecommands()
         {
             if ((input.mousex >= dpos.instrumentsX+3+c*12) &&
                     (input.mousex <= dpos.instrumentsX+7+c*12))
-            tables.m_num = c;
+            tables.setnum(c);
         }
         if (input.wheel > 0)
           tables.tableup(input.shiftpressed);

@@ -34,7 +34,6 @@
 #include "play.h"
 #include "settings.h"
 #include "song.h"
-#include "table.h"
 #include "timer.h"
 
 #include "bme_main.h"
@@ -62,6 +61,8 @@ const char *notename[] =
 };
 
 char textbuffer[MAX_PATHNAME];
+
+Tables tables;
 
 bool menu = false;
 int editmode = EDIT_PATTERN;
@@ -482,7 +483,7 @@ void printstatus()
 
   if (editmode == EDIT_TABLES)
   {
-    if (ehmode == EditHdr::NONE) printbg(dpos.instrumentsX+3+tables.num()*12+tables.column(), dpos.instrumentsY+8+tables.pos()-tables.curview(), cc, 1);
+    if (ehmode == EditHdr::NONE) printbg(dpos.instrumentsX+3+tables.num()*12+tables.columnpos(), dpos.instrumentsY+8+tables.pos()-tables.curview(), cc, 1);
   }
 
   // Info view

@@ -26,6 +26,7 @@
 
 #include "common.h"
 #include "channels.h"
+#include "display.h"
 #include "file.h"
 #include "instr.h"
 #include "order.h"
@@ -2007,4 +2008,61 @@ int determinechannels(FILE* handle)
 int getPattlen(int patt)
 {
     return pattlen[patt];
+}
+
+int makespeedtable(unsigned data, int mode, bool makenew)
+{
+  if (!data) return -1;
+
+  unsigned char l = 0, r = 0;
+
+  switch (mode)
+  {
+    case MST_NOFINEVIB:
+    l = (data & 0xf0) >> 4;
+    r = (data & 0x0f) << 4;
+    break;
+
+    case MST_FINEVIB:
+    l = (data & 0x70) >> 4;
+    r = ((data & 0x0f) << 4) | ((data & 0x80) >> 4);
+    break;
+
+    case MST_FUNKTEMPO:
+    l = (data & 0xf0) >> 4;
+    r = data & 0x0f;
+    break;
+
+    case MST_PORTAMENTO:
+    l = (data << 2) >> 8;
+    r = (data << 2) & 0xff;
+    break;
+
+    case MST_RAW:
+    r = data & 0xff;
+    l = data >> 8;
+    break;
+  }
+
+  if (!makenew)
+  {
+    for (int c = 0; c < MAX_TABLELEN; c++)
+    {
+      if ((song.ltable[STBL][c] == l) && (song.rtable[STBL][c] == r))
+        return c;
+    }
+  }
+
+  for (int c = 0; c < MAX_TABLELEN; c++)
+  {
+    if ((!song.ltable[STBL][c]) && (!song.rtable[STBL][c]))
+    {
+      song.ltable[STBL][c] = l;
+      song.rtable[STBL][c] = r;
+
+      tables.settableview(STBL, c);
+      return c;
+    }
+  }
+  return -1;
 }

@@ -23,6 +23,15 @@
 
 #include <bitset>
 
+enum
+{
+  MST_NOFINEVIB     = 0,
+  MST_FINEVIB       = 1,
+  MST_FUNKTEMPO     = 2,
+  MST_PORTAMENTO    = 3,
+  MST_RAW           = 4
+};
+
 struct Song
 {
     Instr instr[MAX_INSTR];
@@ -64,5 +73,6 @@ int insertpattern(int p);
 void deletepattern(int p);
 void findusedpatterns();
 int getPattlen(int patt);
+int makespeedtable(unsigned data, int mode, bool makenew);
 
 #endif

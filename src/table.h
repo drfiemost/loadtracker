@@ -21,27 +21,15 @@
 
 #include "common.h"
 
-enum
-{
-  MST_NOFINEVIB     = 0,
-  MST_FINEVIB       = 1,
-  MST_FUNKTEMPO     = 2,
-  MST_PORTAMENTO    = 3,
-  MST_RAW           = 4
-};
-
-int makespeedtable(unsigned data, int mode, bool makenew);
-void gototable(int num, int pos);
-
 class Tables
 {
 private:
     int m_view[MAX_TABLES];
-public:
     int m_num;
+public:
     int m_pos;
-    int m_column;
 private:
+    int m_column;
     Selection m_mark;
     bool m_lock = false;
 
@@ -50,11 +38,21 @@ public:
     inline int curview() const { return m_view[m_num]; }
     inline int num() const { return m_num; }
     inline int pos() const { return m_pos; }
-    inline int column() const { return (m_column & 1)+(m_column/2)*3; }
+    inline int column() const { return m_column; }
+    inline int columnpos() const { return (m_column & 1)+(m_column/2)*3; }
     inline int marknum() const { return m_mark.chn; }
     inline int markstart() const { return m_mark.start; }
     inline int markend() const { return m_mark.end; }
     inline bool islocked() const { return m_lock; }
+
+    inline void setnum(int num) { m_num = num; }
+    inline void incnum() { m_num++; if (m_num >= MAX_TABLES) m_num = 0; }
+    inline void decnum() { m_num--; if (m_num < 0) m_num = MAX_TABLES - 1; }
+    inline void incpos() { m_pos++; if (m_pos >= MAX_TABLELEN) m_pos = MAX_TABLELEN - 1; }
+    inline void setcolumn(int col) { m_column = col; }
+    inline bool inccolumn() { m_column++; if (m_column > 3) { m_column = 0; return true; } return false; }
+    inline bool deccolumn() { m_column--; if (m_column < 0) { m_column = 3; return true; } return false; }
+
     void setrow(int num, int pos, int column);
     void resetmarknum();
     void setmarkstart(int num, int markstart);
@@ -68,7 +66,5 @@ public:
     void settableview(int num, int pos);
     void settableviewfirst(int num, int pos);
 };
-
-extern Tables tables;
 
 #endif
