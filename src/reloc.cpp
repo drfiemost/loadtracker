@@ -45,10 +45,9 @@
 #  include "loadtrk.h"
 #endif
 
-extern "C" {
-#include "buf.h"
-#include "parse.h"
-}
+#include "asm/buf.h"
+#include "asm/log.h"
+#include "asm/parse.h"
 
 #include <algorithm>
 #include <array>
@@ -350,6 +349,7 @@ void relocator(const char* filename)
 
   stopsong();
 
+  //LOG_INIT_CONSOLE(LOG_NORMAL);
   parse_init();
   buf_free(&src);
   buf_free(&dest);
@@ -703,6 +703,7 @@ void relocator(const char* filename)
   }
   if (selectdone == -1) goto PRCLEANUP;
 #endif
+
   // Disable optimizations if necessary
   if (config.playerversion & PLAYER_NOOPTIMIZATION)
   {
@@ -1168,6 +1169,7 @@ void relocator(const char* filename)
 
   if (selectdone == -1) goto PRCLEANUP;
 #endif
+
   // Validate frequencytable parameters
   if (lastnote < firstnote)
     lastnote = firstnote;
@@ -1805,6 +1807,7 @@ PRCLEANUP:
   buf_free(&src);
   buf_free(&dest);
   parse_free();
+  //LOG_FREE;
 
   if (pattwork) delete [] pattwork;
   if (songwork) delete [] songwork;
@@ -2318,10 +2321,14 @@ void relocator_stereo(const char* filename)
     int speedtblsize = 0;
     int playersize = 0;
     int packedsize = 0;
+
     FILE *songhandle = nullptr;
+#ifndef LTRELOC
     int selectdone;
     int opt = 0;
+#endif
     unsigned char speedcode[] = {0xa2,0x00,0x8e,0x04,0xdc,0xa2,0x00,0x8e,0x05,0xdc};
+
     unsigned char patttemp[512];
     unsigned char *songwork = nullptr;
     unsigned char *pattwork = nullptr;
@@ -2340,6 +2347,7 @@ void relocator_stereo(const char* filename)
 
     stopsong();
 
+    //LOG_INIT_CONSOLE(LOG_NORMAL);
     parse_init();
     buf_free(&src);
     buf_free(&dest);
@@ -2409,6 +2417,7 @@ void relocator_stereo(const char* filename)
     }
 
 #if 0
+  // Optimize amount of used channels
   for (int c = maxChns; c; c--)
   {
     if (chnused.test(c))
@@ -2608,7 +2617,12 @@ void relocator_stereo(const char* filename)
     for (int c = 0; c < MAX_TABLES; c++)
         findtableduplicates(c);
 
+    // Force options for dual sid tunes
+    config.playerversion |= PLAYER_BUFFERED;
+    config.playerversion &= ~PLAYER_ZPGHOSTREGS;
+
     // Select playroutine options
+#ifndef LTRELOC
     clearscreen();
     printblankc(0, 0, colors.CHEADER, MAX_COLUMNS);
     if (!std::strlen(filename))
@@ -2618,9 +2632,6 @@ void relocator_stereo(const char* filename)
     textbuffer[MAX_COLUMNS] = 0;
     printtext(1, 0, colors.CHEADER, textbuffer);
     printtext(1, 2, colors.CTITLE, "SELECT PLAYROUTINE OPTIONS: (CURSORS=MOVE/CHANGE, ENTER=ACCEPT, ESC=CANCEL)");
-
-    config.playerversion |= PLAYER_BUFFERED;
-    config.playerversion &= ~PLAYER_ZPGHOSTREGS;
 
     selectdone = 0;
     while (!selectdone)
@@ -2688,6 +2699,7 @@ void relocator_stereo(const char* filename)
         config.playerversion &= ~PLAYER_ZPGHOSTREGS;
     }
     if (selectdone == -1) goto PRCLEANUP_S;
+#endif
 
     // Disable optimizations if necessary
     if (config.playerversion & PLAYER_NOOPTIMIZATION)
@@ -3020,6 +3032,10 @@ void relocator_stereo(const char* filename)
     if (nopulse) pulsetblsize = 0;
     if (nofilter) filttblsize = 0;
 
+#ifdef LTRELOC
+    std::fprintf(STDOUT, "Player address:   $%04X\n", config.playeradr);
+    std::fprintf(STDOUT, "Zeropage address: $%04X\n", config.zeropageadr);
+#else
     std::snprintf(textbuffer, MAX_PATHNAME, "SELECT START ADDRESS: (CURSORS=MOVE, ENTER=ACCEPT, ESC=CANCEL)");
     printtext(1, 10, colors.CTITLE, textbuffer);
 
@@ -3145,6 +3161,7 @@ void relocator_stereo(const char* filename)
     }
 
     if (selectdone == -1) goto PRCLEANUP_S;
+#endif
 
     // Validate frequencytable parameters
     if (lastnote < firstnote)
@@ -3482,6 +3499,25 @@ SKIPTABLE_S:
     }
 
     // Print results
+#ifdef LTRELOC
+  std::fprintf(STDOUT, "packing results:\n");
+  std::fprintf(STDOUT, "Playroutine:     %d bytes\n", playersize);
+  std::fprintf(STDOUT, "Songtable:       %d bytes\n", songtblsize);
+  std::fprintf(STDOUT, "Song-orderlists: %d bytes\n", songdatasize);
+  std::fprintf(STDOUT, "Patterntable:    %d bytes\n", patttblsize);
+  std::fprintf(STDOUT, "Patterns:        %d bytes\n", pattdatasize);
+  std::fprintf(STDOUT, "Instruments:     %d bytes\n", instrsize);
+  std::fprintf(STDOUT, "Tables:          %d bytes\n", wavetblsize+pulsetblsize+filttblsize+speedtblsize);
+  std::fprintf(STDOUT, "Total size:      %d bytes\n", packedsize);
+
+  songhandle = std::fopen(filename, "wb");
+  if (!songhandle) 
+  {
+      std::fprintf(STDERR, "error: could not open output file '%s'.\n", filename);
+      goto PRCLEANUP_S;
+  }
+
+#else
     clearscreen();
     printblankc(0, 0, colors.CHEADER, MAX_COLUMNS);
     if (!std::strlen(filename))
@@ -3629,6 +3665,7 @@ SKIPTABLE_S:
         }
         songhandle = std::fopen(packedsongname, "wb");
     }
+#endif
 
     if (config.fileformat == FORMAT_PRG)
     {
@@ -3749,6 +3786,7 @@ PRCLEANUP_S:
     buf_free(&src);
     buf_free(&dest);
     parse_free();
+    //LOG_FREE;
 
     if (pattwork) delete [] pattwork;
     if (songwork) delete [] songwork;

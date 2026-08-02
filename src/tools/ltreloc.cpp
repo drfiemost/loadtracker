@@ -161,12 +161,17 @@ int main(int argc, char **argv)
   std::fprintf(STDOUT, "song file:       %s\n", loadedsongfilename);
   std::fprintf(STDOUT, "output file:     %s\n", packedsongname);
   std::fprintf(STDOUT, "output format:   ");
-  if (config.fileformat == FORMAT_SID) {
+  switch (config.fileformat)
+  {
+  case FORMAT_SID:
       std::fprintf(STDOUT, "sid\n");
-  } else if (config.fileformat == FORMAT_BIN) {
+      break;
+  case FORMAT_BIN:
       std::fprintf(STDOUT, "bin\n");
-  } else {
+      break;
+  default:
       std::fprintf(STDOUT, "prg\n");
+      break;
   }
 
   // Scan command line
@@ -321,10 +326,19 @@ int main(int argc, char **argv)
     calculatefreqtable(config);
 
   // perform relocation
+  std::fprintf(STDOUT, "song format:     ");
   switch (type)
   {
-    case SngType::STANDARD: relocator(packedsongname); break;
-    case SngType::DUAL: relocator_stereo(packedsongname); break;
+    case SngType::STANDARD:
+        std::fprintf(STDOUT, "Single SID\n");
+        config.numsids = 1;
+        relocator(packedsongname);
+        break;
+    case SngType::DUAL:
+        std::fprintf(STDOUT, "Dual SID\n");
+        config.numsids = 2;
+        relocator_stereo(packedsongname);
+        break;
     default: break; // unreachable
   }
 

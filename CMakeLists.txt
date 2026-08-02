@@ -117,7 +117,6 @@ set(LTRELOC_SOURCES
 include_directories(${CMAKE_BINARY_DIR}/src)
 include_directories(${CMAKE_SOURCE_DIR}/src)
 include_directories(${CMAKE_SOURCE_DIR}/src/bme)
-include_directories(${CMAKE_SOURCE_DIR}/src/asm)
 
 find_package(SDL3 REQUIRED)
 
