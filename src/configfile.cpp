@@ -300,7 +300,7 @@ void getstringparam(FILE *handle, char *value)
 
   char *configptr = configbuf;
 
-  char tmpbuf[MAX_PATHNAME];
+  char tmpbuf[MAX_PATHNAME+1];
   std::sscanf(configptr, "%" xstr(MAX_PATHNAME) "s", tmpbuf);
   // Strip quotes
   size_t len = std::strlen(tmpbuf);
