@@ -419,7 +419,7 @@ void relocator(const char* filename)
   }
 
   // Optimize amount of used channels
-  for (int c = maxChns; c; c--)
+  for (int c = maxChns-1; c; c--)
   {
     if (chnused.test(c))
       break;
@@ -2416,15 +2416,14 @@ void relocator_stereo(const char* filename)
         goto PRCLEANUP_S;
     }
 
-#if 0
-  // Optimize amount of used channels
-  for (int c = maxChns; c; c--)
-  {
-    if (chnused.test(c))
-      break;
-    channels = c;
-  }
-#endif
+    // Optimize amount of used channels
+    for (int c = maxChns-1; c; c--)
+    {
+      if (chnused.test(c))
+        break;
+      channels = c;
+    }
+
     // Build the pattern-mapping
     // Instrument 1 is always used
     instr[1].used = true;
