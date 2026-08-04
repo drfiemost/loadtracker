@@ -109,7 +109,7 @@ int getCursorColor()
 
 static inline void setcharcolor(unsigned *dptr, unsigned char ch, unsigned char color)
 {
-  *dptr = (ch & 0xff) | (color << 16) | (colors.CBKGND << 20);
+  *dptr = (ch & 0xff) | (color << 16) | (colors.cbkgnd() << 20);
 }
 
 bool initscreen()
@@ -337,7 +337,7 @@ void printbg(int x, int y, int color, int length)
 
   while (length--)
   {
-    *dptr = (*dptr & 0xffff) | (colors.CBKGND << 16) | (color << 20);
+    *dptr = (*dptr & 0xffff) | (colors.cbkgnd() << 16) | (color << 20);
     dptr++;
   }
 }

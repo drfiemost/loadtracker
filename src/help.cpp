@@ -277,8 +277,8 @@ void onlinehelp(int standalone, int context)
   unsigned char color_normal = HELP_NORMAL;
   if (!standalone)
   {
-    color_header = colors.CTITLE;
-    color_normal = colors.CNORMAL;
+    color_header = colors.ctitle();
+    color_normal = colors.cnormal();
   }
 
   for (;;)
@@ -363,13 +363,13 @@ void onlinehelp(int standalone, int context)
     if (!lastrow) lastrow=left;
 
     printblank(0, 0, MAX_COLUMNS);
-    printbg(0, 0, colors.CHDRBG, MAX_COLUMNS);
+    printbg(0, 0, colors.chdrbg(), MAX_COLUMNS);
     std::snprintf(textbuffer, MAX_PATHNAME, "%s Online Help", programname);
-    printtext(1, 0, colors.CHEADER, textbuffer);
+    printtext(1, 0, colors.cheader(), textbuffer);
     if (standalone) {
-      printtext(84, 0, colors.CHEADER, "Arrows/PgUp/PgDn/Home/End scroll, ESC exits");
+      printtext(84, 0, colors.cheader(), "Arrows/PgUp/PgDn/Home/End scroll, ESC exits");
     } else {
-      printtext(61, 0, colors.CHEADER, "Arrows/PgUp/PgDn/Home/End scroll, F12 toggles context, others exit");
+      printtext(61, 0, colors.cheader(), "Arrows/PgUp/PgDn/Home/End scroll, F12 toggles context, others exit");
     }
 
     waitkeymousenoupdate();

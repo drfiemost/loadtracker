@@ -168,7 +168,7 @@ int main(int argc, char **argv)
         if (!initscreen())
           return EXIT_FAILURE;
         for (int y = 0; y < usagelen; ++y)
-          printtext(0, y, colors.CMESSAGE, usage[y]);
+          printtext(0, y, colors.cmessage(), usage[y]);
         waitkeynoupdate();
 #else
         for (int y = 0; y < usagelen; ++y)
@@ -334,7 +334,7 @@ int main(int argc, char **argv)
   // Init sound
   if (!sound_init(writer, config))
   {
-    printtextc(MAX_ROWS/2-1, colors.CMESSAGE, "Sound init failed. Press any key to run without sound (notice that song timer won't start)");
+    printtextc(MAX_ROWS/2-1, colors.cmessage(), "Sound init failed. Press any key to run without sound (notice that song timer won't start)");
     waitkeynoupdate();
   }
 
@@ -1320,7 +1320,7 @@ void quit()
 {
   if ((!input.shiftpressed) || (input.mouseb))
   {
-    printtextcp(dpos.statusBottomX+29, dpos.statusBottomY, colors.CMESSAGE, "Really Quit (y/n)?");
+    printtextcp(dpos.statusBottomX+29, dpos.statusBottomY, colors.cmessage(), "Really Quit (y/n)?");
     waitkey();
     printblank(dpos.statusBottomX, dpos.statusBottomY, 58);
     if (input.iskeyyes()) exitprogram = true;
@@ -1330,7 +1330,7 @@ void quit()
 
 void clear()
 {
-  printtextcp(dpos.statusBottomX+29, dpos.statusBottomY, colors.CMESSAGE, "Optimize everything (y/n)?");
+  printtextcp(dpos.statusBottomX+29, dpos.statusBottomY, colors.cmessage(), "Optimize everything (y/n)?");
   waitkey();
   printblank(dpos.statusBottomX, dpos.statusBottomY, 58);
   if (input.iskeyyes())
@@ -1346,27 +1346,27 @@ void clear()
   bool ct = false;
   bool cn = false;
 
-  printtextcp(dpos.statusBottomX+29, dpos.statusBottomY, colors.CMESSAGE, "Clear orderlists (y/n)?");
+  printtextcp(dpos.statusBottomX+29, dpos.statusBottomY, colors.cmessage(), "Clear orderlists (y/n)?");
   waitkey();
   printblank(dpos.statusBottomX, dpos.statusBottomY, 58);
   if (input.iskeyyes()) cs = true;
 
-  printtextcp(dpos.statusBottomX+29, dpos.statusBottomY, colors.CMESSAGE, "Clear patterns (y/n)?");
+  printtextcp(dpos.statusBottomX+29, dpos.statusBottomY, colors.cmessage(), "Clear patterns (y/n)?");
   waitkey();
   printblank(dpos.statusBottomX, dpos.statusBottomY, 58);
   if (input.iskeyyes()) cp = true;
 
-  printtextcp(dpos.statusBottomX+29, dpos.statusBottomY, colors.CMESSAGE, "Clear instruments (y/n)?");
+  printtextcp(dpos.statusBottomX+29, dpos.statusBottomY, colors.cmessage(), "Clear instruments (y/n)?");
   waitkey();
   printblank(dpos.statusBottomX, dpos.statusBottomY, 58);
   if (input.iskeyyes()) ci = true;
 
-  printtextcp(dpos.statusBottomX+29, dpos.statusBottomY, colors.CMESSAGE, "Clear tables (y/n)?");
+  printtextcp(dpos.statusBottomX+29, dpos.statusBottomY, colors.cmessage(), "Clear tables (y/n)?");
   waitkey();
   printblank(dpos.statusBottomX, dpos.statusBottomY, 58);
   if (input.iskeyyes()) ct = true;
 
-  printtextcp(dpos.statusBottomX+29, dpos.statusBottomY, colors.CMESSAGE, "Clear songname (y/n)?");
+  printtextcp(dpos.statusBottomX+29, dpos.statusBottomY, colors.cmessage(), "Clear songname (y/n)?");
   waitkey();
   printblank(dpos.statusBottomX, dpos.statusBottomY, 58);
   if (input.iskeyyes()) cn = true;
@@ -1376,7 +1376,7 @@ void clear()
     bool selectdone = false;
     unsigned olddpl = config.defaultpatternlength;
 
-    printtext(dpos.statusBottomX+20, dpos.statusBottomY, colors.CMESSAGE, "Pattern length:");
+    printtext(dpos.statusBottomX+20, dpos.statusBottomY, colors.cmessage(), "Pattern length:");
     while (!selectdone)
     {
         if (config.patterndispmode)
@@ -1387,7 +1387,7 @@ void clear()
         {
             std::sprintf(textbuffer, "%02d ", config.defaultpatternlength);
         }
-        printtext(dpos.statusBottomX+35, dpos.statusBottomY, colors.CTITLE, textbuffer);
+        printtext(dpos.statusBottomX+35, dpos.statusBottomY, colors.ctitle(), textbuffer);
       waitkey();
       switch(input.rawkey)
       {
@@ -1657,7 +1657,7 @@ void switchMode()
     printtextcp(
         dpos.statusBottomX+29,
         dpos.statusBottomY,
-        colors.CMESSAGE,
+        colors.cmessage(),
         textbuffer
     );
     settooltip("Warning: All Songdata Will Be Lost!!!");

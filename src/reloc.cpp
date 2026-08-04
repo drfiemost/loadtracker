@@ -189,7 +189,7 @@ void insertaddrhi(const char *name);
 void error(const char *msg)
 {
     clearscreen();
-    printtextc(MAX_ROWS/2, colors.CTITLE, msg);
+    printtextc(MAX_ROWS/2, colors.ctitle(), msg);
     fliptoscreen();
     waitkeynoupdate();
 }
@@ -245,7 +245,7 @@ TABLETYPE:
         // unreachable
         break;
     }
-    printtextc(MAX_ROWS/2, colors.CTITLE, textbuffer);
+    printtextc(MAX_ROWS/2, colors.ctitle(), textbuffer);
 
     fliptoscreen();
     waitkeynoupdate();
@@ -650,14 +650,14 @@ void relocator(const char* filename)
   // Select playroutine options
 #ifndef LTRELOC
   clearscreen();
-  printblankc(0, 0, colors.CHEADER, MAX_COLUMNS);
+  printblankc(0, 0, colors.cheader(), MAX_COLUMNS);
   if (!std::strlen(filename))
     std::snprintf(textbuffer, MAX_PATHNAME, "%s Packer/Relocator", programname);
   else
     std::snprintf(textbuffer, MAX_PATHNAME, "%s Packer/Relocator - %s", programname, filename);
   textbuffer[MAX_COLUMNS] = 0;
-  printtext(1, 0, colors.CHEADER, textbuffer);
-  printtext(1, 2, colors.CTITLE, "SELECT PLAYROUTINE OPTIONS: (CURSORS=MOVE/CHANGE, ENTER=ACCEPT, ESC=CANCEL)");
+  printtext(1, 0, colors.cheader(), textbuffer);
+  printtext(1, 2, colors.ctitle(), "SELECT PLAYROUTINE OPTIONS: (CURSORS=MOVE/CHANGE, ENTER=ACCEPT, ESC=CANCEL)");
 
   if (!dual)
   {
@@ -666,7 +666,7 @@ void relocator(const char* filename)
       ciaval = 19566 - ((19655 / 125) * (snd_bpmtempo - 125));
 
       std::snprintf(textbuffer, MAX_PATHNAME, "[INFO] CIA timer value for %03d BPM: $%04X", snd_bpmtempo, ciaval);
-      printtext(1, 3+MAX_OPTIONS+8, colors.CEDIT, textbuffer);
+      printtext(1, 3+MAX_OPTIONS+8, colors.cedit(), textbuffer);
     }
   }
 
@@ -677,7 +677,7 @@ void relocator(const char* filename)
     if (dual) opts--;
     for (int c = 0; c < opts; c++)
     {
-      int color = (opt == c) ? colors.CEDIT : colors.CNORMAL;
+      int color = (opt == c) ? colors.cedit() : colors.cnormal();
 
       printtext(1, 3+c, color, playeroptname[c]);
       if (config.playerversion & (PLAYER_BUFFERED << c))
@@ -1092,13 +1092,13 @@ void relocator(const char* filename)
 #else
   ypos = dual ? 10 : 11;
   std::snprintf(textbuffer, MAX_PATHNAME, "SELECT START ADDRESS: (CURSORS=MOVE, ENTER=ACCEPT, ESC=CANCEL)");
-  printtext(1, ypos, colors.CTITLE, textbuffer);
+  printtext(1, ypos, colors.ctitle(), textbuffer);
 
   selectdone = 0;
   while (!selectdone)
   {
     std::snprintf(textbuffer, MAX_PATHNAME, "$%04X", config.playeradr);
-    printtext(1, ypos+1, colors.CEDIT, textbuffer);
+    printtext(1, ypos+1, colors.cedit(), textbuffer);
 
     fliptoscreen();
     waitkeynoupdate();
@@ -1144,7 +1144,7 @@ void relocator(const char* filename)
   if (selectdone == -1) goto PRCLEANUP;
 
   std::snprintf(textbuffer, MAX_PATHNAME, "SELECT ZEROPAGE ADDRESS: (CURSORS=MOVE, ENTER=ACCEPT, ESC=CANCEL)");
-  printtext(1, ypos+3, colors.CTITLE, textbuffer);
+  printtext(1, ypos+3, colors.ctitle(), textbuffer);
 
   selectdone = 0;
   while (!selectdone)
@@ -1176,7 +1176,7 @@ void relocator(const char* filename)
       std::snprintf(textbuffer, MAX_PATHNAME, "$%02X-$%02X (ghostregs start at %02X)", config.zeropageadr, config.zeropageadr+26, config.zeropageadr);
     }
 
-    printtext(1, ypos+4, colors.CEDIT, textbuffer);
+    printtext(1, ypos+4, colors.cedit(), textbuffer);
 
     fliptoscreen();
     waitkeynoupdate();
@@ -1592,38 +1592,38 @@ void relocator(const char* filename)
 
 #else
   clearscreen();
-  printblankc(0, 0, colors.CHEADER, MAX_COLUMNS);
+  printblankc(0, 0, colors.cheader(), MAX_COLUMNS);
   if (!std::strlen(filename))
     std::snprintf(textbuffer, MAX_PATHNAME, "%s Packer/Relocator", programname);
   else
     std::snprintf(textbuffer, MAX_PATHNAME, "%s Packer/Relocator - %s", programname, filename);
   textbuffer[80] = 0;
-  printtext(0, 0, colors.CHEADER, textbuffer);
+  printtext(0, 0, colors.cheader(), textbuffer);
 
   std::snprintf(textbuffer, MAX_PATHNAME, "PACKING RESULTS:");
-  printtext(1, 2, colors.CMESSAGE, textbuffer);
+  printtext(1, 2, colors.cmessage(), textbuffer);
 
   std::snprintf(textbuffer, MAX_PATHNAME, "Playroutine:     %d bytes", playersize);
-  printtext(1, 3, colors.CHDRFG, textbuffer);
+  printtext(1, 3, colors.chdrfg(), textbuffer);
   std::snprintf(textbuffer, MAX_PATHNAME, "Songtable:       %d bytes", songtblsize);
-  printtext(1, 4, colors.CHDRFG, textbuffer);
+  printtext(1, 4, colors.chdrfg(), textbuffer);
   std::snprintf(textbuffer, MAX_PATHNAME, "Song-orderlists: %d bytes", songdatasize);
-  printtext(1, 5, colors.CHDRFG, textbuffer);
+  printtext(1, 5, colors.chdrfg(), textbuffer);
   std::snprintf(textbuffer, MAX_PATHNAME, "Patterntable:    %d bytes", patttblsize);
-  printtext(1, 6, colors.CHDRFG, textbuffer);
+  printtext(1, 6, colors.chdrfg(), textbuffer);
   std::snprintf(textbuffer, MAX_PATHNAME, "Patterns:        %d bytes", pattdatasize);
-  printtext(1, 7, colors.CHDRFG, textbuffer);
+  printtext(1, 7, colors.chdrfg(), textbuffer);
   std::snprintf(textbuffer, MAX_PATHNAME, "Instruments:     %d bytes", instrsize);
-  printtext(1, 8, colors.CHDRFG, textbuffer);
+  printtext(1, 8, colors.chdrfg(), textbuffer);
   std::snprintf(textbuffer, MAX_PATHNAME, "Tables:          %d bytes", wavetblsize+pulsetblsize+filttblsize+speedtblsize);
-  printtext(1, 9, colors.CHDRFG, textbuffer);
+  printtext(1, 9, colors.chdrfg(), textbuffer);
   std::snprintf(textbuffer, MAX_PATHNAME, "Total size:      %d bytes", packedsize);
-  printtext(1, 11, colors.CHDRFG, textbuffer);
+  printtext(1, 11, colors.chdrfg(), textbuffer);
   fliptoscreen();
 
 
   // Now ask for config.fileformat
-  printtext(1, 13, colors.CTITLE, "SELECT FORMAT TO SAVE IN: (CURSORS=MOVE, ENTER=ACCEPT, ESC=CANCEL)");
+  printtext(1, 13, colors.ctitle(), "SELECT FORMAT TO SAVE IN: (CURSORS=MOVE, ENTER=ACCEPT, ESC=CANCEL)");
 
   selectdone = 0;
 
@@ -1633,17 +1633,17 @@ void relocator(const char* filename)
     switch(config.fileformat)
     {
       case FORMAT_SID:
-      printtext(1, 14, colors.CEDIT, "SID - SIDPlay music file format          ");
+      printtext(1, 14, colors.cedit(), "SID - SIDPlay music file format          ");
       std::strcpy(packedfilter, "*.sid");
       break;
 
       case FORMAT_PRG:
-      printtext(1, 14, colors.CEDIT, "PRG - C64 native format                  ");
+      printtext(1, 14, colors.cedit(), "PRG - C64 native format                  ");
       std::strcpy(packedfilter, "*.prg");
       break;
 
       case FORMAT_BIN:
-      printtext(1, 14, colors.CEDIT, "BIN - Raw binary format (no startaddress)");
+      printtext(1, 14, colors.cedit(), "BIN - Raw binary format (no startaddress)");
       std::strcpy(packedfilter, "*.bin");
       break;
     }

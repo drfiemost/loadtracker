@@ -24,7 +24,6 @@ class Colorscheme
 private:
     int rainbowtable[5];
 
-public: // FIXME make private and add getters
     unsigned char CBKGND;
     unsigned char CNORMAL;
     unsigned char CMUTE;
@@ -46,6 +45,19 @@ public:
     int getCursorColor(int i);
 
     int getRainbowColor(int i);
+
+    unsigned char cbkgnd() const { return CBKGND; };
+    unsigned char cnormal() const { return CNORMAL; };
+    unsigned char cmute() const { return CMUTE; };
+    unsigned char cedit() const { return CEDIT; };
+    unsigned char cplaying() const { return CPLAYING; };
+    unsigned char ccommand() const { return CCOMMAND; };
+    unsigned char ctitle() const { return CTITLE; };
+    unsigned char chdrbg() const { return CHDRBG; };
+    unsigned char chdrfg() const { return CHDRFG; };
+    unsigned char cheader() const { return CHEADER; };
+    unsigned char cmessage() const { return CMESSAGE; };
+    unsigned char ctooltip() const { return CTOOLTIP; };
 };
 
 extern Colorscheme colors;
