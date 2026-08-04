@@ -116,17 +116,26 @@ bool sound_init(bool writer, const Settings &cfg)
       return false;
 
     int model = exSID_hwmodel(exsidfd);
+    int mode;
     switch (model)
     {
       case XS_MD_PLUS:
-      exSID_audio_op(exsidfd, cfg.sidmodel == 1 ? XS_AU_8580_8580 : XS_AU_6581_6581);
+      if (cfg.numsids == 2)
+          mode = XS_AU_6581_8580;
+      else
+          mode = (cfg.sidmodel == 1) ? XS_AU_8580_8580 : XS_AU_6581_6581;
+      exSID_audio_op(exsidfd, mode);
       exSID_clockselect(exsidfd, cfg.ntsc ? XS_CL_NTSC : XS_CL_PAL);
       exSID_audio_op(exsidfd, XS_AU_UNMUTE);
       exsidDelay = cfg.ntsc ? NTSCCLOCKRATE : PALCLOCKRATE;
       break;
 
       case XS_MD_STD:
-      exSID_chipselect(exsidfd, cfg.sidmodel == 1 ? XS_CS_CHIP1 : XS_CS_CHIP0);
+      if (cfg.numsids == 2)
+          mode = XS_CS_BOTH;
+      else
+          mode = (cfg.sidmodel == 1) ? XS_CS_CHIP1 : XS_CS_CHIP0;
+      exSID_chipselect(exsidfd, mode);
       exsidDelay = 1000000;
       break;
 
