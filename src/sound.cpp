@@ -61,7 +61,7 @@ FILE *writehandle = nullptr;
 
 #ifdef USE_EXSID
 bool useexsid = false;
-SDL_TimerID timer = 0;
+SDL_TimerID tmr = 0;
 void* exsidfd = nullptr;
 unsigned exsidDelay = 0;
 
@@ -119,14 +119,14 @@ bool sound_init(bool writer, const Settings &cfg)
     switch (model)
     {
       case XS_MD_PLUS:
-      exSID_audio_op(exsidfd, m == 1 ? XS_AU_8580_8580 : XS_AU_6581_6581);
+      exSID_audio_op(exsidfd, cfg.sidmodel == 1 ? XS_AU_8580_8580 : XS_AU_6581_6581);
       exSID_clockselect(exsidfd, cfg.ntsc ? XS_CL_NTSC : XS_CL_PAL);
       exSID_audio_op(exsidfd, XS_AU_UNMUTE);
       exsidDelay = cfg.ntsc ? NTSCCLOCKRATE : PALCLOCKRATE;
       break;
 
       case XS_MD_STD:
-      exSID_chipselect(exsidfd, m == 1 ? XS_CS_CHIP1 : XS_CS_CHIP0);
+      exSID_chipselect(exsidfd, cfg.sidmodel == 1 ? XS_CS_CHIP1 : XS_CS_CHIP0);
       exsidDelay = 1000000;
       break;
 
@@ -138,7 +138,7 @@ bool sound_init(bool writer, const Settings &cfg)
     exsidDelay -= SIDWRITEDELAY*NUMSIDREGS;
 
     useexsid = true;
-    timer = SDL_AddTimer(1000 / framerate, sound_timer, nullptr);
+    tmr = SDL_AddTimer(1000 / framerate, sound_timer, nullptr);
 #else
     return false;
 #endif
@@ -186,7 +186,7 @@ void sound_uninit()
 #ifdef USE_EXSID
   if (useexsid)
   {
-    SDL_RemoveTimer(timer);
+    SDL_RemoveTimer(tmr);
   }
   else
 #endif
