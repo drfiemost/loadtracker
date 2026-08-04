@@ -173,11 +173,11 @@ buf dest = STATIC_BUF_INIT;
 void exectable(int num, int ptr);
 int packpattern(unsigned char *dest, unsigned char *src, int rows);
 void findtableduplicates(int num);
-int isusedandselfcontained(int num, int start);
+bool isusedandselfcontained(int num, int start);
 void calcspeedtest(unsigned char pos);
 unsigned char swapnybbles(unsigned char n);
 
-int insertfile(const char *name);
+bool insertfile(const char *name);
 void inserttext(const char *text);
 void insertdefine(const char *name, int value);
 void insertlabel(const char *name);
@@ -1401,8 +1401,8 @@ void relocator(const char* filename)
   // Insert tables
   for (int c = 0; c < MAX_TABLES; c++)
   {
-    if ((c == PTBL) && (nopulse)) goto SKIPTABLE;
-    if ((c == FTBL) && (nofilter)) goto SKIPTABLE;
+    if ((c == PTBL) && (nopulse)) continue;
+    if ((c == FTBL) && (nofilter)) continue;
 
     // Write table left side
     // Extra zero for speedtable
@@ -1526,9 +1526,6 @@ void relocator(const char* filename)
           insertbyte(table[c][song.rtable[c][d]].map);
       }
     }
-
-SKIPTABLE:
-    {}
   }
 
   // Insert orderlists
@@ -2061,10 +2058,10 @@ int packpattern(unsigned char *dest, unsigned char *src, int rows)
       dest[destsize++] = temp2[c++];
       if (fxnum) dest[destsize++] = temp2[c++];
       packok = false;
-      goto NEXTROW;
+      continue;
     }
     if (temp2[c] < FXONLY)
-     {
+    {
       int fxnum = temp2[c] - FX;
       dest[destsize++] = temp2[c++];
       if (fxnum) dest[destsize++] = temp2[c++];
@@ -2096,8 +2093,6 @@ int packpattern(unsigned char *dest, unsigned char *src, int rows)
       else
         dest[destsize++] = temp2[c++];
     }
-NEXTROW:
-    {}
   }
   // See if pattern too big
   if (destsize > 256) return -1;
@@ -2136,10 +2131,10 @@ unsigned char swapnybbles(unsigned char n)
   return (lownybble << 4) | highnybble;
 }
 
-int insertfile(const char *name)
+bool insertfile(const char *name)
 {
   int handle = io_open(name);
-  if (handle == -1) return 0;
+  if (handle == -1) return false;
 
   int size = io_lseek(handle, 0, SEEK_END);
   io_lseek(handle, 0, SEEK_SET);
@@ -2148,7 +2143,7 @@ int insertfile(const char *name)
     buf_append_char(&src, io_read8(handle));
   }
   io_close(handle);
-  return 1;
+  return true;
 }
 
 void inserttext(const char *text)
@@ -2241,7 +2236,8 @@ void findtableduplicates(int num)
         {
           if (table[num][d].used)
           {
-            if ((song.ltable[num][d-1] == song.ltable[num][c-1]) && (song.rtable[num][d-1] == song.rtable[num][c-1]))
+            if ((song.ltable[num][d-1] == song.ltable[num][c-1]) &&
+                (song.rtable[num][d-1] == song.rtable[num][c-1]))
             {
               // Duplicate found, remove and map to the original
               table[num][d].used = false;
@@ -2272,7 +2268,8 @@ void findtableduplicates(int num)
               if (e < len-1)
               {
                 // Is table data the same?
-                if ((song.ltable[num][d+e-1] != song.ltable[num][c+e-1]) || (song.rtable[num][d+e-1] != song.rtable[num][c+e-1]))
+                if ((song.ltable[num][d+e-1] != song.ltable[num][c+e-1]) ||
+                    (song.rtable[num][d+e-1] != song.rtable[num][c+e-1]))
                   break;
               }
               else
@@ -2312,37 +2309,43 @@ void findtableduplicates(int num)
   }
 }
 
-int isusedandselfcontained(int num, int start)
+bool isusedandselfcontained(int num, int start)
 {
   int len = song.gettablepartlen(num, start - 1);
-  int end = start + len - 1;
 
   // Don't use jumps only
-  if (len == 1) return 0;
+  if (len == 1) return false;
+
+  int end = start + len - 1;
 
   // Check that whole table is used
   for (int c = start; c <= end; c++)
   {
-    if (!table[num][c].used) return 0;
+    if (!table[num][c].used) return false;
   }
   // Check for jump to outside
   if (song.rtable[num][end-1] != 0)
   {
-    if ((song.rtable[num][end-1] < start) || (song.rtable[num][end-1] > end)) return 0;
+    if ((song.rtable[num][end-1] < start) ||
+        (song.rtable[num][end-1] > end)) return false;
   }
   // Check for jump from outside
   for (int c = 1; c < start; c++)
-    if ((table[num][c].used) && (song.ltable[num][c-1] == 0xff) && (song.rtable[num][c-1] >= start) && (song.rtable[num][c-1] <= end)) return 0;
+    if ((table[num][c].used) && (song.ltable[num][c-1] == 0xff) &&
+        (song.rtable[num][c-1] >= start) &&
+        (song.rtable[num][c-1] <= end)) return false;
   for (int c = end+1; c <= MAX_TABLELEN; c++)
-    if ((table[num][c].used) && (song.ltable[num][c-1] == 0xff) && (song.rtable[num][c-1] >= start) && (song.rtable[num][c-1] <= end)) return 0;
+    if ((table[num][c].used) && (song.ltable[num][c-1] == 0xff) &&
+        (song.rtable[num][c-1] >= start) &&
+        (song.rtable[num][c-1] <= end)) return false;
 
   // OK!
-  return 1;
+  return true;
 }
 
 void calcspeedtest(unsigned char pos)
 {
-  if (!pos) 
+  if (!pos)
   {
     nozerospeed = 0;
     return;
@@ -2399,9 +2402,11 @@ void optimizetable(int num)
   {
     for (int d = 0; d < getPattlen(c); d++)
     {
-      if ((song.pattern[c][d*4+2] >= CMD_SETWAVEPTR) && (song.pattern[c][d*4+2] <= CMD_SETFILTERPTR))
+      if ((song.pattern[c][d*4+2] >= CMD_SETWAVEPTR) &&
+          (song.pattern[c][d*4+2] <= CMD_SETFILTERPTR))
         exectable(song.pattern[c][d*4+2] - CMD_SETWAVEPTR, song.pattern[c][d*4+3]);
-      if ((song.pattern[c][d*4+2] >= CMD_PORTAUP) && (song.pattern[c][d*4+2] <= CMD_VIBRATO))
+      if ((song.pattern[c][d*4+2] >= CMD_PORTAUP) &&
+          (song.pattern[c][d*4+2] <= CMD_VIBRATO))
         exectable(STBL, song.pattern[c][d*4+3]);
       if (song.pattern[c][d*4+2] == CMD_FUNKTEMPO)
         exectable(STBL, song.pattern[c][d*4+3]);
@@ -2420,7 +2425,8 @@ void optimizetable(int num)
   {
     if (table[WTBL][c+1].used)
     {
-      if ((song.ltable[WTBL][c] >= WAVECMD) && (song.ltable[WTBL][c] <= WAVELASTCMD))
+      if ((song.ltable[WTBL][c] >= WAVECMD) &&
+          (song.ltable[WTBL][c] <= WAVELASTCMD))
       {
         int d = -1;
 

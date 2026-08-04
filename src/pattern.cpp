@@ -43,9 +43,7 @@
 int epnum[MAX_CHN];
 int eppos;
 int epview[MAX_CHN];
-int epcolumn;
 int epchn;
-int epoctave = 2;
 int autoadvance = 0;
 Selection epmark;
 

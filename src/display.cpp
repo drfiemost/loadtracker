@@ -71,7 +71,10 @@ bool followplay = false;
 int hexnybble = -1;
 bool exitprogram = false;
 int eacolumn = 0;
+int epcolumn;
 int eamode = 0;
+int enpos;
+int epoctave = 2;
 EditHdr ehmode = EditHdr::NONE;
 
 std::string tooltip;

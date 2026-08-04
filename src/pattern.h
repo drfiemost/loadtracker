@@ -32,9 +32,7 @@ enum
 extern int epnum[MAX_CHN];
 extern int eppos;
 extern int epview[MAX_CHN];
-extern int epcolumn;
 extern int epchn;
-extern int epoctave;
 extern int autoadvance;
 extern Selection epmark;
 #endif

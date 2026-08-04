@@ -29,7 +29,6 @@ extern int esview[MAX_CHN];
 extern int escolumn;
 extern int eschn;
 extern int esnum;
-extern int enpos;
 extern Selection esmark;
 #endif
 

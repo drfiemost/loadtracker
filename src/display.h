@@ -37,6 +37,9 @@ extern bool followplay;
 extern int hexnybble;
 extern bool exitprogram;
 extern int eacolumn;
+extern int epcolumn;
+extern int enpos;
+extern int epoctave;
 extern EditHdr ehmode;
 #endif
 

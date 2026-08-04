@@ -45,7 +45,6 @@ int esview[MAX_CHN];
 int escolumn;
 int eschn;
 int esnum;
-int enpos;
 Selection esmark;
 
 void insertorder(unsigned char byte)
