@@ -187,10 +187,14 @@ void insertaddrhi(const char *name);
 
 void error(const char *msg)
 {
+#ifndef LTRELOC
     clearscreen();
     printtextc(MAX_ROWS/2, colors.ctitle(), msg);
     fliptoscreen();
     waitkeynoupdate();
+#else
+    std::fprintf(STDERR, "%s\n", msg);
+#endif
 }
 
 void table_error(TabError terr)
@@ -244,10 +248,14 @@ TABLETYPE:
         // unreachable
         break;
     }
+#ifndef LTRELOC
     printtextc(MAX_ROWS/2, colors.ctitle(), textbuffer);
 
     fliptoscreen();
     waitkeynoupdate();
+#else
+    std::fprintf(STDERR, "%s\n", textbuffer);
+#endif
 }
 
 void initreloc()

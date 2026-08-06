@@ -31,6 +31,4 @@
 #  endif
 #endif
 
-void waitkeynoupdate();
-
 #endif

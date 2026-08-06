@@ -346,10 +346,6 @@ int main(int argc, char **argv)
   return EXIT_SUCCESS;
 }
 
-void waitkeynoupdate()
-{
-}
-
 void writereg(int, unsigned char)
 {
 }
