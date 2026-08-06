@@ -27,7 +27,6 @@
 #include "colors.h"
 #include "console.h"
 #include "display.h"
-#include "play.h"
 #include "settings.h"
 #include "song.h"
 #include "table.h"
@@ -365,8 +364,6 @@ void relocator(const char* filename)
   int patternlastnote = 0;
 
   initreloc();
-
-  stopsong();
 
   // this errors out, hopefully we don't need to debug players
   // asm/log.h:124:59: error: invalid conversion from ‘int’ to ‘log_level’ [-fpermissive]

@@ -1007,6 +1007,7 @@ void mousecommands()
         save();
       if ((input.mousex >= 49) && (input.mousex <= 57))
       {
+        stopsong();
         relocator(loadedsongfilename);
       }
       if ((input.mousex >= 59) && (input.mousex <= 64))
@@ -1213,6 +1214,7 @@ void generalcommands()
     case KEY_F9:
     if (!input.shiftpressed)
     {
+        stopsong();
         relocator(loadedsongfilename);
     }
     else if (input.shiftpressed && (config.numsids == 2))

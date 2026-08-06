@@ -38,16 +38,18 @@
 #include <cstdio>
 #include <cstring>
 
-unsigned char filterctrl = 0;
-unsigned char filtertype = 0;
-unsigned char filtercutoff = 0;
-unsigned char filtertime = 0;
-unsigned char filterptr = 0;
-unsigned char filter2ctrl = 0;
-unsigned char filter2type = 0;
-unsigned char filter2cutoff = 0;
-unsigned char filter2time = 0;
-unsigned char filter2ptr = 0;
+struct Filter
+{
+    unsigned char ctrl;
+    unsigned char type;
+    unsigned char cutoff;
+    unsigned char time;
+    unsigned char ptr;
+};
+
+Filter filter = {};
+Filter filter2 = {};
+
 unsigned char masterfader = 0x0f;
 int psnum = 0;
 int songinit = PLAY_STOPPED;
@@ -154,8 +156,8 @@ void playroutine()
   {
     lastsonginit = songinit;
 
-    filterctrl = 0;
-    filterptr = 0;
+    filter.ctrl = 0;
+    filter.ptr = 0;
 
     timer.reset();
 
@@ -230,56 +232,56 @@ void playroutine()
   }
   else
   {
-    if (filterptr)
+    if (filter.ptr)
     {
       // Filter jump
-      if (song.ltable[FTBL][filterptr-1] == 0xff)
+      if (song.ltable[FTBL][filter.ptr-1] == 0xff)
       {
-        filterptr = song.rtable[FTBL][filterptr-1];
-        if (!filterptr) goto FILTERSTOP;
+        filter.ptr = song.rtable[FTBL][filter.ptr-1];
+        if (!filter.ptr) goto FILTERSTOP;
       }
 
-      if (!filtertime)
+      if (!filter.time)
       {
         // Filter set
-        if (song.ltable[FTBL][filterptr-1] >= 0x80)
+        if (song.ltable[FTBL][filter.ptr-1] >= 0x80)
         {
-          filtertype = song.ltable[FTBL][filterptr-1] & 0x70;
-          filterctrl = song.rtable[FTBL][filterptr-1];
-          filterptr++;
+          filter.type = song.ltable[FTBL][filter.ptr-1] & 0x70;
+          filter.ctrl = song.rtable[FTBL][filter.ptr-1];
+          filter.ptr++;
           // Can be combined with cutoff set
-          if (song.ltable[FTBL][filterptr-1] == 0x00)
+          if (song.ltable[FTBL][filter.ptr-1] == 0x00)
           {
-            filtercutoff = song.rtable[FTBL][filterptr-1];
-            filterptr++;
+            filter.cutoff = song.rtable[FTBL][filter.ptr-1];
+            filter.ptr++;
           }
         }
         else
         {
           // New modulation step
-          if (song.ltable[FTBL][filterptr-1])
-            filtertime = song.ltable[FTBL][filterptr-1];
+          if (song.ltable[FTBL][filter.ptr-1])
+            filter.time = song.ltable[FTBL][filter.ptr-1];
           else
           {
             // Cutoff set
-            filtercutoff = song.rtable[FTBL][filterptr-1];
-            filterptr++;
+            filter.cutoff = song.rtable[FTBL][filter.ptr-1];
+            filter.ptr++;
           }
         }
       }
       // Filter modulation
-      if (filtertime)
+      if (filter.time)
       {
-        filtercutoff += song.rtable[FTBL][filterptr-1];
-        filtertime--;
-        if (!filtertime) filterptr++;
+        filter.cutoff += song.rtable[FTBL][filter.ptr-1];
+        filter.time--;
+        if (!filter.time) filter.ptr++;
       }
     }
 FILTERSTOP:
     writereg(0x15, 0x00);
-    writereg(0x16, filtercutoff);
-    writereg(0x17, filterctrl);
-    writereg(0x18, filtertype | masterfader);
+    writereg(0x16, filter.cutoff);
+    writereg(0x17, filter.ctrl);
+    writereg(0x18, filter.type | masterfader);
 
     for (int c = 0; c < MAX_CHN_MONO; c++)
     {
@@ -365,12 +367,12 @@ TICK0:
           }
           if (iptr->ptr[FTBL])
           {
-            filterptr = iptr->ptr[FTBL];
-            filtertime = 0;
-            if (filterptr)
+            filter.ptr = iptr->ptr[FTBL];
+            filter.time = 0;
+            if (filter.ptr)
             {
               // Stop the song in case of jumping into a jump
-              if (song.ltable[FTBL][filterptr-1] == 0xff)
+              if (song.ltable[FTBL][filter.ptr-1] == 0xff)
                 stopsong();
             }
           }
@@ -436,23 +438,23 @@ TICK0:
         break;
 
         case CMD_SETFILTERPTR:
-        filterptr = cptr->newcmddata;
-        filtertime = 0;
-        if (filterptr)
+        filter.ptr = cptr->newcmddata;
+        filter.time = 0;
+        if (filter.ptr)
         {
           // Stop the song in case of jumping into a jump
-          if (song.ltable[FTBL][filterptr-1] == 0xff)
+          if (song.ltable[FTBL][filter.ptr-1] == 0xff)
             stopsong();
         }
         break;
 
         case CMD_SETFILTERCTRL:
-        filterctrl = cptr->newcmddata;
-        if (!filterctrl) filterptr = 0;
+        filter.ctrl = cptr->newcmddata;
+        if (!filter.ctrl) filter.ptr = 0;
         break;
 
         case CMD_SETFILTERCUTOFF:
-        filtercutoff = cptr->newcmddata;
+        filter.cutoff = cptr->newcmddata;
         break;
 
         case CMD_SETMASTERVOL:
@@ -647,23 +649,23 @@ TICK0:
               break;
 
               case CMD_SETFILTERPTR:
-              filterptr = param;
-              filtertime = 0;
-              if (filterptr)
+              filter.ptr = param;
+              filter.time = 0;
+              if (filter.ptr)
               {
                 // Stop the song in case of jumping into a jump
-                if (song.ltable[FTBL][filterptr-1] == 0xff)
+                if (song.ltable[FTBL][filter.ptr-1] == 0xff)
                 stopsong();
               }
               break;
 
               case CMD_SETFILTERCTRL:
-              filterctrl = param;
-              if (!filterctrl) filterptr = 0;
+              filter.ctrl = param;
+              if (!filter.ctrl) filter.ptr = 0;
               break;
 
               case CMD_SETFILTERCUTOFF:
-              filtercutoff = param;
+              filter.cutoff = param;
               break;
 
               case CMD_SETMASTERVOL:
@@ -950,10 +952,10 @@ void playroutine_stereo()
     {
         lastsonginit = songinit;
 
-        filterctrl = 0;
-        filterptr = 0;
-        filter2ctrl = 0;
-        filter2ptr = 0;
+        filter.ctrl = 0;
+        filter.ptr = 0;
+        filter2.ctrl = 0;
+        filter2.ptr = 0;
 
         timer.reset();
 
@@ -1032,108 +1034,108 @@ void playroutine_stereo()
     }
     else
     {
-        if (filterptr)
+        if (filter.ptr)
         {
             // Filter jump
-            if (song.ltable[FTBL][filterptr-1] == 0xff)
+            if (song.ltable[FTBL][filter.ptr-1] == 0xff)
             {
-                filterptr = song.rtable[FTBL][filterptr-1];
-                if (!filterptr) goto FILTERSTOP_S;
+                filter.ptr = song.rtable[FTBL][filter.ptr-1];
+                if (!filter.ptr) goto FILTERSTOP_S;
             }
 
-            if (!filtertime)
+            if (!filter.time)
             {
                 // Filter set
-                if (song.ltable[FTBL][filterptr-1] >= 0x80)
+                if (song.ltable[FTBL][filter.ptr-1] >= 0x80)
                 {
-                    filtertype = song.ltable[FTBL][filterptr-1] & 0x70;
-                    filterctrl = song.rtable[FTBL][filterptr-1];
-                    filterptr++;
+                    filter.type = song.ltable[FTBL][filter.ptr-1] & 0x70;
+                    filter.ctrl = song.rtable[FTBL][filter.ptr-1];
+                    filter.ptr++;
                     // Can be combined with cutoff set
-                    if (song.ltable[FTBL][filterptr-1] == 0x00)
+                    if (song.ltable[FTBL][filter.ptr-1] == 0x00)
                     {
-                        filtercutoff = song.rtable[FTBL][filterptr-1];
-                        filterptr++;
+                        filter.cutoff = song.rtable[FTBL][filter.ptr-1];
+                        filter.ptr++;
                     }
                 }
                 else
                 {
                     // New modulation step
-                    if (song.ltable[FTBL][filterptr-1])
-                        filtertime = song.ltable[FTBL][filterptr-1];
+                    if (song.ltable[FTBL][filter.ptr-1])
+                        filter.time = song.ltable[FTBL][filter.ptr-1];
                     else
                     {
                         // Cutoff set
-                        filtercutoff = song.rtable[FTBL][filterptr-1];
-                        filterptr++;
+                        filter.cutoff = song.rtable[FTBL][filter.ptr-1];
+                        filter.ptr++;
                     }
                 }
             }
             // Filter modulation
-            if (filtertime)
+            if (filter.time)
             {
-                filtercutoff += song.rtable[FTBL][filterptr-1];
-                filtertime--;
-                if (!filtertime) filterptr++;
+                filter.cutoff += song.rtable[FTBL][filter.ptr-1];
+                filter.time--;
+                if (!filter.time) filter.ptr++;
             }
         }
 FILTERSTOP_S:
         writereg(0x15, 0x00);
-        writereg(0x16, filtercutoff);
-        writereg(0x17, filterctrl);
-        writereg(0x18, filtertype | masterfader);
+        writereg(0x16, filter.cutoff);
+        writereg(0x17, filter.ctrl);
+        writereg(0x18, filter.type | masterfader);
 
-        if (filter2ptr)
+        if (filter2.ptr)
         {
             // Filter jump
-            if (song.ltable[FTBL][filter2ptr-1] == 0xff)
+            if (song.ltable[FTBL][filter2.ptr-1] == 0xff)
             {
-                filter2ptr = song.rtable[FTBL][filter2ptr-1];
-                if (!filter2ptr) goto FILTER2STOP_S;
+                filter2.ptr = song.rtable[FTBL][filter2.ptr-1];
+                if (!filter2.ptr) goto FILTER2STOP_S;
             }
 
-            if (!filter2time)
+            if (!filter2.time)
             {
                 // Filter set
-                if (song.ltable[FTBL][filter2ptr-1] >= 0x80)
+                if (song.ltable[FTBL][filter2.ptr-1] >= 0x80)
                 {
-                    filter2type = song.ltable[FTBL][filter2ptr-1] & 0x70;
-                    filter2ctrl = song.rtable[FTBL][filter2ptr-1];
-                    filter2ptr++;
+                    filter2.type = song.ltable[FTBL][filter2.ptr-1] & 0x70;
+                    filter2.ctrl = song.rtable[FTBL][filter2.ptr-1];
+                    filter2.ptr++;
                     // Can be combined with cutoff set
-                    if (song.ltable[FTBL][filter2ptr-1] == 0x00)
+                    if (song.ltable[FTBL][filter2.ptr-1] == 0x00)
                     {
-                        filter2cutoff = song.rtable[FTBL][filter2ptr-1];
-                        filter2ptr++;
+                        filter2.cutoff = song.rtable[FTBL][filter2.ptr-1];
+                        filter2.ptr++;
                     }
                 }
                 else
                 {
                     // New modulation step
-                    if (song.ltable[FTBL][filter2ptr-1])
-                        filter2time = song.ltable[FTBL][filter2ptr-1];
+                    if (song.ltable[FTBL][filter2.ptr-1])
+                        filter2.time = song.ltable[FTBL][filter2.ptr-1];
                     else
                     {
                         // Cutoff set
-                        filter2cutoff = song.rtable[FTBL][filter2ptr-1];
-                        filter2ptr++;
+                        filter2.cutoff = song.rtable[FTBL][filter2.ptr-1];
+                        filter2.ptr++;
                     }
                 }
             }
             // Filter modulation
-            if (filter2time)
+            if (filter2.time)
             {
-                filter2cutoff += song.rtable[FTBL][filter2ptr-1];
-                filter2time--;
-                if (!filter2time) filter2ptr++;
+                filter2.cutoff += song.rtable[FTBL][filter2.ptr-1];
+                filter2.time--;
+                if (!filter2.time) filter2.ptr++;
             }
         }
 
 FILTER2STOP_S:
         writereg2(0x15, 0x00);
-        writereg2(0x16, filter2cutoff);
-        writereg2(0x17, filter2ctrl);
-        writereg2(0x18, filter2type | masterfader);
+        writereg2(0x16, filter2.cutoff);
+        writereg2(0x17, filter2.ctrl);
+        writereg2(0x18, filter2.type | masterfader);
 
         for (int c = 0; c < MAX_CHN; c++)
         {
@@ -1221,23 +1223,23 @@ TICK0_S:
                     {
                         if (c < 3)
                         {
-                            filterptr = iptr->ptr[FTBL];
-                            filtertime = 0;
-                            if (filterptr)
+                            filter.ptr = iptr->ptr[FTBL];
+                            filter.time = 0;
+                            if (filter.ptr)
                             {
                                 // Stop the song in case of jumping into a jump
-                                if (song.ltable[FTBL][filterptr-1] == 0xff)
+                                if (song.ltable[FTBL][filter.ptr-1] == 0xff)
                                     stopsong();
                             }
                         }
                         else
                         {
-                            filter2ptr = iptr->ptr[FTBL];
-                            filter2time = 0;
-                            if (filter2ptr)
+                            filter2.ptr = iptr->ptr[FTBL];
+                            filter2.time = 0;
+                            if (filter2.ptr)
                             {
                                 // Stop the song in case of jumping into a jump
-                                if (song.ltable[FTBL][filter2ptr-1] == 0xff)
+                                if (song.ltable[FTBL][filter2.ptr-1] == 0xff)
                                     stopsong();
                             }
                         }
@@ -1320,23 +1322,23 @@ TICK0_S:
             case CMD_SETFILTERPTR:
                 if (c < 3)
                 {
-                    filterptr = cptr->newcmddata;
-                    filtertime = 0;
-                    if (filterptr)
+                    filter.ptr = cptr->newcmddata;
+                    filter.time = 0;
+                    if (filter.ptr)
                     {
                         // Stop the song in case of jumping into a jump
-                        if (song.ltable[FTBL][filterptr-1] == 0xff)
+                        if (song.ltable[FTBL][filter.ptr-1] == 0xff)
                             stopsong();
                     }
                 }
                 else
                 {
-                    filter2ptr = cptr->newcmddata;
-                    filter2time = 0;
-                    if (filter2ptr)
+                    filter2.ptr = cptr->newcmddata;
+                    filter2.time = 0;
+                    if (filter2.ptr)
                     {
                         // Stop the song in case of jumping into a jump
-                        if (song.ltable[FTBL][filter2ptr-1] == 0xff)
+                        if (song.ltable[FTBL][filter2.ptr-1] == 0xff)
                             stopsong();
                     }
                 }
@@ -1345,21 +1347,21 @@ TICK0_S:
             case CMD_SETFILTERCTRL:
                 if (c < 3)
                 {
-                    filterctrl = cptr->newcmddata;
-                    if (!filterctrl) filterptr = 0;
+                    filter.ctrl = cptr->newcmddata;
+                    if (!filter.ctrl) filter.ptr = 0;
                 }
                 else
                 {
-                    filter2ctrl = cptr->newcmddata;
-                    if (!filter2ctrl) filter2ptr = 0;
+                    filter2.ctrl = cptr->newcmddata;
+                    if (!filter2.ctrl) filter2.ptr = 0;
                 }
                 break;
 
             case CMD_SETFILTERCUTOFF:
                 if (c < 3)
-                    filtercutoff = cptr->newcmddata;
+                    filter.cutoff = cptr->newcmddata;
                 else
-                    filter2cutoff = cptr->newcmddata;
+                    filter2.cutoff = cptr->newcmddata;
                 break;
 
             case CMD_SETMASTERVOL:
@@ -1561,23 +1563,23 @@ WAVEEXEC_S:
                         case CMD_SETFILTERPTR:
                             if (c < 3)
                             {
-                                filterptr = param;
-                                filtertime = 0;
-                                if (filterptr)
+                                filter.ptr = param;
+                                filter.time = 0;
+                                if (filter.ptr)
                                 {
                                     // Stop the song in case of jumping into a jump
-                                    if (song.ltable[FTBL][filterptr-1] == 0xff)
+                                    if (song.ltable[FTBL][filter.ptr-1] == 0xff)
                                         stopsong();
                                 }
                             }
                             else
                             {
-                                filter2ptr = param;
-                                filter2time = 0;
-                                if (filter2ptr)
+                                filter2.ptr = param;
+                                filter2.time = 0;
+                                if (filter2.ptr)
                                 {
                                     // Stop the song in case of jumping into a jump
-                                    if (song.ltable[FTBL][filter2ptr-1] == 0xff)
+                                    if (song.ltable[FTBL][filter2.ptr-1] == 0xff)
                                         stopsong();
                                 }
                             }
@@ -1586,21 +1588,21 @@ WAVEEXEC_S:
                         case CMD_SETFILTERCTRL:
                             if (c < 3)
                             {
-                                filterctrl = param;
-                                if (!filterctrl) filterptr = 0;
+                                filter.ctrl = param;
+                                if (!filter.ctrl) filter.ptr = 0;
                             }
                             else
                             {
-                                filter2ctrl = param;
-                                if (!filter2ctrl) filter2ptr = 0;
+                                filter2.ctrl = param;
+                                if (!filter2.ctrl) filter2.ptr = 0;
                             }
                             break;
 
                         case CMD_SETFILTERCUTOFF:
                             if (c < 3)
-                                filtercutoff = param;
+                                filter.cutoff = param;
                             else
-                                filter2cutoff = param;
+                                filter2.cutoff = param;
                             break;
 
                         case CMD_SETMASTERVOL:
@@ -1913,13 +1915,15 @@ void sequencer(int c, Chn *cptr)
       }
     }
     // Transpose
-    if ((song.order[psnum][c][cptr->songptr] >= TRANSDOWN) && (song.order[psnum][c][cptr->songptr] < LOOPSONG))
+    if ((song.order[psnum][c][cptr->songptr] >= TRANSDOWN) &&
+        (song.order[psnum][c][cptr->songptr] < LOOPSONG))
     {
       cptr->trans = song.order[psnum][c][cptr->songptr]-TRANSUP;
       cptr->songptr++;
     }
     // Repeat
-    if ((song.order[psnum][c][cptr->songptr] >= REPEAT) && (song.order[psnum][c][cptr->songptr] < TRANSDOWN))
+    if ((song.order[psnum][c][cptr->songptr] >= REPEAT) &&
+        (song.order[psnum][c][cptr->songptr] < TRANSDOWN))
     {
       cptr->repeat = song.order[psnum][c][cptr->songptr]-REPEAT;
       cptr->songptr++;
@@ -1941,7 +1945,11 @@ void sequencer(int c, Chn *cptr)
       cptr->pattptr = 0;
 
     // Check for playback endpos
-    if ((lastsonginit != PLAY_BEGINNING) && (esend[c] > 0) && (esend[c] > espos[c]) && (cptr->songptr > esend[c]) && (espos[c] < song.len[psnum][c]))
+    if ((lastsonginit != PLAY_BEGINNING) &&
+        (esend[c] > 0) &&
+        (esend[c] > espos[c]) &&
+        (cptr->songptr > esend[c]) &&
+        (espos[c] < song.len[psnum][c]))
       cptr->songptr = espos[c];
   }
 SEQDONE:
