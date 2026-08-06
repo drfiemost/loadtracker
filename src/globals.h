@@ -16,18 +16,27 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#ifndef DISPLAY_H
-#define DISPLAY_H
+#ifndef GLOBALS_H
+#define GLOBALS_H
 
-#include "file.h"
+#include "table.h"
 
-#ifndef DISPLAY_C
-extern const char *notename[];
-#endif
+extern Tables tables;
 
-void printmainscreen();
-void displayupdate();
-void printstatus();
-void settooltip(const char *msg);
+extern const char *programname;
+
+extern char textbuffer[MAX_PATHNAME];
+
+extern bool menu;
+extern int editmode;
+extern bool recordmode;
+extern bool followplay;
+extern int hexnybble;
+extern bool exitprogram;
+extern int eacolumn;
+extern int epcolumn;
+extern int enpos;
+extern int epoctave;
+extern EditHdr ehmode;
 
 #endif

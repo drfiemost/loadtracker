@@ -22,6 +22,7 @@
 
 #define PATTERN_C
 
+#include "globals.h"
 #include "console.h"
 #include "display.h"
 #include "instr.h"

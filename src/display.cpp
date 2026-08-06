@@ -25,6 +25,7 @@
 #include "display.h"
 
 #include "common.h"
+#include "globals.h"
 #include "channels.h"
 #include "colors.h"
 #include "console.h"
@@ -46,8 +47,6 @@
 #include <cstdio>
 #include <cstring>
 
-const char *programname;
-
 const char *notename[] =
 {
   "C-0", "C#0", "D-0", "D#0", "E-0", "F-0", "F#0", "G-0", "G#0", "A-0", "A#0", "B-0",
@@ -59,23 +58,6 @@ const char *notename[] =
   "C-6", "C#6", "D-6", "D#6", "E-6", "F-6", "F#6", "G-6", "G#6", "A-6", "A#6", "B-6",
   "C-7", "C#7", "D-7", "D#7", "E-7", "F-7", "F#7", "G-7", "G#7", "...", "---", "+++"
 };
-
-char textbuffer[MAX_PATHNAME];
-
-Tables tables;
-
-bool menu = false;
-int editmode = EDIT_PATTERN;
-bool recordmode = true;
-bool followplay = false;
-int hexnybble = -1;
-bool exitprogram = false;
-int eacolumn = 0;
-int epcolumn;
-int eamode = 0;
-int enpos;
-int epoctave = 2;
-EditHdr ehmode = EditHdr::NONE;
 
 std::string tooltip;
 

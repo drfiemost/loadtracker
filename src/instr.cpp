@@ -24,6 +24,7 @@
 
 #include "instr.h"
 
+#include "globals.h"
 #include "console.h"
 #include "display.h"
 #include "pattern.h"

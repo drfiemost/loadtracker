@@ -36,6 +36,7 @@ set(LOADTRK_SOURCES
     ${CMAKE_BINARY_DIR}/src/ltrkdata.cpp
     src/loadtrk.cpp
     src/configfile.cpp
+    src/globals.cpp
     src/song.cpp
     src/order.cpp
     src/pattern.cpp
@@ -100,7 +101,7 @@ set(LTRELOC_SOURCES
     src/instr.cpp
     src/table.cpp
     src/play.cpp
-    src/display.cpp
+    src/globals.cpp
     src/file.cpp
     src/reloc.cpp
     src/console.cpp

@@ -24,6 +24,7 @@
 
 #include "play.h"
 
+#include "globals.h"
 #include "channels.h"
 #include "display.h"
 #include "order.h"

@@ -25,6 +25,7 @@
 #include "song.h"
 
 #include "common.h"
+#include "globals.h"
 #include "channels.h"
 #include "display.h"
 #include "file.h"

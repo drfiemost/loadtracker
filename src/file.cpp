@@ -24,6 +24,7 @@
 
 #include "file.h"
 
+#include "globals.h"
 #include "colors.h"
 #include "console.h"
 #include "display.h"

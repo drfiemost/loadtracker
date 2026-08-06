@@ -24,6 +24,7 @@
 
 #include "reloc.h"
 
+#include "globals.h"
 #include "colors.h"
 #include "console.h"
 #include "display.h"
@@ -1877,8 +1878,10 @@ PRCLEANUP:
   if (pattwork) delete [] pattwork;
   if (songwork) delete [] songwork;
   if (instrwork) delete [] instrwork;
+#ifndef LTRELOC
   printmainscreen();
   input.clearkeys();
+#endif
 }
 
 int packpattern(unsigned char *dest, unsigned char *src, int rows)

@@ -19,6 +19,7 @@
 #include "commands.h"
 
 #include "common.h"
+#include "globals.h"
 #include "console.h"
 #include "display.h"
 #include "instr.h"

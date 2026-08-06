@@ -26,9 +26,9 @@
 
 #include "config.h"
 
+#include "globals.h"
 #include "channels.h"
 #include "colors.h"
-#include "display.h"
 #include "file.h"
 #include "pattern.h"
 #include "reloc.h"
@@ -346,10 +346,10 @@ int main(int argc, char **argv)
   return EXIT_SUCCESS;
 }
 
-void writereg(int, unsigned char)
-{
-}
+// in file.cpp
+void printmainscreen() {}
+void printstatus() {}
 
-void writereg2(int, unsigned char)
-{
-}
+// in play.cpp
+void writereg(int, unsigned char) {}
+void writereg2(int, unsigned char) {}
