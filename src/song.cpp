@@ -44,6 +44,10 @@
 
 Song song;
 
+char loadedsongfilename[MAX_FILENAME];
+char songfilename[MAX_FILENAME];
+char instrfilename[MAX_FILENAME];
+
 std::bitset<MAX_PATT> pattused;
 int pattlen[MAX_PATT];
 int highestusedpattern;

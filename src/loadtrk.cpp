@@ -133,6 +133,7 @@ int main(int argc, char **argv)
   loadconfig();
 
   // Init pathnames
+  initdirentries();
   initpaths();
 
   bool dark = config.darkmode != 0;
@@ -287,6 +288,7 @@ int main(int argc, char **argv)
           std::strcpy(startpath, argv[c]);
           startpath[d+1] = 0;
           chdir(startpath);
+          initdirentries();
           initpaths();
           std::strcpy(songfilename, &argv[c][d+1]);
           break;

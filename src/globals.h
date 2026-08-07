@@ -27,6 +27,12 @@ extern const char *programname;
 
 extern char textbuffer[MAX_PATHNAME];
 
+extern char songpath[MAX_PATHNAME];
+extern char instrpath[MAX_PATHNAME];
+extern char packedpath[MAX_PATHNAME];
+extern char songfilter[MAX_FILENAME];
+extern char instrfilter[MAX_FILENAME];
+
 extern bool menu;
 extern int editmode;
 extern bool recordmode;
@@ -38,5 +44,7 @@ extern int epcolumn;
 extern int enpos;
 extern int epoctave;
 extern EditHdr ehmode;
+
+void initpaths();
 
 #endif

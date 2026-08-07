@@ -21,19 +21,7 @@
 
 #include "common.h"
 
-#ifndef FILE_C
-extern char loadedsongfilename[MAX_FILENAME];
-extern char songfilename[MAX_FILENAME];
-extern char instrfilename[MAX_FILENAME];
-
-extern char songpath[MAX_PATHNAME];
-extern char instrpath[MAX_PATHNAME];
-extern char packedpath[MAX_PATHNAME];
-extern char songfilter[MAX_FILENAME];
-extern char instrfilter[MAX_FILENAME];
-#endif
-
-void initpaths();
+void initdirentries();
 bool fileselector(char *name, char *path, char *filter, const char *title, int filemode);
 
 #endif

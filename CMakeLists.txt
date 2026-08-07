@@ -102,7 +102,6 @@ set(LTRELOC_SOURCES
     src/table.cpp
     src/play.cpp
     src/globals.cpp
-    src/file.cpp
     src/reloc.cpp
     src/console.cpp
     src/colors.cpp

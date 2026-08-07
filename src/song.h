@@ -63,6 +63,10 @@ public:
 
 
 #ifndef SONG_C
+extern char loadedsongfilename[MAX_FILENAME];
+extern char songfilename[MAX_FILENAME];
+extern char instrfilename[MAX_FILENAME];
+
 extern Song song;
 extern std::bitset<MAX_PATT> pattused;
 #endif

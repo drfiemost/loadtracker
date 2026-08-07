@@ -60,35 +60,12 @@ struct Direntry
 
 Direntry direntry[MAX_DIRFILES];
 
-char loadedsongfilename[MAX_FILENAME];
-char songfilename[MAX_FILENAME];
-char instrfilename[MAX_FILENAME];
-
-char songpath[MAX_PATHNAME];
-char instrpath[MAX_PATHNAME];
-char packedpath[MAX_PATHNAME];
-char songfilter[MAX_FILENAME];
-char instrfilter[MAX_FILENAME];
-
 int cmpname(char *string1, char *string2);
 
-void initpaths()
+void initdirentries()
 {
   for (int c = 0; c < MAX_DIRFILES; c++)
      direntry[c].name = nullptr;
-
-  std::memset(loadedsongfilename, 0, sizeof loadedsongfilename);
-  std::memset(songfilename, 0, sizeof songfilename);
-  std::memset(instrfilename, 0, sizeof instrfilename);
-  std::memset(songpath, 0, sizeof songpath);
-  std::memset(instrpath, 0, sizeof instrpath);
-  std::memset(packedpath, 0, sizeof packedpath);
-  std::strcpy(songfilter, "*.sng");
-  std::strcpy(instrfilter, "*.ins");
-
-  getcwd(songpath, MAX_PATHNAME);
-  std::strcpy(instrpath, songpath);
-  std::strcpy(packedpath, songpath);
 }
 
 bool fileselector(char *name, char *path, char *filter, const char *title, int filemode)

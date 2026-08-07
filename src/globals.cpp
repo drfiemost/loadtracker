@@ -16,11 +16,23 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
+#include "common.h"
 #include "table.h"
+#include "song.h"
+
+#include <cstring>
+
+#include <unistd.h>
 
 const char *programname;
 
 char textbuffer[MAX_PATHNAME];
+
+char songpath[MAX_PATHNAME];
+char instrpath[MAX_PATHNAME];
+char packedpath[MAX_PATHNAME];
+char songfilter[MAX_FILENAME];
+char instrfilter[MAX_FILENAME];
 
 Tables tables;
 
@@ -36,3 +48,19 @@ int eamode = 0;
 int enpos;
 int epoctave = 2;
 EditHdr ehmode = EditHdr::NONE;
+
+void initpaths()
+{
+  std::memset(loadedsongfilename, 0, sizeof loadedsongfilename);
+  std::memset(songfilename, 0, sizeof songfilename);
+  std::memset(instrfilename, 0, sizeof instrfilename);
+  std::memset(songpath, 0, sizeof songpath);
+  std::memset(instrpath, 0, sizeof instrpath);
+  std::memset(packedpath, 0, sizeof packedpath);
+  std::strcpy(songfilter, "*.sng");
+  std::strcpy(instrfilter, "*.ins");
+
+  getcwd(songpath, MAX_PATHNAME);
+  std::strcpy(instrpath, songpath);
+  std::strcpy(packedpath, songpath);
+}
