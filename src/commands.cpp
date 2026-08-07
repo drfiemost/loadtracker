@@ -87,6 +87,8 @@ void clear(bool cs, bool cp, bool ci, bool cf, bool cn)
 {
     if (ci)
         std::memset(&instrcopybuffer, 0, sizeof(Instr));
+    stopsong();
+    resetmasterfader();
     clearsong(cs, cp, ci, cf, cn);
 }
 
@@ -350,26 +352,44 @@ void patterncommands()
       }
     }
 
-    if (newnote >= 0) {
+    if (newnote >= 0)
+    {
+        playtestnote(newnote, einum, epchn);
         insertnote(newnote);
     }
   }
   switch(input.rawkey)
   {
     case KEY_O:
-    if (input.shiftpressed) shrinkpattern();
+    if (input.shiftpressed)
+    {
+        stopsong();
+        shrinkpattern();
+    }
     break;
 
     case KEY_P:
-    if (input.shiftpressed) expandpattern();
+    if (input.shiftpressed)
+    {
+        stopsong();
+        expandpattern();
+    }
     break;
 
     case KEY_J:
-    if (input.shiftpressed) joinpattern();
+    if (input.shiftpressed)
+    {
+        stopsong();
+        joinpattern();
+    }
     break;
 
     case KEY_K:
-    if (input.shiftpressed) splitpattern();
+    if (input.shiftpressed)
+    {
+        stopsong();
+        splitpattern();
+    }
     break;
 
     case KEY_Z:

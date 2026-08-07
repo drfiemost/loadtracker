@@ -37,7 +37,9 @@ int current_note_on = -1;
 void noteOn(unsigned char note)
 {
     current_note_on = note;
-    insertnote(note + 72);
+    int newnote = note + 72;
+    insertnote(newnote);
+    playtestnote(newnote, einum, epchn);
     epview[epchn] = eppos-VISIBLEPATTROWS/2;
 }
 

@@ -28,7 +28,6 @@
 #include "instr.h"
 #include "order.h"
 #include "pattern.h"
-#include "play.h"
 #include "reloc.h"
 #include "settings.h"
 #include "song.h"
@@ -79,7 +78,6 @@ void insertnote(int newnote)
             }
         }
     }
-    playtestnote(newnote, einum, epchn);
 }
 
 void patterndown(int n)
@@ -146,8 +144,6 @@ void shrinkpattern()
 
   if (getPattlen(c) < 2) return;
 
-  stopsong();
-
   int l = getPattlen(c);
   int nl = l/2;
 
@@ -175,8 +171,6 @@ void expandpattern()
   int l = getPattlen(c);
   int nl = l*2;
   if (nl > MAX_PATTROWS) return;
-
-  stopsong();
 
   unsigned char temp[MAX_PATTROWS*4+4];
   std::memset(temp, 0, sizeof temp);
@@ -213,8 +207,6 @@ void splitpattern()
   int maxChns = config.getMaxChannels();
 
   if ((eppos == 0) || (eppos == l)) return;
-
-  stopsong();
 
   if (insertpattern(c))
   {
@@ -267,8 +259,6 @@ void joinpattern()
   int d = song.order[esnum][epchn][eseditpos + 1];
   if (d >= MAX_PATT) return;
   if (getPattlen(c) + getPattlen(d) > MAX_PATTROWS) return;
-
-  stopsong();
 
   if (insertpattern(c))
   {

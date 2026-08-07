@@ -1251,6 +1251,8 @@ void load()
     {
       if (fileselector(songfilename, songpath, songfilter, "LOAD SONG", 0))
       {
+        stopsong();
+        resetmasterfader();
         SngType type = loadsong();
         switchMode((type == SngType::DUAL) ? 2 : 1);
       }
@@ -1266,7 +1268,10 @@ void load()
     if (einum)
     {
       if (fileselector(instrfilename, instrpath, instrfilter, "LOAD INSTRUMENT", 0))
+      {
+        stopsong();
         loadinstrument();
+      }
     }
   }
   input.clearkeys();

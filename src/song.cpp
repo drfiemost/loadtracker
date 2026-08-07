@@ -32,7 +32,6 @@
 #include "instr.h"
 #include "order.h"
 #include "pattern.h"
-#include "play.h"
 #include "reloc.h"
 #include "settings.h"
 #include "table.h"
@@ -1201,7 +1200,6 @@ void loadinstrument()
     int pulsestart = -1;
     int pulseend = -1;
 
-    stopsong();
     std::fread(ident, 4, 1, handle);
 
     if ((!std::memcmp(ident, "GTI3", 4)) || (!std::memcmp(ident, "GTI4", 4)) || (!std::memcmp(ident, "GTI5", 4)))
@@ -1577,9 +1575,6 @@ void clearsong(bool cs, bool cp, bool ci, bool ct, bool cn)
 {
   if (!(cs | cp | ci | ct | cn)) return;
 
-  stopsong();
-
-  resetmasterfader();
   epmark.chn = -1;
   tables.clear();
   esmark.chn = -1;

@@ -100,7 +100,6 @@ set(LTRELOC_SOURCES
     src/pattern.cpp
     src/instr.cpp
     src/table.cpp
-    src/play.cpp
     src/globals.cpp
     src/reloc.cpp
     src/console.cpp
@@ -108,6 +107,7 @@ set(LTRELOC_SOURCES
     src/channels.cpp
     src/settings.cpp
     src/tuning.cpp
+    src/play.cpp
     src/timer.cpp
     src/ltlog.cpp
     src/bme/bme_win.cpp
