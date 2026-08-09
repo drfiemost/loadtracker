@@ -5,8 +5,6 @@
 
 #include <SDL3/SDL.h>
 
-constexpr int MAX_COLORS = 16;
-
 constexpr int MAX_COLUMNS = 128;
 constexpr int MAX_ROWS    =  40;
 
@@ -15,6 +13,14 @@ enum
   MOUSEB_LEFT   = 1,
   MOUSEB_RIGHT  = 2,
   MOUSEB_MIDDLE = 4
+};
+
+struct Mouse
+{
+    unsigned xpos;
+    unsigned ypos;
+    unsigned buttons;
+    float wheel;
 };
 
 bool win_openwindow(const char *appname);
@@ -37,9 +43,7 @@ void gfx_freecursor();
 
 bool gfx_loadcharset(const char *name, unsigned char *chardata);
 
-void mou_getpos(unsigned *x, unsigned *y);
-unsigned mou_getbuttons();
-float mou_getwheel();
+Mouse mou_get();
 
 int key_get();
 int key_getraw();

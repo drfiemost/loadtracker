@@ -16,6 +16,8 @@
 #include <cstdlib>
 #include <cstring>
 
+constexpr int MAX_COLORS = 16;
+
 // Colodore palette
 unsigned char gfx_palette[MAX_COLORS * 3] =
 {
@@ -53,12 +55,10 @@ bool win_quitted = false;
 bool win_keytable[SDL_SCANCODE_COUNT] = {false};
 bool win_keystate[SDL_SCANCODE_COUNT] = {false};
 unsigned char win_asciikey = 0;
-unsigned win_mousexpos = 0;
-unsigned win_mouseypos = 0;
 unsigned win_mousexrel = 0;
 unsigned win_mouseyrel = 0;
-unsigned win_mousebuttons = 0;
-float win_mouseywheel = 0.f;
+
+Mouse mouse = {};
 
 bool gfx_initted = false;
 bool gfx_redraw = false;
@@ -202,7 +202,7 @@ void win_checkmessages()
     SDL_Event event;
     unsigned keynum;
 
-    win_mouseywheel = 0.f;
+    mouse.wheel = 0.f;
     win_asciikey = 0;
 
     SDL_PumpEvents();
@@ -212,8 +212,8 @@ void win_checkmessages()
         switch (event.type)
         {
             case SDL_EVENT_MOUSE_MOTION:
-            win_mousexpos = event.motion.x;
-            win_mouseypos = event.motion.y;
+            mouse.xpos = event.motion.x;
+            mouse.ypos = event.motion.y;
             win_mousexrel += event.motion.xrel;
             win_mouseyrel += event.motion.yrel;
             break;
@@ -222,15 +222,15 @@ void win_checkmessages()
             switch(event.button.button)
             {
                 case SDL_BUTTON_LEFT:
-                win_mousebuttons |= MOUSEB_LEFT;
+                mouse.buttons |= MOUSEB_LEFT;
                 break;
 
                 case SDL_BUTTON_MIDDLE:
-                win_mousebuttons |= MOUSEB_MIDDLE;
+                mouse.buttons |= MOUSEB_MIDDLE;
                 break;
 
                 case SDL_BUTTON_RIGHT:
-                win_mousebuttons |= MOUSEB_RIGHT;
+                mouse.buttons |= MOUSEB_RIGHT;
                 break;
             }
             break;
@@ -239,21 +239,21 @@ void win_checkmessages()
             switch(event.button.button)
             {
                 case SDL_BUTTON_LEFT:
-                win_mousebuttons &= ~MOUSEB_LEFT;
+                mouse.buttons &= ~MOUSEB_LEFT;
                 break;
 
                 case SDL_BUTTON_MIDDLE:
-                win_mousebuttons &= ~MOUSEB_MIDDLE;
+                mouse.buttons &= ~MOUSEB_MIDDLE;
                 break;
 
                 case SDL_BUTTON_RIGHT:
-                win_mousebuttons &= ~MOUSEB_RIGHT;
+                mouse.buttons &= ~MOUSEB_RIGHT;
                 break;
             }
             break;
 
             case SDL_EVENT_MOUSE_WHEEL:
-            win_mouseywheel = event.wheel.y;
+            mouse.wheel = event.wheel.y;
             break;
 
             case SDL_EVENT_QUIT:
@@ -629,28 +629,14 @@ void gfx_drawcursor(int x, int y)
     SDL_BlitSurface(gfx_cursor, NULL, gfx_screen, &dstrect);
 }
 
-void mou_getpos(unsigned *x, unsigned *y)
+Mouse mou_get()
 {
-    if (!gfx_initted)
+    if (gfx_initted)
     {
-        *x = win_mousexpos;
-        *y = win_mouseypos;
+        mouse.xpos *= gfx_virtualxsize / gfx_windowxsize;
+        mouse.ypos *= gfx_virtualysize / gfx_windowysize;
     }
-    else
-    {
-        *x = win_mousexpos * gfx_virtualxsize / gfx_windowxsize;
-        *y = win_mouseypos * gfx_virtualysize / gfx_windowysize;
-    }
-}
-
-unsigned mou_getbuttons()
-{
-    return win_mousebuttons;
-}
-
-float mou_getwheel()
-{
-    return win_mouseywheel;
+    return mouse;
 }
 
 int key_get()

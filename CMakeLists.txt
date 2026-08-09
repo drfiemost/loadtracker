@@ -108,7 +108,6 @@ set(LTRELOC_SOURCES
     src/tuning.cpp
     src/input.cpp
     src/ltlog.cpp
-    src/bme/bme_win.cpp
     src/bme/bme_io.cpp
     src/bme/bme_end.cpp)
 

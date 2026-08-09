@@ -449,12 +449,14 @@ void getkey()
 
   input.prevmouseb = input.mouseb;
 
-  mou_getpos(&mousepixelx, &mousepixely);
-  input.mouseb = mou_getbuttons();
+  Mouse m = mou_get();
+  mousepixelx = m.xpos;
+  mousepixely = m.ypos;
+  input.mouseb = m.buttons;
   input.mousex = mousepixelx / fontwidth;
   input.mousey = mousepixely / fontheight;
 
-  input.wheel = static_cast<int>(mou_getwheel());
+  input.wheel = static_cast<int>(m.wheel);
 
   if (input.mouseb) input.mouseheld++;
   else input.mouseheld = 0;
