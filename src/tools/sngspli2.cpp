@@ -2,7 +2,7 @@
  * GoatTracker V2.xx pattern splitter
  */
 
-#include "bme_end.h"
+#include "io_helpers.h"
 #include "common.h"
 
 #include <cstdio>

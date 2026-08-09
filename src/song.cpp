@@ -35,8 +35,7 @@
 #include "reloc.h"
 #include "settings.h"
 #include "table.h"
-
-#include "bme_end.h"
+#include "io_helpers.h"
 
 #include <cstring>
 #include <cstdio>

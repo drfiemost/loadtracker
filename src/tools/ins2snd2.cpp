@@ -2,7 +2,7 @@
  * GoatTracker V2.0 Instrument -> Sound effect convertor
  */
 
-#include "bme_end.h"
+#include "io_helpers.h"
 #include "common.h"
 
 #include <cstdio>

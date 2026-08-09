@@ -33,9 +33,9 @@
 #include "song.h"
 #include "table.h"
 #include "tuning.h"
+#include "io_helpers.h"
 
 #include "bme_main.h"
-#include "bme_end.h"
 #include "bme_win.h"
 #include "bme_io.h"
 #include "bme_snd.h"

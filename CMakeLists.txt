@@ -62,7 +62,7 @@ set(LOADTRK_SOURCES
     src/bme/bme_snd.cpp
     src/bme/bme_win.cpp
     src/bme/bme_io.cpp
-    src/bme/bme_end.cpp
+    src/io_helpers.cpp
     src/rtmidi/rtmidi_c.h
     src/rtmidi/rtmidi_c.cpp
     src/rtmidi/RtMidi.h
@@ -76,19 +76,19 @@ endif(MINGW)
 
 set(MOD2SNG_SOURCES
     src/tools/mod2sng.cpp
-    src/bme/bme_end.cpp)
+    src/io_helpers.cpp)
 
 set(INS2SND2_SOURCES
     src/tools/ins2snd2.cpp
-    src/bme/bme_end.cpp)
+    src/io_helpers.cpp)
 
 set(SNGSPLI2_SOURCES
     src/tools/sngspli2.cpp
-    src/bme/bme_end.cpp)
+    src/io_helpers.cpp)
 
 set(DATAFILE_SOURCES
     src/tools/datafile.cpp
-    src/bme/bme_end.cpp)
+    src/io_helpers.cpp)
 
 set(DAT2INC_SOURCES
     src/tools/dat2inc.cpp)
@@ -109,7 +109,7 @@ set(LTRELOC_SOURCES
     src/input.cpp
     src/ltlog.cpp
     src/bme/bme_io.cpp
-    src/bme/bme_end.cpp)
+    src/io_helpers.cpp)
 
 include_directories(${CMAKE_BINARY_DIR}/src)
 include_directories(${CMAKE_SOURCE_DIR}/src)
