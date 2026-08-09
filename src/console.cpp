@@ -27,10 +27,9 @@
 #include "colors.h"
 #include "input.h"
 #include "settings.h"
-
-#include "bme_main.h"
-#include "bme_win.h"
-#include "bme_io.h"
+#include "sdl_gui.h"
+#include "sdl_keys.h"
+#include "sdl_io.h"
 
 #include <new>
 

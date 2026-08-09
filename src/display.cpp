@@ -37,10 +37,8 @@
 #include "settings.h"
 #include "song.h"
 #include "timer.h"
-
-#include "bme_main.h"
-#include "bme_snd.h"
-#include "bme_win.h"
+#include "sdl_gui.h"
+#include "sdl_sound.h"
 
 #include <utility>
 #include <string>

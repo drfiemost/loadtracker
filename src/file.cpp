@@ -30,9 +30,8 @@
 #include "input.h"
 #include "display.h"
 #include "play.h"
-
-#include "bme_main.h"
-#include "bme_win.h"
+#include "sdl_gui.h"
+#include "sdl_keys.h"
 
 #include <cstring>
 #include <cctype>

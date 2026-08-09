@@ -41,11 +41,10 @@
 #include "table.h"
 #include "timer.h"
 #include "tuning.h"
-
-#include "bme_main.h"
-#include "bme_win.h"
-#include "bme_snd.h"
-#include "bme_io.h"
+#include "sdl_gui.h"
+#include "sdl_keys.h"
+#include "sdl_sound.h"
+#include "sdl_io.h"
 
 #include <bitset>
 

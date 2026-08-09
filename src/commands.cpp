@@ -32,8 +32,7 @@
 #include "song.h"
 #include "table.h"
 #include "tuning.h"
-
-#include "bme_main.h"
+#include "sdl_keys.h"
 
 #include <cstring>
 

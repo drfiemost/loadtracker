@@ -34,9 +34,7 @@
 #include "settings.h"
 #include "song.h"
 #include "tuning.h"
-
-#include "bme_io.h"
-#include "bme_win.h"
+#include "sdl_io.h"
 
 #ifdef _WIN32
 #  include <windows.h>

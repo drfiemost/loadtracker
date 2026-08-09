@@ -29,8 +29,7 @@
 #include "play.h"
 #include "settings.h"
 #include "sid.h"
-
-#include "bme_snd.h"
+#include "sdl_sound.h"
 
 #include <SDL3/SDL.h>
 

@@ -23,8 +23,7 @@
 #include "common.h"
 #include "file.h"
 #include "settings.h"
-
-#include "bme_win.h"
+#include "sdl_gui.h"
 
 #ifdef _WIN32
 #  include <windows.h>

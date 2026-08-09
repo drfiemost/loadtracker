@@ -34,16 +34,15 @@
 #include "table.h"
 #include "tuning.h"
 #include "io_helpers.h"
-
-#include "bme_main.h"
-#include "bme_win.h"
-#include "bme_io.h"
-#include "bme_snd.h"
+#include "sdl_keys.h"
+#include "sdl_io.h"
+#include "sdl_sound.h"
 
 #ifdef LTRELOC
 #  include "tools/ltreloc.h"
 #else
 #  include "loadtrk.h"
+#  include "sdl_gui.h"
 #endif
 
 #include "asm/buf.h"

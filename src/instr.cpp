@@ -33,8 +33,6 @@
 #include "song.h"
 #include "table.h"
 
-#include "bme_main.h"
-
 #include <cstring>
 
 int einum;

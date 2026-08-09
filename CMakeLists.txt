@@ -59,9 +59,9 @@ set(LOADTRK_SOURCES
     src/sid.cpp
     src/ltlog.cpp
     src/ltmidi.cpp
-    src/bme/bme_snd.cpp
-    src/bme/bme_win.cpp
-    src/bme/bme_io.cpp
+    src/sdl_sound.cpp
+    src/sdl_gui.cpp
+    src/sdl_io.cpp
     src/io_helpers.cpp
     src/rtmidi/rtmidi_c.h
     src/rtmidi/rtmidi_c.cpp
@@ -108,12 +108,11 @@ set(LTRELOC_SOURCES
     src/tuning.cpp
     src/input.cpp
     src/ltlog.cpp
-    src/bme/bme_io.cpp
+    src/sdl_io.cpp
     src/io_helpers.cpp)
 
 include_directories(${CMAKE_BINARY_DIR}/src)
 include_directories(${CMAKE_SOURCE_DIR}/src)
-include_directories(${CMAKE_SOURCE_DIR}/src/bme)
 
 find_package(SDL3 REQUIRED)
 

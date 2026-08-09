@@ -32,8 +32,6 @@
 #include "settings.h"
 #include "song.h"
 
-#include "bme_main.h"
-
 #include <utility>
 
 #include <cstring>
