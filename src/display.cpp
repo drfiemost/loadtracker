@@ -29,6 +29,7 @@
 #include "channels.h"
 #include "colors.h"
 #include "console.h"
+#include "input.h"
 #include "instr.h"
 #include "order.h"
 #include "pattern.h"

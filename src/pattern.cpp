@@ -24,6 +24,7 @@
 
 #include "globals.h"
 #include "console.h"
+#include "input.h"
 #include "display.h"
 #include "instr.h"
 #include "order.h"

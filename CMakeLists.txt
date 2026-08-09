@@ -51,6 +51,7 @@ set(LOADTRK_SOURCES
     src/console.cpp
     src/colors.cpp
     src/commands.cpp
+    src/input.cpp
     src/channels.cpp
     src/tuning.cpp
     src/timer.cpp
@@ -102,13 +103,10 @@ set(LTRELOC_SOURCES
     src/table.cpp
     src/globals.cpp
     src/reloc.cpp
-    src/console.cpp
-    src/colors.cpp
     src/channels.cpp
     src/settings.cpp
     src/tuning.cpp
-    src/play.cpp
-    src/timer.cpp
+    src/input.cpp
     src/ltlog.cpp
     src/bme/bme_win.cpp
     src/bme/bme_io.cpp

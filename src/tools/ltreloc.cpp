@@ -28,7 +28,6 @@
 
 #include "globals.h"
 #include "channels.h"
-#include "colors.h"
 #include "file.h"
 #include "pattern.h"
 #include "reloc.h"
@@ -313,9 +312,6 @@ int main(int argc, char **argv)
     }
   }
 
-  // Init colorscheme
-  colors.init(true);
-
   // Validate parameters
   config.validate();
 
@@ -349,6 +345,9 @@ int main(int argc, char **argv)
 // in file.cpp
 void printmainscreen() {}
 void printstatus() {}
+
+// in order.cpp
+void stopsong() {}
 
 // in play.cpp
 void writereg(int, unsigned char) {}

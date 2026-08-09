@@ -25,6 +25,7 @@
 #include "console.h"
 
 #include "colors.h"
+#include "input.h"
 #include "settings.h"
 
 #include "bme_main.h"
@@ -46,7 +47,6 @@ unsigned mousepixelx = 0;
 unsigned mousepixely = 0;
 unsigned oldmousepixelx = 0xffffffff;
 unsigned oldmousepixely = 0xffffffff;
-Input input;
 
 int cursorflash = 0;
 
@@ -76,17 +76,6 @@ Positions dpos =
     0,                          // statusTopX
     0                           // statusTopY
 };
-
-bool Input::iskeyyes()
-{
-    return (key == 'y') || (key == 'Y');
-}
-
-void Input::clearkeys()
-{
-    key = 0;
-    rawkey = 0;
-}
 
 void closescreen();
 void loadexternalpalette();

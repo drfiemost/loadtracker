@@ -23,6 +23,7 @@
 #include "globals.h"
 #include "colors.h"
 #include "console.h"
+#include "input.h"
 #include "display.h"
 
 #include "bme_main.h"

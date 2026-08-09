@@ -28,6 +28,7 @@
 #include "commands.h"
 #include "configfile.h"
 #include "console.h"
+#include "input.h"
 #include "display.h"
 #include "instr.h"
 #include "order.h"

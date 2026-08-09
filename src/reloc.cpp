@@ -27,6 +27,7 @@
 #include "globals.h"
 #include "colors.h"
 #include "console.h"
+#include "input.h"
 #include "display.h"
 #include "settings.h"
 #include "song.h"
@@ -200,7 +201,6 @@ void error(const char *msg)
 
 void table_error(TabError terr)
 {
-    clearscreen();
     switch (terr.type)
     {
         case ErrorType::JUMP:
@@ -250,6 +250,7 @@ TABLETYPE:
         break;
     }
 #ifndef LTRELOC
+    clearscreen();
     printtextc(MAX_ROWS/2, colors.ctitle(), textbuffer);
 
     fliptoscreen();
