@@ -77,31 +77,25 @@ bool sound_init(bool writer, const Settings &cfg)
 {
   sound_uninit();
 
-  if (cfg.multiplier)
+  if (cfg.ntsc)
   {
-    if (cfg.ntsc)
-    {
-      framerate = NTSCFRAMERATE * cfg.multiplier;
-      snd_bpmtempo = 150 * cfg.multiplier;
-    }
-    else
-    {
-      framerate = PALFRAMERATE * cfg.multiplier;
-      snd_bpmtempo = 125 * cfg.multiplier;
-    }
+    framerate = NTSCFRAMERATE;
+    snd_bpmtempo = 150;
   }
   else
   {
-    if (cfg.ntsc)
-    {
-      framerate = NTSCFRAMERATE / 2;
-      snd_bpmtempo = 150 / 2;
-    }
-    else
-    {
-      framerate = PALFRAMERATE / 2;
-      snd_bpmtempo = 125 / 2;
-    }
+    framerate = PALFRAMERATE;
+    snd_bpmtempo = 125;
+  }
+  if (cfg.multiplier)
+  {
+    framerate *= cfg.multiplier;
+    snd_bpmtempo *= cfg.multiplier;
+  }
+  else
+  {
+    framerate /= 2;
+    snd_bpmtempo /= 2;
   }
 
   if (cfg.exsid)
@@ -246,8 +240,8 @@ void sound_uninit()
 
 Uint32 sound_timer(void*, SDL_TimerID, Uint32 interval)
 {
-  if (!initted) return interval;
-  sound_playrout();
+  if (initted)
+    sound_playrout();
   return interval;
 }
 

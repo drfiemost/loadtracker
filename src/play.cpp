@@ -153,7 +153,7 @@ void playroutine()
   if (songinit == PLAY_STOP)
     followplay = false;
 
-  if ((songinit > 0) && (songinit < PLAY_STOPPED))
+  if ((songinit > PLAY_PLAYING) && (songinit < PLAY_STOPPED))
   {
     lastsonginit = songinit;
 
@@ -164,8 +164,11 @@ void playroutine()
 
     if ((songinit == PLAY_POS) || (songinit == PLAY_PATTERN))
     {
-      if ((espos[0] >= song.len[psnum][0]) || (espos[1] >= song.len[psnum][1]) || (espos[2] >= song.len[psnum][2]))
+      for (int c = 0; c < MAX_CHN_MONO; c++)
+      {
+        if (espos[c] >= song.len[psnum][c])
          songinit = PLAY_BEGINNING;
+      }
     }
 
     for (int c = 0; c < MAX_CHN_MONO; c++)
@@ -469,9 +472,8 @@ TICK0:
           funktable[0] = song.ltable[STBL][cptr->newcmddata-1]-1;
           funktable[1] = song.rtable[STBL][cptr->newcmddata-1]-1;
         }
-        chn[0].tempo = 0;
-        chn[1].tempo = 0;
-        chn[2].tempo = 0;
+        for (int d = 0; d < MAX_CHN_MONO; d++)
+            chn[d].tempo = 0;
         break;
 
         case CMD_SETTEMPO:
@@ -483,9 +485,8 @@ TICK0:
             cptr->tempo = newtempo;
           else
           {
-            chn[0].tempo = newtempo;
-            chn[1].tempo = newtempo;
-            chn[2].tempo = newtempo;
+            for (int d = 0; d < MAX_CHN_MONO; d++)
+              chn[d].tempo = newtempo;
           }
         }
         break;
@@ -496,7 +497,7 @@ TICK0:
         if (cptr->newcommand != CMD_TONEPORTA) goto NEXTCHN;
       }
 
-      WAVEEXEC:
+WAVEEXEC:
       if (cptr->ptr[WTBL])
       {
         unsigned char wave = song.ltable[WTBL][cptr->ptr[WTBL]-1];
@@ -1168,7 +1169,7 @@ FILTER2STOP_S:
                     cptr->tempo ^= 1;
                 }
                 // Check for illegally high gatetimer and stop the song in this case
-                if (chn->gatetimer > cptr->tick)
+                if (cptr->gatetimer > cptr->tick)
                     stopsong();
             }
             goto WAVEEXEC_S;
@@ -1376,11 +1377,8 @@ TICK0_S:
                     funktable[0] = song.ltable[STBL][cptr->newcmddata-1]-1;
                     funktable[1] = song.rtable[STBL][cptr->newcmddata-1]-1;
                 }
-                {
-                    int d;
-                    for (d = 0; d < MAX_CHN; d++)
-                        chn[d].tempo = 0;
-                }
+                for (int d = 0; d < MAX_CHN; d++)
+                    chn[d].tempo = 0;
                 break;
 
             case CMD_SETTEMPO:
@@ -1392,8 +1390,7 @@ TICK0_S:
                     cptr->tempo = newtempo;
                 else
                 {
-                    int d;
-                    for (d = 0; d < MAX_CHN; d++)
+                    for (int d = 0; d < MAX_CHN; d++)
                         chn[d].tempo = newtempo;
                 }
             }
@@ -1471,6 +1468,7 @@ WAVEEXEC_S:
                             if (!param)
                             {
                                 cptr->freq = targetfreq;
+                                cptr->lastnote = cptr->note;
                                 cptr->vibtime = 0;
                             }
                             else
@@ -1488,6 +1486,7 @@ WAVEEXEC_S:
                                     if (cptr->freq > targetfreq)
                                     {
                                         cptr->freq = targetfreq;
+                                        cptr->lastnote = cptr->note;
                                         cptr->vibtime = 0;
                                     }
                                 }
@@ -1497,6 +1496,7 @@ WAVEEXEC_S:
                                     if (cptr->freq < targetfreq)
                                     {
                                         cptr->freq = targetfreq;
+                                        cptr->lastnote = cptr->note;
                                         cptr->vibtime = 0;
                                     }
                                 }
@@ -1731,6 +1731,7 @@ TICKNEFFECTS_S:
                     if (!cptr->cmddata)
                     {
                         cptr->freq = targetfreq;
+                        cptr->lastnote = cptr->note;
                         cptr->vibtime = 0;
                     }
                     else
@@ -1748,6 +1749,7 @@ TICKNEFFECTS_S:
                             if (cptr->freq > targetfreq)
                             {
                                 cptr->freq = targetfreq;
+                                cptr->lastnote = cptr->note;
                                 cptr->vibtime = 0;
                             }
                         }
@@ -1757,6 +1759,7 @@ TICKNEFFECTS_S:
                             if (cptr->freq < targetfreq)
                             {
                                 cptr->freq = targetfreq;
+                                cptr->lastnote = cptr->note;
                                 cptr->vibtime = 0;
                             }
                         }

@@ -155,11 +155,11 @@ bool snd_init_jack()
 bool snd_init(unsigned mixrate, unsigned numsids)
 {
     // If user wants to re-initialize, shutdown first
-
     snd_uninit();
 
 #ifdef USE_JACK
-    if (use_jack) {
+    if (use_jack)
+    {
         snd_init_jack();
         if (use_jack_audio) return true;
     }
@@ -179,7 +179,6 @@ bool snd_init(unsigned mixrate, unsigned numsids)
     spec.channels = numsids;
 
     // Init tempo count
-
     snd_bpmcount = 0;
 
     stream = SDL_OpenAudioDeviceStream(SDL_AUDIO_DEVICE_DEFAULT_PLAYBACK, &spec, snd_mixer_callback, nullptr);
@@ -379,13 +378,14 @@ static void snd_mixdata(Uint8 *dest, unsigned bytes)
 
 int clip(int sample)
 {
-    if (sample > 32767) sample = 32767;
-    if (sample < -32768) sample = -32768;
+    if (sample > 32767) return 32767;
+    if (sample < -32768) return -32768;
     return sample;
 }
 
 #ifdef USE_JACK
-static void snd_jack_postprocess(Sint32* src, sample_t* dest, unsigned samples) {
+static void snd_jack_postprocess(Sint32* src, sample_t* dest, unsigned samples)
+{
     while (samples--)
     {
         int sample = clip(*src++);
@@ -394,7 +394,8 @@ static void snd_jack_postprocess(Sint32* src, sample_t* dest, unsigned samples) 
 }
 #endif
 
-static void snd_float_postprocess(Sint32* src, float* dest, unsigned samples) {
+static void snd_float_postprocess(Sint32* src, float* dest, unsigned samples)
+{
     while (samples--)
     {
         int sample = clip(*src++);

@@ -28,7 +28,6 @@
 
 #include "globals.h"
 #include "channels.h"
-#include "file.h"
 #include "pattern.h"
 #include "reloc.h"
 #include "settings.h"
@@ -340,13 +339,5 @@ int main(int argc, char **argv)
   return EXIT_SUCCESS;
 }
 
-// in file.cpp
-void printmainscreen() {}
-void printstatus() {}
-
 // in order.cpp
 void stopsong() {}
-
-// in play.cpp
-void writereg(int, unsigned char) {}
-void writereg2(int, unsigned char) {}
