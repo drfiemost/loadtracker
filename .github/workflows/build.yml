@@ -41,9 +41,8 @@ jobs:
           HOMEBREW_NO_INSTALL_CLEANUP: 1
         run: |
           brew update
-          brew install sdl3 libresidfp
-      - name: Install libresidfp (Linux)
-        if: runner.os == 'Linux'
+          brew install sdl3
+      - name: Install libresidfp
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
