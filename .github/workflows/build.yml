@@ -54,13 +54,6 @@ jobs:
           cd libresidfp*/.
           ./configure --disable-dependency-tracking
           make && sudo make install
-      - name: build-lib
-        run: |
-          cd subdir
-          tar -xf libresidfp*.tar.gz
-          cd libresidfp*/.
-          ./configure --disable-dependency-tracking
-          make && sudo make install
       - uses: actions/checkout@v7
       - name: Build
         run: |
