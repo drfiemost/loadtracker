@@ -1572,7 +1572,7 @@ PULSEDONE:
 
 void clearsong(bool cs, bool cp, bool ci, bool ct, bool cn)
 {
-  if (!(cs | cp | ci | ct | cn)) return;
+  if (!(cs || cp || ci || ct || cn)) return;
 
   epmark.chn = -1;
   tables.clear();

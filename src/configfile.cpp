@@ -36,6 +36,9 @@
 
 #include <sys/stat.h>
 
+char specialnotenames[186];
+char scalatuningfilepath[MAX_PATHNAME];
+
 void getparam(FILE *handle, unsigned *value);
 void getfloatparam(FILE *handle, float *value);
 void getstringparam(FILE *handle, char *value);

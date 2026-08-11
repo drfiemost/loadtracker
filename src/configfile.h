@@ -19,6 +19,9 @@
 #ifndef CONFIGFILE_H
 #define CONFIGFILE_H
 
+extern char specialnotenames[];
+extern char scalatuningfilepath[];
+
 void loadconfig();
 void saveconfig();
 

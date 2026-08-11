@@ -22,13 +22,6 @@
 // Increase if configuration has incompatible changes
 constexpr int CFG_VERSION = 2;
 
-#ifndef SETTINGS_C
-// config FIXME
-extern char specialnotenames[];
-extern char scalatuningfilepath[];
-
-#endif
-
 struct Settings
 {
     unsigned mixrate;

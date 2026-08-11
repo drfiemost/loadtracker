@@ -25,11 +25,6 @@
 
 Settings config;
 
-// config
-char specialnotenames[186];
-char scalatuningfilepath[MAX_PATHNAME];
-
-
 int Settings::getMaxChannels()
 {
     return (numsids == 1) ? MAX_CHN_MONO : MAX_CHN;

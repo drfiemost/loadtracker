@@ -22,7 +22,9 @@
 
 #include <SDL3/SDL.h>
 
+#include <algorithm>
 #include <new>
+#include <string>
 
 #include <cstdio>
 #include <cstdlib>
@@ -102,15 +104,8 @@ int io_open(const char *name)
 {
     if (!name || !io_datafileopen) return -1;
 
-    size_t namelength = std::strlen(name);
-    if (namelength > 12) namelength = 12;
-    char namecopy[13];
-    std::memcpy(namecopy, name, namelength + 1);
-    namelength = std::strlen(namecopy);
-    for (size_t index = 0; index < namelength; index++)
-    {
-        namecopy[index] = std::toupper(namecopy[index]);
-    }
+    std::string namecopy(name);
+    std::transform(namecopy.begin(), namecopy.end(), namecopy.begin(), [](char c) { return std::toupper(c); });
 
     for (size_t index = 0; index < MAX_HANDLES; index++)
     {
@@ -121,7 +116,7 @@ int io_open(const char *name)
 
             while (count)
             {
-                if (!std::strcmp(namecopy, handle[index].currentheader->name))
+                if (!std::strcmp(namecopy.c_str(), handle[index].currentheader->name))
                 {
                         handle[index].open = true;
                         handle[index].filepos = 0;
